@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/nav-bar/nav-bar",
+    "bill-form": "../../../components/bill-form/bill-form",
+    "skeleton": "../../../components/skeleton/skeleton"
+  },
+  "navigationBarTitleText": "账单详情"
+}

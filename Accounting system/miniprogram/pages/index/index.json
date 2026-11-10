@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../components/nav-bar/nav-bar",
+    "ui-icon": "../../components/ui-icon/ui-icon",
+    "drawer-menu": "../../components/drawer-menu/drawer-menu",
+    "parse-preview": "../../components/parse-preview/parse-preview"
+  }
+}

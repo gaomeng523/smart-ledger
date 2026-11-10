@@ -1,0 +1,98 @@
+.bill {
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  padding: 24rpx 0;
+}
+
+.bill--hover {
+  opacity: .7;
+}
+
+.bill__badge {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.bill__badge-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1C1D20;
+}
+
+.bill__main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+}
+
+.bill__title {
+  font-size: 30rpx;
+  color: var(--color-text);
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.bill__sub {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bill__sub-item {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  margin-right: 16rpx;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.bill__sub-item--remark {
+  max-width: 320rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 标签（V2 §4.10 ④） */
+.bill__tags {
+  margin-top: 8rpx;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.bill__tag {
+  margin: 0 var(--gap-xs) var(--gap-xs) 0;
+  padding: var(--gap-xxs) var(--gap-xs2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-text);
+  font-size: 24rpx;
+}
+
+.bill__amount {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bill__amount.is-expense {
+  color: var(--color-expense-strong);
+}
+
+.bill__amount.is-income {
+  color: var(--color-income-text);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}

@@ -1,0 +1,66 @@
+<view class="page">
+  <nav-bar back title="资产体检" />
+
+  <view class="body">
+    <view class="total">
+      <text class="total__k">净资产</text>
+      <view class="total__row">
+        <text class="total__cur">¥</text>
+        <text class="total__v num">{{netText}}</text>
+      </view>
+      <view class="total__sub">
+        <text>{{accountCount}} 个账户 · 手动维护</text>
+        <text class="total__debt">待还 ¥{{debtText}}</text>
+      </view>
+    </view>
+
+    <view class="card accounts">
+      <view class="card__head">
+        <text class="card__title">账户余额</text>
+        <text class="card__aside">点击修改 · 长按删除</text>
+      </view>
+
+      <view
+        wx:for="{{accounts}}"
+        wx:key="id"
+        class="acc"
+        hover-class="acc--hover"
+        data-id="{{item.id}}"
+        bindtap="onAccountTap"
+        bindlongpress="onAccountLongPress"
+      >
+        <view class="acc__ico" style="background-color:{{item.isDebt ? 'rgba(255,107,107,.12)' : 'rgba(255,255,255,.05)'}};">
+          <ui-icon name="{{item.icon}}" size="30" color="{{item.color}}" />
+        </view>
+        <view class="acc__main">
+          <text class="acc__name">{{item.name}}</text>
+          <text class="acc__sub">{{item.isDebt ? '负债' : '资产'}}</text>
+        </view>
+        <text class="acc__amt num {{item.isDebt ? 'is-debt' : ''}}">{{item.isDebt ? '-' : ''}}¥{{item.amountText}}</text>
+      </view>
+
+      <view class="acc acc--add" hover-class="acc--hover" bindtap="onAddAccount">
+        <view class="acc__ico"><ui-icon name="plus" size="28" color="#7B7C82" /></view>
+        <text class="acc__add-text">新增账户</text>
+      </view>
+    </view>
+
+    <view class="check">
+      <view class="check__head">
+        <ui-icon name="spark" size="26" color="#B49CFF" />
+        <text class="check__title">AI 体检</text>
+        <text class="check__score num" style="color:{{scoreColor}};">{{score}}<text class="check__unit">分</text></text>
+      </view>
+      <view class="check__bar">
+        <view class="check__bar-fill" style="width:{{score}}%;background-color:{{scoreColor}};"></view>
+      </view>
+      <text class="check__state" style="color:{{scoreColor}};">{{scoreText}}</text>
+      <view wx:for="{{findings}}" wx:key="key" class="check__item">
+        <view class="check__dot"></view>
+        <text class="check__text">{{item.text}}</text>
+      </view>
+    </view>
+
+    <view class="tip">账户余额只保存在本机，不会上传；记账流水仍以服务器为准。</view>
+  </view>
+</view>

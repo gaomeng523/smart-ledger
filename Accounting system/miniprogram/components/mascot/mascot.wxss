@@ -1,0 +1,483 @@
+/**
+ * 吉祥物「萌萌」— 云朵身体 + 硬币光环 + 钱包尾巴（§2.7）
+ *
+ * 全部用 em 绘制：根节点 font-size = size，内部尺寸按 em 等比缩放，
+ * 因此同一套样式可同时服务 96 / 160 / 240 rpx 三档尺寸。
+ * 深色版色板：body #1C1D20 / line #8A8B92 / eye #EDEDEC / blush #FF8FA3 /
+ * coin #FFB020 / wallet #57D9A3 / heart #FF8B8B；云朵形状写在 data URI 中，只能写死色值。
+ */
+
+.mascot {
+  position: relative;
+  display: block;
+}
+
+.mascot__art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ================= 头顶：硬币光环 ================= */
+
+.mascot__halo {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  width: .26em;
+  height: .11em;
+  margin-left: -.13em;
+  border: .032em solid #FFB020;
+  border-radius: 50%;
+  box-shadow: 0 0 .07em rgba(255, 176, 32, .5);
+  animation: mascot-halo 2.6s ease-in-out infinite;
+}
+
+@keyframes mascot-halo {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-9%); }
+}
+
+/* ================= 头顶：雨伞（网络异常） ================= */
+
+.mascot__umbrella {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: .56em;
+  height: .2em;
+  margin-left: -.28em;
+  background-color: var(--color-info);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.mascot__umbrella::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: .022em;
+  height: .2em;
+  margin-left: -.011em;
+  background-color: #8A8B92;
+}
+
+/* ================= 云朵身体 ================= */
+
+.mascot__body {
+  position: absolute;
+  top: 21%;
+  left: 8%;
+  width: 76%;
+  height: 67%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 88'%3E%3Cpath d='M24 78C11 78 3 69 3 58C3 47 11 39 22 38C25 23 38 13 53 13C68 13 81 24 83 38C93 40 97 48 97 58C97 69 91 78 80 78Z' fill='%231C1D20' stroke='%238A8B92' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* 眼睛：黑豆眼 + 高光 */
+.mascot__eye {
+  position: absolute;
+  top: 30%;
+  width: .12em;
+  height: .12em;
+  border-radius: 50%;
+  background-color: #EDEDEC;
+}
+
+.mascot__eye--left {
+  left: 24%;
+}
+
+.mascot__eye--right {
+  left: 54%;
+}
+
+.mascot__eye::after {
+  content: '';
+  position: absolute;
+  top: 16%;
+  right: 16%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background-color: #1C1D20;
+}
+
+/* 腮红 */
+.mascot__blush {
+  position: absolute;
+  top: 56%;
+  width: .12em;
+  height: .08em;
+  border-radius: 50%;
+  background-color: #FF8FA3;
+}
+
+.mascot__blush--left {
+  left: 2%;
+}
+
+.mascot__blush--right {
+  left: 68%;
+}
+
+/* 嘴巴：默认微笑 ∪ */
+.mascot__mouth {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  width: .085em;
+  height: .05em;
+  margin-left: -.0425em;
+  border-bottom: .026em solid #EDEDEC;
+  border-radius: 0 0 100% 100%;
+}
+
+/* ================= 短短圆圆的手 + 钱包尾巴 ================= */
+
+.mascot__arm {
+  position: absolute;
+  top: 58%;
+  width: .2em;
+  height: .15em;
+  border-radius: 50%;
+  background-color: #1C1D20;
+  border: .02em solid #8A8B92;
+}
+
+.mascot__arm--left {
+  left: 0;
+}
+
+.mascot__arm--right {
+  right: 0;
+}
+
+.mascot__tail {
+  position: absolute;
+  top: 62%;
+  right: 0;
+  width: .2em;
+  height: .17em;
+  background-color: #57D9A3;
+  border: .02em solid #8A8B92;
+  border-radius: .05em .05em .06em .06em;
+}
+
+/* 钱包搭扣 */
+.mascot__tail::after {
+  content: '';
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  width: .05em;
+  height: .05em;
+  margin-left: -.025em;
+  border-radius: 50%;
+  background-color: #8A8B92;
+  opacity: .5;
+}
+
+/* ================= 身前道具 ================= */
+
+/* 抱着小账本（期待） */
+.mascot__book {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  width: .26em;
+  height: .18em;
+  margin-left: -.13em;
+  background-color: var(--color-accent-mint);
+  border: .02em solid #8A8B92;
+  border-radius: .03em;
+}
+
+.mascot__book::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: .022em;
+  height: 100%;
+  margin-left: -.011em;
+  background-color: #8A8B92;
+  opacity: .45;
+}
+
+/* 抱着硬币（闪亮） */
+.mascot__coin {
+  position: absolute;
+  top: 73%;
+  left: 50%;
+  width: .19em;
+  height: .19em;
+  margin-left: -.095em;
+  border-radius: 50%;
+  background-color: #FFB020;
+  border: .022em solid #8A8B92;
+}
+
+.mascot__coin::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: .07em;
+  height: .07em;
+  margin: -.035em 0 0 -.035em;
+  border: .018em solid #8A8B92;
+  border-radius: 50%;
+  opacity: .6;
+}
+
+/* 抱臂（疑惑思考） */
+.mascot__cross {
+  position: absolute;
+  left: 50%;
+  width: .3em;
+  height: .07em;
+  margin-left: -.15em;
+  border-radius: 999rpx;
+  background-color: #1C1D20;
+  border: .02em solid #8A8B92;
+}
+
+.mascot__cross--left {
+  top: 58%;
+  transform: rotate(14deg);
+}
+
+.mascot__cross--right {
+  top: 62%;
+  transform: rotate(-14deg);
+}
+
+/* 蒙眼害羞的手 */
+.mascot__shy {
+  position: absolute;
+  top: 40%;
+  width: .17em;
+  height: .15em;
+  border-radius: 50%;
+  background-color: #1C1D20;
+  border: .02em solid #8A8B92;
+}
+
+.mascot__shy--left {
+  left: 22%;
+}
+
+.mascot__shy--right {
+  left: 47%;
+}
+
+/* 小爱心点缀 */
+.mascot__heart {
+  position: absolute;
+  width: .09em;
+  height: .09em;
+  background-color: #FF8B8B;
+  border-radius: .012em;
+  transform: rotate(45deg);
+}
+
+.mascot__heart::before,
+.mascot__heart::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #FF8B8B;
+}
+
+.mascot__heart::before {
+  left: -50%;
+}
+
+.mascot__heart::after {
+  top: -50%;
+}
+
+.mascot__heart--left {
+  top: 18%;
+  left: 2%;
+}
+
+.mascot__heart--right {
+  top: 10%;
+  right: 2%;
+}
+
+/* ================= 抱臂思考的三个小点 ================= */
+
+.mascot__dots {
+  position: absolute;
+  top: 14%;
+  right: 1%;
+  display: flex;
+  align-items: center;
+}
+
+.mascot__dot {
+  width: .05em;
+  height: .05em;
+  margin-left: .03em;
+  border-radius: 50%;
+  background-color: #8A8B92;
+}
+
+/* ================= 各状态的表情差异 ================= */
+
+/* idle 微笑：手举起来挥手 */
+.mascot__art--idle .mascot__arm--left {
+  animation: mascot-wave 1.9s ease-in-out infinite;
+}
+
+@keyframes mascot-wave {
+  0%, 100% { transform: translate(-.03em, -.12em) rotate(-14deg); }
+  50%      { transform: translate(-.03em, -.14em) rotate(12deg); }
+}
+
+/* expect 期待：眼睛略放大，抱着小账本 */
+.mascot__art--expect .mascot__eye {
+  transform: scale(1.08);
+}
+
+.mascot__art--expect .mascot__eye::after {
+  width: 38%;
+  height: 38%;
+}
+
+/* thinking 疑惑：短横嘴 */
+.mascot__art--thinking .mascot__mouth {
+  height: 0;
+  border-bottom: none;
+  border-top: .026em solid #EDEDEC;
+  border-radius: 0;
+}
+
+.mascot__art--thinking .mascot__dot {
+  animation: mascot-think 1.2s ease-in-out infinite;
+}
+
+.mascot__art--thinking .mascot__dot:nth-child(2) { animation-delay: .18s; }
+.mascot__art--thinking .mascot__dot:nth-child(3) { animation-delay: .36s; }
+
+@keyframes mascot-think {
+  0%, 100% { opacity: .25; transform: translateY(0); }
+  50%      { opacity: 1;   transform: translateY(-18%); }
+}
+
+/* success 开心：弯月眼 + 开口大笑 + 打滚 */
+.mascot__art--success .mascot__eye {
+  height: .07em;
+  margin-top: .02em;
+  background-color: transparent;
+  border-top: .028em solid #EDEDEC;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.mascot__art--success .mascot__eye::after {
+  display: none;
+}
+
+.mascot__art--success .mascot__mouth {
+  width: .1em;
+  height: .07em;
+  margin-left: -.05em;
+  border: none;
+  border-radius: .02em .02em .07em .07em;
+  background-color: #EDEDEC;
+}
+
+.mascot__art--success .mascot__arm--left {
+  transform: translate(-.04em, -.11em) rotate(-26deg);
+}
+
+.mascot__art--success .mascot__arm--right {
+  transform: translate(.04em, -.11em) rotate(26deg);
+}
+
+.mascot__art--success {
+  animation: mascot-roll .8s ease-in-out infinite;
+}
+
+@keyframes mascot-roll {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50%      { transform: rotate(5deg) translateY(-4%); }
+}
+
+/* wow 惊讶：小圆嘴 + 更大的腮红 */
+.mascot__art--wow .mascot__mouth {
+  width: .05em;
+  height: .05em;
+  margin-left: -.025em;
+  border: .022em solid #EDEDEC;
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.mascot__art--wow .mascot__blush {
+  width: .15em;
+  height: .1em;
+}
+
+/* empty / offline 委屈：下垂眼 + 下垂嘴 */
+.mascot__art--empty .mascot__eye,
+.mascot__art--offline .mascot__eye {
+  height: .07em;
+  margin-top: .03em;
+  background-color: transparent;
+  border-bottom: .028em solid #EDEDEC;
+  border-radius: 0 0 100% 100% / 0 0 100% 100%;
+}
+
+.mascot__art--empty .mascot__eye::after,
+.mascot__art--offline .mascot__eye::after {
+  display: none;
+}
+
+.mascot__art--empty .mascot__mouth,
+.mascot__art--offline .mascot__mouth {
+  border-bottom: none;
+  border-top: .026em solid #EDEDEC;
+  border-radius: 100% 100% 0 0;
+}
+
+/* shine 闪亮：高光变大 + 抱着硬币 */
+.mascot__art--shine .mascot__eye::after {
+  top: 12%;
+  right: 12%;
+  width: 42%;
+  height: 42%;
+}
+
+/* ================= 位图素材 ================= */
+
+.mascot__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mascot .is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 尊重系统「减弱动态效果」设置 */
+@media (prefers-reduced-motion: reduce) {
+  .mascot__halo,
+  .mascot__art--idle .mascot__arm--left,
+  .mascot__art--thinking .mascot__dot,
+  .mascot__art--success {
+    animation: none;
+  }
+}

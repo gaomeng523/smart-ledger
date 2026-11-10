@@ -1,0 +1,188 @@
+<view class="savings">
+  <view class="nav-fix"><nav-bar back title="心愿储蓄" /></view>
+
+  <view class="savings__head">
+    <view class="savings__new" hover-class="savings__new--hover" bindtap="openNew">+ 新建心愿</view>
+  </view>
+
+  <skeleton wx:if="{{loading}}" rows="{{3}}" />
+
+  <block wx:else>
+    <!-- 汇总 -->
+    <view wx:if="{{count > 0}}" class="summary card">
+      <view class="summary__cell">
+        <text class="summary__num num">¥{{totalSavedText}}</text>
+        <text class="summary__label">已存总额</text>
+      </view>
+      <view class="summary__cell">
+        <text class="summary__num num">{{count}}</text>
+        <text class="summary__label">心愿数</text>
+      </view>
+      <view class="summary__cell">
+        <text class="summary__num num">{{achieved}}</text>
+        <text class="summary__label">已达成</text>
+      </view>
+    </view>
+
+    <view wx:if="{{count === 0}}" bindtap="openNew">
+      <empty-state
+        mascotState="empty"
+        text="还没有心愿，新建一个吧"
+        actionText="新建心愿"
+        bind:action="openNew"
+      />
+    </view>
+
+    <view wx:else class="savings__list">
+      <view wx:for="{{items}}" wx:key="id" class="goal card {{item.done ? 'is-done' : ''}}">
+        <view class="goal__top">
+          <text class="goal__icon">{{item.icon}}</text>
+          <view class="goal__main">
+            <view class="goal__title-row">
+              <text class="goal__title">{{item.title}}</text>
+              <text wx:if="{{item.statusText}}" class="goal__badge {{item.done ? 'is-done' : ''}}">{{item.statusText}}</text>
+            </view>
+            <text class="goal__sub text-hint">{{item.subText}}</text>
+          </view>
+        </view>
+
+        <view class="bar">
+          <view class="bar__fill" style="width: {{item.percent}}%"></view>
+        </view>
+
+        <view class="goal__amounts">
+          <text class="goal__saved num">¥{{item.savedText}}</text>
+          <text class="goal__target text-hint">/ ¥{{item.targetText}}</text>
+          <text class="goal__pct num">{{item.percent}}%</text>
+        </view>
+
+        <view class="goal__ops">
+          <view class="op-btn op-btn--primary" data-id="{{item.id}}" catchtap="openAdd">存一笔</view>
+          <view wx:if="{{item.canWithdraw}}" class="op-btn" data-id="{{item.id}}" catchtap="openTake">取出</view>
+          <view class="op-btn" data-id="{{item.id}}" catchtap="openEdit">编辑</view>
+          <view class="op-btn op-btn--danger" data-id="{{item.id}}" catchtap="onDelete">删除</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+
+  <!-- ===== 新建 / 编辑弹层 ===== -->
+  <view wx:if="{{sheetVisible}}" class="mask" bindtap="closeSheet" catchtouchmove="noop"></view>
+  <view wx:if="{{sheetVisible}}" class="panel">
+    <view class="panel__header">
+      <text class="panel__title">{{sheetMode === 'edit' ? '编辑心愿' : '新建心愿'}}</text>
+      <text class="panel__close" bindtap="closeSheet">关闭</text>
+    </view>
+
+    <scroll-view class="panel__body" scroll-y>
+      <view class="panel__row">
+        <text class="panel__label">图标</text>
+        <view class="icons">
+          <text
+            wx:for="{{icons}}"
+            wx:key="*this"
+            class="icons__item {{selectedIcon === item ? 'is-active' : ''}}"
+            data-icon="{{item}}"
+            bindtap="onIconSelect"
+          >{{item}}</text>
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">名称</text>
+        <view class="panel__field">
+          <input
+            class="panel__text"
+            placeholder="如：换台新相机"
+            placeholder-class="panel__ph"
+            maxlength="20"
+            value="{{form.title}}"
+            bindinput="onTitleInput"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">目标金额</text>
+        <view class="panel__amount">
+          <text class="panel__prefix">¥</text>
+          <input
+            class="panel__input"
+            type="digit"
+            placeholder="0.00"
+            placeholder-class="panel__ph"
+            value="{{form.targetAmount}}"
+            bindinput="onTargetInput"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">计划日</text>
+        <view class="panel__field">
+          <picker mode="date" value="{{form.dueDate}}" bindchange="onDueChange">
+            <view class="panel__picker">
+              <text class="panel__picker-text {{form.dueDate ? '' : 'panel__ph'}}">{{form.dueDate || '选填，选个目标日期'}}</text>
+              <text class="panel__arrow">›</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="panel__footer">
+      <view
+        class="btn btn-primary panel__save {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--active'}}"
+        bindtap="onSheetSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+
+    <view class="safe-bottom"></view>
+  </view>
+
+  <!-- ===== 存 / 取金额弹层 ===== -->
+  <view wx:if="{{amountVisible}}" class="mask" bindtap="closeAmount" catchtouchmove="noop"></view>
+  <view wx:if="{{amountVisible}}" class="panel">
+    <view class="panel__header">
+      <text class="panel__title">{{amountTitle}}</text>
+      <text class="panel__close" bindtap="closeAmount">关闭</text>
+    </view>
+
+    <scroll-view class="panel__body" scroll-y>
+      <view class="panel__amount panel__amount--lg">
+        <text class="panel__prefix">¥</text>
+        <input
+          class="panel__input"
+          type="digit"
+          placeholder="0.00"
+          placeholder-class="panel__ph"
+          value="{{amountValue}}"
+          bindinput="onAmountInput"
+        />
+      </view>
+
+      <view class="quick">
+        <text
+          wx:for="{{quickAmounts}}"
+          wx:key="*this"
+          class="quick__item num"
+          data-value="{{item}}"
+          bindtap="onQuickTap"
+        >¥{{item}}</text>
+      </view>
+    </scroll-view>
+
+    <view class="panel__footer">
+      <view
+        class="btn btn-primary panel__save {{amountSaving ? 'btn--disabled' : ''}}"
+        hover-class="{{amountSaving ? '' : 'btn--active'}}"
+        bindtap="onAmountSave"
+      >{{amountSaving ? '处理中…' : '确定'}}</view>
+    </view>
+
+    <view class="safe-bottom"></view>
+  </view>
+</view>

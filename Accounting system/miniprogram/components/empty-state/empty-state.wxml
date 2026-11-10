@@ -1,0 +1,10 @@
+<view class="empty">
+  <mascot state="{{mascotState}}" size="{{160}}" />
+  <text class="empty__text">{{text}}</text>
+  <view
+    wx:if="{{actionText}}"
+    class="empty__btn"
+    hover-class="empty__btn--hover"
+    bindtap="onAction"
+  >{{actionText}}</view>
+</view>

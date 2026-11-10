@@ -1,0 +1,85 @@
+<view class="fp">
+  <view wx:if="{{visible}}" class="fp__mask" bindtap="close" catchtouchmove="noop"></view>
+
+  <view wx:if="{{visible}}" class="fp__panel">
+    <view class="fp__header">
+      <text class="fp__title">筛选</text>
+      <text class="fp__close" bindtap="close">关闭</text>
+    </view>
+
+    <scroll-view class="fp__body" scroll-y>
+      <!-- 金额区间 -->
+      <view class="fp__section">
+        <text class="fp__label">金额区间</text>
+        <view class="fp__range">
+          <input
+            class="fp__num num"
+            type="digit"
+            placeholder="最低"
+            placeholder-class="fp__ph"
+            value="{{draft.amountMin}}"
+            bindinput="onAmountMin"
+          />
+          <text class="fp__tilde">~</text>
+          <input
+            class="fp__num num"
+            type="digit"
+            placeholder="最高"
+            placeholder-class="fp__ph"
+            value="{{draft.amountMax}}"
+            bindinput="onAmountMax"
+          />
+        </view>
+      </view>
+
+      <!-- 日期区间 -->
+      <view class="fp__section">
+        <text class="fp__label">日期区间</text>
+        <view class="fp__range">
+          <picker mode="date" value="{{draft.dateStart}}" end="{{maxDate}}" bindchange="onDateStart">
+            <view class="fp__date">
+              <text class="{{draft.dateStart ? '' : 'fp__ph'}}">{{draft.dateStart || '开始'}}</text>
+            </view>
+          </picker>
+          <text class="fp__tilde">~</text>
+          <picker mode="date" value="{{draft.dateEnd}}" end="{{maxDate}}" bindchange="onDateEnd">
+            <view class="fp__date">
+              <text class="{{draft.dateEnd ? '' : 'fp__ph'}}">{{draft.dateEnd || '结束'}}</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- 标签 -->
+      <view class="fp__section">
+        <text class="fp__label">标签</text>
+        <tag-chips
+          mode="filter"
+          value="{{draft.tags}}"
+          suggestions="{{tags}}"
+          bind:change="onTagsChange"
+        />
+      </view>
+
+      <!-- 来源 -->
+      <view class="fp__section">
+        <text class="fp__label">来源</text>
+        <view class="fp__segment">
+          <view
+            wx:for="{{sourceOptions}}"
+            wx:key="value"
+            class="fp__segment-item {{draft.source === item.value ? 'is-active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onSourceTap"
+          >{{item.label}}</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="fp__footer">
+      <view class="fp__btn fp__btn--ghost" bindtap="onReset">重置</view>
+      <view class="fp__btn fp__btn--primary" bindtap="onConfirm">{{resultCount >= 0 ? '查看结果 (' + resultCount + ')' : '查看结果'}}</view>
+    </view>
+    <view class="fp__safe"></view>
+  </view>
+</view>

@@ -1,0 +1,127 @@
+.tpl {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32rpx;
+}
+
+/* 滑出的「编辑 / 删除」面板：300rpx（= 375pt 屏上的 150px），随屏宽等比缩放 */
+.tpl__actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300rpx;
+  display: flex;
+}
+
+.tpl__action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 面板本身靠 top/bottom:0 撑满卡片高度；再加一道下限，卡片变矮时也不低于 88rpx（§2.4） */
+  min-height: 88rpx;
+  font-size: 28rpx;
+  color: #1C1D20;
+}
+
+.tpl__action--edit {
+  background-color: var(--color-info-strong);
+}
+
+.tpl__action--del {
+  background-color: var(--color-expense-strong);
+}
+
+.tpl__card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background-color: var(--color-bg-card);
+  box-shadow: var(--shadow-card);
+  border-radius: 32rpx;
+  transition: transform .2s ease;
+}
+
+.tpl__badge {
+  flex: none;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1C1D20;
+}
+
+.tpl__main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.tpl__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl__meta {
+  margin-top: var(--gap-xxs);
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl__right {
+  flex: none;
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tpl__amount {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.tpl__amount.is-expense {
+  color: var(--color-expense-strong);
+}
+
+.tpl__amount.is-income {
+  color: var(--color-income-text);
+}
+
+.tpl__used {
+  margin-top: var(--gap-xxs);
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.tpl__use {
+  flex: none;
+  margin-left: var(--gap-sm2);
+  /* §2.4 最小热区 88rpx */
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-text);
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

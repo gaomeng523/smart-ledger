@@ -1,0 +1,13 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/nav-bar/nav-bar",
+    "month-picker": "../../../components/month-picker/month-picker",
+    "empty-state": "../../../components/empty-state/empty-state",
+    "skeleton": "../../../components/skeleton/skeleton",
+    "dict-picker": "../../../components/dict-picker/dict-picker"
+  },
+  "navigationBarTitleText": "预算设置",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light"
+}

@@ -1,0 +1,240 @@
+/**
+ * 资产体检（设计稿 04 屏）
+ */
+.page {
+  min-height: 100vh;
+  background: radial-gradient(120% 55% at 50% 0%, #131417 0%, #0B0B0C 44%, #08090A 100%);
+}
+
+.body {
+  padding: 8rpx 32rpx 60rpx;
+}
+
+/* ---- 净资产 ---- */
+
+.total {
+  padding: 24rpx 8rpx 34rpx;
+}
+
+.total__k {
+  font-size: 20rpx;
+  color: #62636A;
+  letter-spacing: .18em;
+}
+
+.total__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.total__cur {
+  font-size: 36rpx;
+  color: #7B7C82;
+}
+
+.total__v {
+  font-family: var(--font-brush);
+  font-size: 88rpx;
+  line-height: 1.1;
+  color: #F4F4F1;
+  letter-spacing: -.01em;
+}
+
+.total__sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16rpx;
+  font-size: 20rpx;
+  color: #62636A;
+  letter-spacing: .04em;
+}
+
+.total__debt {
+  color: #FF8B8B;
+}
+
+/* ---- 账户 ---- */
+
+.card {
+  padding: 26rpx 28rpx 16rpx;
+  border-radius: 40rpx;
+  background: linear-gradient(165deg, #191A1D, #141518 70%);
+  border: 1rpx solid rgba(255, 255, 255, .055);
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12rpx;
+}
+
+.card__title {
+  font-size: 27rpx;
+  color: #E0E1DD;
+  letter-spacing: .1em;
+}
+
+.card__aside {
+  font-size: 18rpx;
+  color: #4E4F56;
+}
+
+.acc {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  min-height: 104rpx;
+  padding: 8rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, .04);
+}
+
+.acc:last-child {
+  border-bottom: none;
+}
+
+.acc--hover {
+  opacity: .72;
+}
+
+.acc__ico {
+  width: 64rpx;
+  height: 64rpx;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(255, 255, 255, .05);
+}
+
+.acc__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.acc__name {
+  font-size: 26rpx;
+  color: #DCDDD9;
+  letter-spacing: .02em;
+}
+
+.acc__sub {
+  font-size: 18rpx;
+  color: #5E5F66;
+  letter-spacing: .1em;
+}
+
+.acc__amt {
+  font-size: 28rpx;
+  color: #E8E8E4;
+}
+
+.acc__amt.is-debt {
+  color: #FF8B8B;
+}
+
+.acc--add {
+  border-bottom: none;
+}
+
+.acc--add .acc__ico {
+  border-style: dashed;
+}
+
+.acc__add-text {
+  font-size: 23rpx;
+  color: #7B7C82;
+  letter-spacing: .06em;
+}
+
+/* ---- AI 体检 ---- */
+
+.check {
+  margin-top: 22rpx;
+  padding: 26rpx 28rpx 22rpx;
+  border-radius: 40rpx;
+  background-color: rgba(139, 108, 255, .055);
+  border: 1rpx solid rgba(139, 108, 255, .13);
+}
+
+.check__head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.check__title {
+  font-size: 25rpx;
+  color: #C9B8FF;
+  letter-spacing: .1em;
+}
+
+.check__score {
+  margin-left: auto;
+  font-size: 46rpx;
+}
+
+.check__unit {
+  font-size: 18rpx;
+  color: #7B7C82;
+  margin-left: 4rpx;
+}
+
+.check__bar {
+  height: 10rpx;
+  margin-top: 18rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .06);
+  overflow: hidden;
+}
+
+.check__bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  transition: width .4s ease;
+}
+
+.check__state {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 20rpx;
+  letter-spacing: .1em;
+}
+
+.check__item {
+  display: flex;
+  gap: 12rpx;
+  padding: 12rpx 0 0;
+}
+
+.check__dot {
+  width: 8rpx;
+  height: 8rpx;
+  flex: none;
+  margin-top: 16rpx;
+  border-radius: 50%;
+  background-color: #8B6CFF;
+}
+
+.check__text {
+  flex: 1;
+  font-size: 23rpx;
+  line-height: 1.6;
+  color: #A9A0C8;
+  letter-spacing: .02em;
+}
+
+.tip {
+  padding: 30rpx 12rpx 8rpx;
+  font-size: 18rpx;
+  line-height: 1.6;
+  color: #46474E;
+  letter-spacing: .03em;
+}

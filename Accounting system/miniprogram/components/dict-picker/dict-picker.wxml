@@ -1,0 +1,101 @@
+<view class="picker">
+  <view
+    class="picker__trigger {{disabled ? 'is-disabled' : ''}} {{invalid ? 'is-invalid' : ''}}"
+    hover-class="picker__trigger--hover"
+    bindtap="open"
+  >
+    <view class="picker__trigger-main">
+      <category-icon
+        wx:if="{{selectedIcon}}"
+        icon="{{selectedIcon}}"
+        size="32"
+        color="{{iconColor}}"
+      />
+      <text class="picker__value {{selectedName ? '' : 'is-placeholder'}}">
+        {{selectedName || placeholder}}
+      </text>
+    </view>
+    <text class="picker__arrow">›</text>
+  </view>
+
+  <view
+    wx:if="{{show}}"
+    class="picker__mask"
+    bindtap="close"
+    catchtouchmove="noop"
+  ></view>
+
+  <view wx:if="{{show}}" class="picker__panel">
+    <view class="picker__header">
+      <text class="picker__title">{{type === 'channel' ? '选择支付渠道' : '选择分类'}}</text>
+      <text class="picker__close" bindtap="close">关闭</text>
+    </view>
+
+    <!-- 单列：渠道，或字典未下发树结构时的兜底 -->
+    <scroll-view wx:if="{{mode === 'single'}}" class="picker__list" scroll-y>
+      <view
+        wx:for="{{list}}"
+        wx:key="code"
+        class="picker__option {{item.code === value ? 'is-active' : ''}}"
+        data-code="{{item.code}}"
+        data-name="{{item.name}}"
+        bindtap="choose"
+      >
+        <view class="picker__option-main">
+          <category-icon
+            wx:if="{{item.icon}}"
+            icon="{{item.icon}}"
+            size="32"
+            color="{{item.code === value ? iconColorActive : iconColor}}"
+          />
+          <text class="picker__option-name">{{item.name}}</text>
+        </view>
+        <text wx:if="{{item.code === value}}" class="picker__check">✓</text>
+      </view>
+      <view wx:if="{{list.length === 0}}" class="picker__empty">暂无可选项</view>
+    </scroll-view>
+
+    <view wx:else class="picker__tree">
+      <!-- 左一级、右二级，右侧首项为一级本身（不细分） -->
+      <scroll-view class="picker__col picker__col--parent" scroll-y>
+        <view
+          wx:for="{{parents}}"
+          wx:key="code"
+          class="picker__parent {{item.code === activeParent ? 'is-active' : ''}}"
+          data-code="{{item.code}}"
+          bindtap="chooseParent"
+        >
+          <category-icon
+            icon="{{item.icon}}"
+            size="32"
+            color="{{item.code === activeParent ? iconColorActive : iconColor}}"
+          />
+          <text class="picker__parent-name">{{item.name}}</text>
+        </view>
+      </scroll-view>
+
+      <scroll-view class="picker__col picker__col--child" scroll-y>
+        <view
+          wx:for="{{children}}"
+          wx:key="code"
+          class="picker__child {{item.code === value ? 'is-active' : ''}}"
+          data-code="{{item.code}}"
+          data-name="{{item.name}}"
+          bindtap="choose"
+        >
+          <view class="picker__option-main">
+            <category-icon
+              icon="{{item.icon}}"
+              size="32"
+              color="{{item.code === value ? iconColorActive : iconColor}}"
+            />
+            <text class="picker__child-name">{{item.label}}</text>
+          </view>
+          <text wx:if="{{item.code === value}}" class="picker__check">✓</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="picker__safe"></view>
+  </view>
+</view>

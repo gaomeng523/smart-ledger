@@ -1,0 +1,252 @@
+.page {
+  padding: 24rpx 32rpx 48rpx;
+}
+
+/* 自定义导航通栏：抵消根容器左右内边距 */
+.nav-fix {
+  margin: 0 -32rpx;
+}
+
+/* ===== 副标题 ===== */
+
+.head {
+  padding: 8rpx 8rpx 24rpx;
+}
+
+.head__sub {
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+/* ===== 别名列表 ===== */
+
+.alias-row {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24rpx 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.alias-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alias-row__map {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.alias-row__keyword {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow-wrap: break-word;
+}
+
+.alias-row__arrow {
+  flex: none;
+  margin: 0 16rpx;
+  font-size: 28rpx;
+  color: var(--color-text-hint);
+}
+
+.alias-row__target {
+  flex: 1;
+  min-width: 0;
+  font-size: 30rpx;
+  color: var(--color-text-sub);
+  overflow-wrap: break-word;
+}
+
+.alias-row__hit {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  font-variant-numeric: tabular-nums;
+}
+
+.alias-row__ops {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid var(--color-border);
+}
+
+.alias-row__type {
+  margin-right: auto;
+}
+
+.alias-row__op {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  margin-left: 24rpx;
+  padding: 0 8rpx;
+  font-size: 28rpx;
+  color: var(--color-info);
+}
+
+.alias-row__op.is-del {
+  color: var(--color-expense-strong);
+}
+
+.alias-row__op--hover {
+  opacity: .7;
+}
+
+/* ===== 新增按钮 ===== */
+
+.foot {
+  margin-top: 32rpx;
+}
+
+.foot__btn {
+  width: 100%;
+}
+
+/* ===== 新增 / 编辑半屏弹窗（mask 300 / panel 301，与 dict-picker 同规范） ===== */
+
+.sheet__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 300;
+}
+
+.sheet__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+}
+
+.sheet__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.sheet__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sheet__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.sheet__body {
+  flex: 1;
+  max-height: 58vh;
+  padding: 0 32rpx;
+}
+
+.sheet__field {
+  margin: 0 0 24rpx;
+}
+
+.sheet__label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.sheet__input {
+  width: 100%;
+  min-height: 88rpx;
+  margin-top: 8rpx;
+  padding: 0 24rpx;
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.sheet__ph {
+  color: var(--color-text-hint);
+}
+
+.sheet__picker {
+  margin-top: 8rpx;
+}
+
+/* 分段控件 */
+.seg {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+  padding: var(--gap-xxs);
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+}
+
+.seg__item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* §2.4 最小热区 88rpx */
+  min-height: 88rpx;
+  border-radius: var(--radius-input);
+  font-size: 30rpx;
+  color: var(--color-text-sub);
+}
+
+.seg__item.is-active {
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-text);
+  font-weight: 600;
+}
+
+.sheet__footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx 16rpx;
+}
+
+.sheet__btn {
+  flex: 1;
+}
+
+.sheet__btn + .sheet__btn {
+  margin-left: 24rpx;
+}
+
+.sheet__btn--hover {
+  opacity: .8;
+}
+
+.sheet__safe {
+  flex: none;
+  height: env(safe-area-inset-bottom);
+}

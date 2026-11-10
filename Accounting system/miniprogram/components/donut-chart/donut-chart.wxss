@@ -1,0 +1,36 @@
+.donut {
+  position: relative;
+  width: 100%;
+  height: 360rpx;
+}
+
+.donut__canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.donut__center {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donut__center-label {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.donut__center-value {
+  margin-top: 4rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}

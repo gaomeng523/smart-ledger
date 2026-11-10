@@ -1,0 +1,86 @@
+<view class="page">
+  <view class="nav-fix"><nav-bar back title="模板管理" /></view>
+
+  <!-- 顶部操作 -->
+  <view class="toolbar">
+    <view class="btn btn-primary toolbar__new" hover-class="btn--active" bindtap="onNew">+ 新建模板</view>
+  </view>
+
+  <!-- 首屏骨架 -->
+  <skeleton wx:if="{{firstLoading}}" rows="3" />
+
+  <!-- 模板列表 -->
+  <block wx:elif="{{!empty}}">
+    <view class="tpl-list">
+      <view wx:for="{{templates}}" wx:key="templateId" class="tpl-list__item">
+        <template-item
+          template="{{item}}"
+          tintIndex="{{index}}"
+          bind:tap="noop"
+          bind:use="onUse"
+          bind:edit="onEdit"
+          bind:delete="onDelete"
+        />
+      </view>
+    </view>
+  </block>
+
+  <!-- 空态 -->
+  <empty-state
+    wx:else
+    mascotState="empty"
+    text="还没有模板，把常记的账存成模板吧"
+    actionText="新建模板"
+    bind:action="onNew"
+  />
+</view>
+
+<!-- 一键记账撤销条 -->
+<view wx:if="{{showUndo}}" class="undo">
+  <text class="undo__text">已记一笔</text>
+  <view class="undo__btn" hover-class="undo__btn--hover" bindtap="onUndo">撤销</view>
+</view>
+
+<!-- 新建 / 编辑半屏弹窗 -->
+<view wx:if="{{showPanel}}">
+  <view class="sheet__mask" bindtap="onPanelClose" catchtouchmove="noop"></view>
+  <view class="sheet__panel">
+    <view class="sheet__header">
+      <text class="sheet__title">{{editing ? '编辑模板' : '新建模板'}}</text>
+      <text class="sheet__close" bindtap="onPanelClose">关闭</text>
+    </view>
+
+    <scroll-view class="sheet__body" scroll-y>
+      <view class="sheet__field">
+        <text class="sheet__label">模板名称</text>
+        <input
+          class="sheet__input"
+          maxlength="12"
+          placeholder="如：早餐"
+          placeholder-class="sheet__ph"
+          value="{{formName}}"
+          bindinput="onNameInput"
+        />
+      </view>
+
+      <bill-form
+        value="{{formValue}}"
+        dict="{{dict}}"
+        mode="create"
+        marks="{{formMarks}}"
+        showTags="{{false}}"
+        bind:change="onFormChange"
+      />
+    </scroll-view>
+
+    <view class="sheet__footer">
+      <view class="btn btn-ghost sheet__btn" hover-class="sheet__btn--hover" bindtap="onPanelClose">取消</view>
+      <view
+        class="btn btn-primary sheet__btn {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--active'}}"
+        bindtap="onSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+    <view class="sheet__safe"></view>
+  </view>
+</view>

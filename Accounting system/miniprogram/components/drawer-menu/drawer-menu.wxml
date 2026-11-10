@@ -1,0 +1,55 @@
+<view class="dm {{mode === 'page' ? 'dm--page' : ''}}">
+  <view class="dm__profile" bindtap="onProfileTap">
+    <view class="dm__avatar">
+      <image wx:if="{{avatarPath}}" class="dm__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
+      <text wx:else class="dm__avatar-text">{{avatarText}}</text>
+      <button
+        class="dm__avatar-btn"
+        open-type="chooseAvatar"
+        hover-class="none"
+        catchtap="noop"
+        bindchooseavatar="onChooseAvatar"
+      ></button>
+    </view>
+    <text wx:if="{{!avatarPath}}" class="dm__avatar-tip">点头像，选「用微信头像」</text>
+    <view class="dm__name">
+      <text class="dm__name-text">{{nickname || '微信用户'}}</text>
+    </view>
+    <view class="dm__sub">已使用 {{usedDays}} 天 · 已学习 {{billCount}} 笔</view>
+  </view>
+
+  <view class="dm__menu">
+    <view
+      wx:for="{{menus}}"
+      wx:key="key"
+      class="dm__item {{item.ai ? 'is-ai' : ''}}"
+      hover-class="dm__item--hover"
+      data-url="{{item.url}}"
+      data-tab="{{item.tab}}"
+      data-action="{{item.action}}"
+      bindtap="onMenuTap"
+    >
+      <ui-icon name="{{item.icon}}" size="38" color="{{item.ai ? '#A78BFF' : '#90919A'}}" />
+      <text class="dm__item-label">{{item.label}}</text>
+      <text wx:if="{{item.tip}}" class="dm__item-tip">{{item.tip}}</text>
+      <text wx:if="{{item.badge}}" class="dm__item-badge">{{item.badge}}</text>
+    </view>
+  </view>
+
+  <view class="dm__more">
+    <view
+      wx:for="{{more}}"
+      wx:key="key"
+      class="dm__more-item"
+      hover-class="dm__more-item--hover"
+      data-url="{{item.url}}"
+      data-action="{{item.action}}"
+      bindtap="onMenuTap"
+    >
+      <ui-icon name="{{item.icon}}" size="28" color="#6E6F76" />
+      <text class="dm__more-label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <view class="dm__foot">v{{version}} · AI 模型 Lumen 2</view>
+</view>

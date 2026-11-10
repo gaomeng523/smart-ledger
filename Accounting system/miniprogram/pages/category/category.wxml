@@ -1,0 +1,73 @@
+<view class="page">
+  <nav-bar back title="分类管理" />
+
+  <view class="body">
+    <view class="summary">
+      <view class="summary__row">
+        <text class="summary__v">{{usedCount}}<text class="summary__unit">个分类在用</text></text>
+        <text class="summary__v">{{billCount}}<text class="summary__unit">笔账单</text></text>
+      </view>
+      <view class="summary__foot">
+        <text>{{monthText}} · 支出合计 ¥{{totalText}}</text>
+        <text class="summary__link" bindtap="goAI">去记账 ›</text>
+      </view>
+    </view>
+
+    <view class="card list">
+      <view class="card__head">
+        <text class="card__title">支出分类</text>
+        <text class="card__aside">点击展开二级</text>
+      </view>
+
+      <block wx:for="{{parents}}" wx:key="code">
+        <view
+          class="row"
+          hover-class="row--hover"
+          data-code="{{item.code}}"
+          bindtap="onParentTap"
+        >
+          <view class="row__ico" style="background-color:{{item.color}}1F;">
+            <category-icon icon="{{item.icon}}" size="34" color="{{item.color}}" />
+          </view>
+          <view class="row__main">
+            <view class="row__line">
+              <text class="row__name">{{item.name}}</text>
+              <text class="row__amt num">¥{{item.amountText}}</text>
+            </view>
+            <view class="row__bar">
+              <view class="row__bar-fill" style="width:{{item.ratio}}%;background-color:{{item.color}};"></view>
+            </view>
+            <text class="row__meta">{{item.ratio}}% · {{item.children.length}} 个二级</text>
+          </view>
+          <ui-icon
+            name="{{expanded === item.code ? 'down' : 'right'}}"
+            size="26"
+            color="#5E5F66"
+          />
+        </view>
+
+        <view wx:if="{{expanded === item.code}}" class="sub">
+          <view wx:if="{{!children.length}}" class="sub__loading">正在加载明细…</view>
+          <view wx:for="{{children}}" wx:for-item="child" wx:key="code" class="sub__row">
+            <category-icon icon="{{child.icon}}" size="26" color="#7B7C82" />
+            <text class="sub__name {{child.zero ? 'is-zero' : ''}}">{{child.name}}</text>
+            <text class="sub__amt num {{child.zero ? 'is-zero' : ''}}">¥{{child.amountText}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="rules" bindtap="goRules">
+      <view class="rules__ico">
+        <ui-icon name="book" size="28" color="#B49CFF" />
+      </view>
+      <view class="rules__main">
+        <text class="rules__title">AI 学习规则</text>
+        <text class="rules__sub">已学会 {{ruleCount}} 条 · 点此管理关键词映射</text>
+      </view>
+      <ui-icon name="right" size="26" color="#5E5F66" />
+    </view>
+
+    <view class="tip">分类由 AI 根据备注自动匹配，记账时随时可改；改过的说法会自动记住。</view>
+  </view>
+</view>

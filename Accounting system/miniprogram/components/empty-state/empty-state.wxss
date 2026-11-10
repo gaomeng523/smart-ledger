@@ -1,0 +1,32 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 32rpx;
+}
+
+.empty__text {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+  text-align: center;
+}
+
+.empty__btn {
+  margin-top: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  padding: 0 48rpx;
+  border-radius: 999rpx;
+  background-color: var(--color-brand-strong);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: var(--shadow-btn);
+}
+
+.empty__btn--hover {
+  background-color: var(--color-brand-active);
+}

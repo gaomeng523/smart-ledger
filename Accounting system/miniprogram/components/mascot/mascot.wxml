@@ -1,0 +1,67 @@
+<view
+  class="mascot"
+  style="font-size:{{size}}rpx;width:{{size}}rpx;height:{{size}}rpx;"
+>
+  <!-- 撑伞躲雨（网络异常）：置于最底层，伞柄被云朵挡住 -->
+  <view wx:if="{{s === 'offline'}}" class="mascot__umbrella"></view>
+
+  <!-- 硬币光环（撑伞时收起） -->
+  <view wx:if="{{s !== 'offline'}}" class="mascot__halo"></view>
+
+  <!-- 抱臂思考的三个小点 -->
+  <view wx:if="{{s === 'thinking'}}" class="mascot__dots">
+    <view class="mascot__dot"></view>
+    <view class="mascot__dot"></view>
+    <view class="mascot__dot"></view>
+  </view>
+
+  <view class="mascot__art mascot__art--{{s}}">
+    <!-- 钱包尾巴（在身体之后，只露出体外部分） -->
+    <view class="mascot__tail"></view>
+
+    <!-- 短短圆圆的手（在身体之后） -->
+    <view class="mascot__arm mascot__arm--left"></view>
+    <view class="mascot__arm mascot__arm--right"></view>
+
+    <!-- 云朵身体 -->
+    <view class="mascot__body">
+      <view class="mascot__blush mascot__blush--left"></view>
+      <view class="mascot__blush mascot__blush--right"></view>
+      <view class="mascot__eye mascot__eye--left"></view>
+      <view class="mascot__eye mascot__eye--right"></view>
+      <view class="mascot__mouth"></view>
+    </view>
+
+    <!-- 身前道具：小账本（期待）/ 硬币（闪亮） -->
+    <view wx:if="{{s === 'expect'}}" class="mascot__book"></view>
+    <view wx:if="{{s === 'shine'}}" class="mascot__coin"></view>
+
+    <!-- 抱臂（疑惑思考） -->
+    <block wx:if="{{s === 'thinking'}}">
+      <view class="mascot__cross mascot__cross--left"></view>
+      <view class="mascot__cross mascot__cross--right"></view>
+    </block>
+
+    <!-- 蒙眼害羞（看到大额支出） -->
+    <block wx:if="{{s === 'wow'}}">
+      <view class="mascot__shy mascot__shy--left"></view>
+      <view class="mascot__shy mascot__shy--right"></view>
+    </block>
+
+    <!-- 小爱心点缀 -->
+    <block wx:if="{{s === 'success' || s === 'shine'}}">
+      <view class="mascot__heart mascot__heart--left"></view>
+      <view class="mascot__heart mascot__heart--right"></view>
+    </block>
+  </view>
+
+  <!-- 位图素材（存在时覆盖在代码绘制之上；默认关闭，见 mascot.js 的 USE_BITMAP） -->
+  <image
+    wx:if="{{useBitmap}}"
+    class="mascot__img {{useImage ? '' : 'is-hidden'}}"
+    src="{{src}}"
+    mode="aspectFit"
+    bindload="onImageLoad"
+    binderror="onImageError"
+  />
+</view>

@@ -1,0 +1,28 @@
+<view class="tpl">
+  <!-- 左滑操作区 -->
+  <view class="tpl__actions">
+    <view class="tpl__action tpl__action--edit" catchtap="onEdit">编辑</view>
+    <view class="tpl__action tpl__action--del" catchtap="onDelete">删除</view>
+  </view>
+
+  <!-- 卡片主体 -->
+  <view
+    class="tpl__card"
+    style="transform: translateX({{offset}}px);"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    bindtap="onTap"
+  >
+    <view class="tpl__badge" style="background-color: {{badgeColor}};">{{badgeText}}</view>
+    <view class="tpl__main">
+      <text class="tpl__title">{{template.title}}</text>
+      <text class="tpl__meta">{{metaText}}</text>
+    </view>
+    <view class="tpl__right">
+      <text class="tpl__amount num {{isIncome ? 'is-income' : 'is-expense'}}">{{amountText}}</text>
+      <text class="tpl__used">已用 {{template.useCount || 0}} 次</text>
+    </view>
+    <view class="tpl__use" catchtap="onUse">记一笔</view>
+  </view>
+</view>

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "mascot": "../mascot/mascot"
+  }
+}

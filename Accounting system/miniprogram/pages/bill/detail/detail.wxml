@@ -1,0 +1,44 @@
+<nav-bar back title="账单详情" />
+
+<view wx:if="{{loading}}" class="loading">
+  <skeleton rows="4" />
+</view>
+
+<view wx:else class="page">
+  <!-- 顶部大金额 -->
+  <view class="hero">
+    <text class="hero__amount num {{isIncome ? 'is-income' : 'is-expense'}}">
+      {{isIncome ? '+' : '-'}}¥{{amountText}}
+    </text>
+    <text class="hero__meta">{{value.categoryName || '未分类'}} · {{value.payChannelName || '未选渠道'}}</text>
+  </view>
+
+  <!-- 字段编辑区 -->
+  <view class="card">
+    <bill-form value="{{value}}" dict="{{dict}}" mode="edit" tagSuggestions="{{tagSuggestions}}" bind:change="onFormChange" />
+  </view>
+
+  <!-- 账单图片（拍照记账，V3 阶段二） -->
+  <view wx:if="{{imageUrl}}" class="photo card">
+    <text class="photo__label">账单图片</text>
+    <image class="photo__img" src="{{imageUrl}}" mode="widthFix" bindtap="onPreviewImage" />
+  </view>
+
+  <!-- AI 原始输入 -->
+  <view class="raw">
+    <text class="raw__title">AI 原始输入</text>
+    <text class="raw__text">{{bill.recordText || '（无原始输入）'}}</text>
+    <text class="raw__meta">解析置信度 {{confidenceText}} · 来源 {{sourceText}}</text>
+    <text class="raw__meta">创建于 {{createTimeText || '—'}}</text>
+  </view>
+
+  <!-- 操作区 -->
+  <view class="actions">
+    <view
+      class="actions__save {{saving ? 'is-disabled' : ''}}"
+      hover-class="{{saving ? '' : 'actions__save--hover'}}"
+      bindtap="onSave"
+    >{{saving ? '保存中…' : '保存修改'}}</view>
+    <view class="actions__delete" hover-class="actions__delete--hover" bindtap="onDelete">删除账单</view>
+  </view>
+</view>

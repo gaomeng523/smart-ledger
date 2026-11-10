@@ -1,0 +1,130 @@
+<view class="page">
+  <nav-bar>
+    <view slot="left" class="mhead">
+      <text class="mhead__m">{{monthCn}}</text>
+      <text class="mhead__y">{{yearText}}年</text>
+    </view>
+    <view slot="right" class="macts">
+      <view class="mact" hover-class="mact--hover" bindtap="onPrevMonth">
+        <ui-icon name="left" size="32" color="#8A8B92" />
+      </view>
+      <view class="mact" hover-class="mact--hover" bindtap="onNextMonth">
+        <ui-icon name="right" size="32" color="#8A8B92" />
+      </view>
+    </view>
+  </nav-bar>
+
+  <view class="body">
+    <view class="hero">
+      <text class="hero__eyebrow">{{monthEn}} {{yearText}}</text>
+      <view class="hero__row">
+        <text class="hero__title">{{monthCn}}账单</text>
+        <view wx:if="{{expenseDiff}}" class="hero__delta {{expenseDiffUp ? 'is-up' : ''}}">{{expenseDiff}}</view>
+      </view>
+      <text class="hero__sub">AI 已为你整理 · 数据更新至 {{updatedText}}</text>
+    </view>
+
+    <view class="kpis">
+      <view class="kpi">
+        <text class="kpi__k">支出</text>
+        <text class="kpi__v num is-out">¥{{expenseText}}</text>
+      </view>
+      <view class="kpi">
+        <text class="kpi__k">收入</text>
+        <text class="kpi__v num is-in">¥{{incomeText}}</text>
+      </view>
+      <view class="kpi">
+        <text class="kpi__k">结余</text>
+        <text class="kpi__v num">¥{{balanceText}}</text>
+      </view>
+    </view>
+
+    <!-- 每日支出 -->
+    <view class="card chart">
+      <view class="card__head">
+        <text class="card__title">每日支出</text>
+        <text class="card__aside">日均 ¥{{dailyAvgText}}</text>
+      </view>
+      <view class="bars">
+        <view
+          wx:for="{{bars}}"
+          wx:key="day"
+          class="bar {{item.empty ? 'is-empty' : ''}} {{item.day === todayBar ? 'is-today' : ''}}"
+          style="height:{{item.h}}rpx;"
+        ></view>
+      </view>
+      <view class="scale">
+        <text>1日</text>
+        <text>8日</text>
+        <text>15日</text>
+        <text>22日</text>
+        <text>{{daysInMonth}}日</text>
+      </view>
+    </view>
+
+    <!-- 分类构成 -->
+    <view class="card cat">
+      <view class="card__head">
+        <text class="card__title">{{drillCode ? drillName : '分类构成'}}</text>
+        <view class="cat__seg">
+          <text
+            class="cat__seg-item {{seg === 0 ? 'is-on' : ''}}"
+            data-seg="0"
+            bindtap="onSegTap"
+          >支出</text>
+          <text
+            class="cat__seg-item {{seg === 1 ? 'is-on' : ''}}"
+            data-seg="1"
+            bindtap="onSegTap"
+          >收入</text>
+        </view>
+      </view>
+
+      <view class="cat__body">
+        <view class="cat__chart">
+          <donut-chart items="{{chartItems}}" centerText="{{totalText}}" />
+        </view>
+
+        <view class="cat__legend">
+          <view
+            wx:for="{{legend}}"
+            wx:key="code"
+            class="lg"
+            hover-class="{{item.drillable ? 'lg--hover' : ''}}"
+            data-code="{{item.drillable ? item.code : ''}}"
+            bindtap="onDrillTap"
+          >
+            <view class="lg__dot" style="background-color:{{item.color}};"></view>
+            <text class="lg__name">{{item.name}}</text>
+            <text class="lg__ratio">{{item.ratioText}}</text>
+            <text class="lg__amt num">¥{{item.amountText}}</text>
+          </view>
+          <view wx:if="{{!legend.length}}" class="cat__empty">本月还没有{{seg === 1 ? '收入' : '支出'}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{drillCode}}" class="cat__back" bindtap="onDrillBack">
+        <ui-icon name="back" size="22" color="#8A8B92" />
+        <text>返回全部分类</text>
+      </view>
+    </view>
+
+    <!-- AI 洞察 -->
+    <view class="ai">
+      <view class="ai__head">
+        <view class="ai__ico">
+          <ui-icon name="spark" size="26" color="#B49CFF" />
+        </view>
+        <text class="ai__title">AI 洞察</text>
+        <text class="ai__sub">共 {{billCount}} 笔</text>
+      </view>
+      <view wx:for="{{insights}}" wx:key="key" class="ai__item">
+        <view class="ai__bullet"></view>
+        <text class="ai__text">{{item.text}}</text>
+      </view>
+      <view wx:if="{{!insights.length}}" class="ai__empty">记账越多，洞察越准。</view>
+    </view>
+
+    <view class="foot">数据统计至 {{updatedText}} · 收支以入账日期为准</view>
+  </view>
+</view>

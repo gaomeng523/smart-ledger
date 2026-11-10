@@ -1,0 +1,142 @@
+.loading {
+  padding: 48rpx 32rpx;
+}
+
+.page {
+  padding: 32rpx 32rpx 48rpx;
+}
+
+/* ===== 顶部大金额 ===== */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 0 48rpx;
+}
+
+.hero__amount {
+  font-size: 72rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__amount.is-expense {
+  color: var(--color-expense-strong);
+}
+
+.hero__amount.is-income {
+  color: var(--color-income-text);
+}
+
+.hero__meta {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+/* ===== 字段卡片 ===== */
+
+.card {
+  background-color: var(--color-bg-card);
+  border-radius: 32rpx;
+  box-shadow: var(--shadow-card);
+  padding: 32rpx;
+}
+
+/* ===== 账单图片（V3 阶段二） ===== */
+
+.photo {
+  margin-top: 32rpx;
+}
+
+.photo__label {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.photo__img {
+  width: 100%;
+  margin-top: 16rpx;
+  border-radius: var(--radius-input);
+}
+
+/* ===== AI 原始输入 ===== */
+
+.raw {
+  margin-top: 32rpx;
+  padding: 0 8rpx;
+}
+
+.raw__title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.raw__text {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: var(--color-text);
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.raw__meta {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+/* ===== 操作区 ===== */
+
+.actions {
+  margin-top: 48rpx;
+}
+
+.actions__save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96rpx;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  background-color: var(--color-brand-strong);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-btn);
+}
+
+.actions__save--hover {
+  background-color: var(--color-brand-active);
+}
+
+.actions__save.is-disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-hint);
+  box-shadow: none;
+}
+
+.actions__delete {
+  margin-top: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96rpx;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-expense-strong);
+  border: 1px solid var(--color-expense-strong);
+  background-color: transparent;
+}
+
+.actions__delete--hover {
+  opacity: .8;
+}

@@ -1,0 +1,14 @@
+<view class="nav" style="padding-top:{{statusBarHeight}}px;">
+  <view class="nav__bar" style="height:{{barHeight}}px;padding-right:{{rightSpace}}px;">
+    <view class="nav__left">
+      <view wx:if="{{back}}" class="nav__back" hover-class="nav__back--hover" bindtap="onBack">
+        <ui-icon name="back" size="38" color="#D3D4D2" />
+      </view>
+      <slot name="left"></slot>
+    </view>
+
+    <view wx:if="{{title}}" class="nav__title {{center ? 'is-center' : ''}}">{{title}}</view>
+    <view class="nav__spacer"></view>
+    <slot name="right"></slot>
+  </view>
+</view>

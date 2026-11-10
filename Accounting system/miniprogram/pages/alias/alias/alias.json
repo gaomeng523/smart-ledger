@@ -1,0 +1,12 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/nav-bar/nav-bar",
+    "empty-state": "../../../components/empty-state/empty-state",
+    "skeleton": "../../../components/skeleton/skeleton",
+    "dict-picker": "../../../components/dict-picker/dict-picker"
+  },
+  "navigationBarTitleText": "别名词典",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light"
+}

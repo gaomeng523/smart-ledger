@@ -1,0 +1,67 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: smart-ledger-backend
+  profiles:
+    # dev：本地开发基础覆盖；local：本地私有密钥（application-local.yml，已被 .gitignore 排除）
+    # 若本地没有 application-local.yml，该项不会报错，会自动跳过。
+    active: dev,local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smart_ledger?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:118523}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+
+smartledger:
+  jwt:
+    secret: ${JWT_SECRET:smart-ledger-dev-secret-key-please-change-in-production-0123456789}
+    expire-days: 7
+  upload:
+    # 图片上传目录（相对或绝对路径），默认应用运行目录下 uploads
+    dir: ${UPLOAD_DIR:./uploads}
+  wx:
+    app-id: ${WX_APP_ID:}
+    app-secret: ${WX_APP_SECRET:}
+    # 本地开发无真实小程序凭据时可开启，用 code 生成 mock openid（生产必须为 false）
+    mock-enabled: false
+  ai:
+    enabled: true
+    base-url: https://api.deepseek.com
+    api-key: ${DEEPSEEK_API_KEY:}
+    model: deepseek-flash
+    connect-timeout: 3000
+    read-timeout: 12000
+    max-retries: 1
+    temperature: 0.2
+    cache-seconds: 60
+    max-input-length: 200
+    rate-limit-per-minute: 20
+
+logging:
+  level:
+    com.smartledger: debug

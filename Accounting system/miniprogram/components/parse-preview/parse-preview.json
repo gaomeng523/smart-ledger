@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "bill-form": "../bill-form/bill-form"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "nav-bar": "../../../components/nav-bar/nav-bar",
+    "ui-icon": "../../../components/ui-icon/ui-icon",
+    "category-icon": "../../../components/category-icon/category-icon",
+    "filter-panel": "../../../components/filter-panel/filter-panel"
+  }
+}

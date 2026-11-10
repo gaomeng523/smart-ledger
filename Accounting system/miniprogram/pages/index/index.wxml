@@ -1,0 +1,209 @@
+<view
+  class="screen"
+  bindtouchstart="onTouchStart"
+  bindtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchEnd"
+>
+  <nav-bar>
+    <view slot="left" class="brand" bindtap="onAvatarTap">
+      <view class="brand__avatar">
+        <image wx:if="{{avatarPath}}" class="brand__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
+        <text wx:else>记</text>
+      </view>
+      <view class="brand__meta">
+        <view class="brand__name">Lumen<text class="brand__ai">AI</text></view>
+        <view class="brand__sub">AI 记账 · 在线</view>
+      </view>
+    </view>
+  </nav-bar>
+
+  <scroll-view
+    class="chat"
+    scroll-y
+    enhanced
+    show-scrollbar="{{false}}"
+    scroll-into-view="{{scrollInto}}"
+    scroll-with-animation
+  >
+    <view class="chat__inner">
+      <!-- 问候 -->
+      <view class="msg is-ai">
+        <view class="bubble">
+          <text class="bubble__text">{{greeting}}</text>
+          <view wx:if="{{renewText}}" class="renew" bindtap="goRenew">
+            <ui-icon name="repeat" size="24" color="#FFB020" />
+            <text class="renew__text">续费提醒 · {{renewText}}</text>
+            <ui-icon name="right" size="22" color="#7B7C82" />
+          </view>
+        </view>
+        <text class="msg__time">{{greetingTime}}</text>
+      </view>
+
+      <!-- 对话 -->
+      <block wx:for="{{messages}}" wx:key="id">
+        <view wx:if="{{item.ai}}" class="msg is-ai" id="msg-{{item.id}}">
+          <view class="bubble">
+            <text class="bubble__text">{{item.text}}</text>
+          </view>
+          <text class="msg__time">{{item.time}}</text>
+        </view>
+        <view wx:else class="msg is-me">
+          <view class="bubble bubble--me">
+            <text class="bubble__text">{{item.text}}</text>
+          </view>
+          <text class="msg__time">{{item.time}}</text>
+        </view>
+      </block>
+
+      <!-- 解析中 -->
+      <view wx:if="{{parsing}}" class="msg is-ai">
+        <view class="bubble bubble--typing">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <text class="typing__text">正在识别</text>
+        </view>
+      </view>
+
+      <!-- 解析结果卡 -->
+      <view wx:if="{{draftView}}" class="card parse">
+        <view class="parse__head">
+          <ui-icon name="spark" size="24" color="#B49CFF" />
+          <text class="parse__title">已识别 · {{draftView.isIncome ? '一笔收入' : '一笔支出'}}</text>
+          <text class="parse__conf {{draftView.confidenceLow ? 'is-low' : ''}}">置信度 {{draftView.confidenceText}}</text>
+        </view>
+
+        <view class="parse__amount" bindtap="onEditDraft">
+          <text class="parse__cur">¥</text>
+          <text class="parse__val num {{draftView.isIncome ? 'is-income' : ''}}">{{draftView.intPart}}<text class="parse__dec">.{{draftView.decPart}}</text></text>
+          <view class="parse__edit">
+            <ui-icon name="edit" size="22" color="#5E5F66" />
+            <text>改</text>
+          </view>
+        </view>
+
+        <view class="parse__meta">
+          <view class="parse__row" bindtap="onEditDraft">
+            <text class="parse__k">分类</text>
+            <view class="parse__v">
+              <text wx:if="{{draftView.missingCategory}}" class="parse__miss">待确认</text>
+              <text wx:else class="chip">{{draftView.categoryLabel}}</text>
+            </view>
+          </view>
+          <view class="parse__row" bindtap="onEditDraft">
+            <text class="parse__k">账户</text>
+            <view class="parse__v">
+              <text wx:if="{{draftView.missingChannel}}" class="parse__miss">待确认</text>
+              <text wx:else>{{draftView.channelName}}</text>
+            </view>
+          </view>
+          <view class="parse__row" bindtap="onEditDraft">
+            <text class="parse__k">时间</text>
+            <view class="parse__v">{{draftView.dateText}}</view>
+          </view>
+          <view class="parse__row" bindtap="onSplitTap">
+            <text class="parse__k">分账</text>
+            <view class="parse__v">
+              <text class="{{draftView.splitText ? '' : 'is-dim'}}">{{draftView.splitText || '不分摊'}}</text>
+              <text wx:if="{{splitCount > 1}}" class="tag-ai">AA</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="parse__foot">
+          <text>本月结余 ¥{{monthBalanceText}}</text>
+          <text>本月第 {{monthBillCount + 1}} 笔</text>
+        </view>
+
+        <view class="parse__actions">
+          <view class="btn parse__btn" hover-class="parse__btn--hover" bindtap="onRetryParse">换个说法</view>
+          <view
+            class="btn btn-primary parse__btn {{saving ? 'btn--disabled' : ''}}"
+            hover-class="parse__btn--hover"
+            bindtap="onSaveDraft"
+          >{{saving ? '保存中…' : '存入账本'}}</view>
+        </view>
+      </view>
+
+      <!-- 快捷短语 -->
+      <scroll-view wx:if="{{!parsing}}" class="chips" scroll-x show-scrollbar="{{false}}">
+        <view class="chips__inner">
+          <view
+            wx:for="{{quickChips}}"
+            wx:key="*this"
+            class="chips__item"
+            hover-class="chips__item--hover"
+            data-text="{{item}}"
+            bindtap="onChipTap"
+          >{{item}}</view>
+        </view>
+      </scroll-view>
+
+      <view class="chat__tip">
+        <ui-icon name="spark" size="20" color="#46474E" />
+        <text>Lumen 会记住你的习惯，越记越准</text>
+      </view>
+
+      <view id="chat-end" class="chat__end"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入条 -->
+  <view class="inputbar safe-bottom">
+    <view wx:if="{{pendingImagePath}}" class="photo">
+      <image class="photo__img" src="{{pendingImagePath}}" mode="aspectFill" />
+      <text class="photo__text">小票已上传</text>
+      <text class="photo__remove" bindtap="onPhotoRemove">移除</text>
+    </view>
+
+    <view class="ib">
+      <view class="ib__field">
+        <view class="ib__icon" bindtap="onVoice">
+          <ui-icon name="mic" size="30" color="#8A8B92" />
+        </view>
+        <input
+          class="ib__input"
+          value="{{text}}"
+          placeholder="说一句，或粘贴账单…"
+          placeholder-class="ib__ph"
+          confirm-type="send"
+          cursor-spacing="24"
+          bindinput="onInput"
+          bindconfirm="onSend"
+        />
+        <view class="ib__icon" bindtap="onPhoto">
+          <ui-icon name="camera" size="30" color="#8A8B92" />
+        </view>
+      </view>
+
+      <view class="ib__send {{canSend ? 'is-on' : ''}}" hover-class="ib__send--hover" bindtap="onSend">
+        <ui-icon name="spark" size="38" color="{{canSend ? '#FFFFFF' : '#6E6F76'}}" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 抽屉 -->
+  <view
+    class="scrim {{dragging ? 'is-drag' : ''}}"
+    style="opacity:{{scrimOpacity}};{{scrimOpacity ? '' : 'pointer-events:none;'}}"
+    bindtap="closeDrawer"
+  ></view>
+  <view
+    class="drawer {{dragging ? 'is-drag' : ''}}"
+    style="transform:translateX({{drawerX}}px);{{drawerOpen || dragging ? '' : 'pointer-events:none;'}}"
+  >
+    <drawer-menu id="menu" mode="drawer" bind:navigate="onDrawerNavigate" />
+  </view>
+</view>
+
+<!-- 编辑 / 手动录入半屏 -->
+<parse-preview
+  visible="{{showPreview}}"
+  draft="{{previewDraft}}"
+  dict="{{dict}}"
+  saving="{{saving}}"
+  tagSuggestions="{{[]}}"
+  bind:confirm="onPreviewConfirm"
+  bind:cancel="onPreviewCancel"
+/>

@@ -1,0 +1,186 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.dm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  padding: 0 44rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.dm--page {
+  min-height: 0;
+  padding-top: 8rpx;
+}
+
+/* ---- 个人资料 ---- */
+
+.dm__profile {
+  padding: 0 4rpx 40rpx;
+}
+
+.dm__avatar {
+  position: relative;
+  flex: none;
+  width: 164rpx;
+  height: 164rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 32% 26%, #B9C6FF, #6E7CE0 42%, #2B2C4A 78%, #15161F);
+  box-shadow: 0 0 0 1rpx rgba(255, 255, 255, .12), 0 20rpx 48rpx -20rpx rgba(110, 124, 224, .8);
+}
+
+.dm__avatar-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 164rpx;
+  height: 164rpx;
+  display: block;
+}
+
+/* 透明按钮铺满整个圆形，只负责触发 chooseAvatar，避免 button 默认样式撑宽 */
+.dm__avatar-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 164rpx;
+  height: 164rpx;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.dm__avatar-btn::after {
+  border: none;
+}
+
+.dm__avatar-text {
+  font-family: var(--font-brush);
+  font-size: 68rpx;
+  color: rgba(255, 255, 255, .92);
+}
+
+/* 未设置头像时的引导：微信不允许静默读取头像，只能点一下走 chooseAvatar */
+.dm__avatar-tip {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: #6E6F76;
+}
+
+.dm__name {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 32rpx;
+}
+
+.dm__name-text {
+  font-size: 48rpx;
+  letter-spacing: .05em;
+  color: #F1F1EE;
+}
+
+.dm__sub {
+  font-size: 21rpx;
+  color: #62636A;
+  letter-spacing: .08em;
+  margin-top: 16rpx;
+}
+
+/* ---- 主菜单 ---- */
+
+.dm__menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.dm__item {
+  display: flex;
+  align-items: center;
+  gap: 30rpx;
+  height: 108rpx;
+  padding: 0 16rpx;
+  border-radius: 28rpx;
+  color: #8E8F96;
+}
+
+.dm__item--hover {
+  background-color: rgba(255, 255, 255, .03);
+}
+
+.dm__item-label {
+  font-size: 33rpx;
+  color: #DCDDD9;
+  letter-spacing: .06em;
+}
+
+.dm__item.is-ai .dm__item-label {
+  color: #C9BEFF;
+}
+
+.dm__item-tip {
+  font-size: 19rpx;
+  color: #5E5F66;
+  letter-spacing: .05em;
+}
+
+.dm__item-badge {
+  margin-left: auto;
+  font-family: var(--font-sans);
+  font-size: 16rpx;
+  letter-spacing: .12em;
+  color: #141318;
+  background: linear-gradient(120deg, #C0AAFF, #8F7BFF);
+  padding: 6rpx 12rpx;
+  border-radius: 10rpx;
+}
+
+/* ---- 更多入口 ---- */
+
+.dm__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, .05);
+}
+
+.dm__more-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .03);
+  border: 1rpx solid rgba(255, 255, 255, .05);
+}
+
+.dm__more-item--hover {
+  background-color: rgba(255, 255, 255, .06);
+}
+
+.dm__more-label {
+  font-size: 21rpx;
+  color: #8A8B92;
+  letter-spacing: .04em;
+}
+
+.dm__foot {
+  margin-top: auto;
+  padding-top: 32rpx;
+  font-size: 18rpx;
+  color: #46474E;
+  letter-spacing: .08em;
+}

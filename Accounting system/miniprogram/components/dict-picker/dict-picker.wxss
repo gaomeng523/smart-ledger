@@ -1,0 +1,230 @@
+/* 自定义组件宿主默认 inline，需显式撑满，否则触发器只占内容宽度 */
+:host {
+  display: block;
+  width: 100%;
+}
+
+.picker {
+  width: 100%;
+}
+
+.picker__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 24rpx;
+  background-color: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+}
+
+.picker__trigger.is-invalid {
+  border-color: var(--color-warning-strong);
+}
+
+.picker__trigger--hover {
+  opacity: .8;
+}
+
+.picker__trigger.is-disabled {
+  opacity: .5;
+}
+
+.picker__trigger-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.picker__value {
+  flex: 1;
+  min-width: 0;
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker__value.is-placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.picker__arrow {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  color: var(--color-text-hint);
+  line-height: 1;
+}
+
+.picker__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  /* 需高于 parse-preview 弹窗（201），保证嵌套在预览弹窗内时仍可点选 */
+  z-index: 300;
+}
+
+.picker__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: 32rpx;
+  border-top-right-radius: 32rpx;
+  box-shadow: var(--shadow-float);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+  flex: none;
+}
+
+.picker__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.picker__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.picker__list {
+  flex: 1;
+  max-height: 46vh;
+  padding: 0 32rpx;
+}
+
+.picker__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.picker__option-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.picker__option-name {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.picker__option.is-active .picker__option-name {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+/* ===== 两级分类：左一级 / 右二级 ===== */
+.picker__tree {
+  flex: none;
+  display: flex;
+  height: 46vh;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.picker__col {
+  height: 100%;
+}
+
+.picker__col--parent {
+  width: 34%;
+  margin-right: 16rpx;
+  border-radius: 24rpx;
+  background-color: var(--color-bg-muted);
+}
+
+.picker__col--child {
+  flex: 1;
+}
+
+.picker__parent {
+  display: flex;
+  align-items: center;
+  min-height: 80rpx;
+  padding: 0 16rpx;
+  border-radius: 20rpx;
+}
+
+.picker__parent.is-active {
+  background-color: var(--color-brand-light);
+}
+
+.picker__parent-name {
+  margin-left: 12rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.picker__parent.is-active .picker__parent-name {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.picker__child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  padding: 0 16rpx;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.picker__child-name {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker__child.is-active .picker__child-name {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.picker__check {
+  font-size: 30rpx;
+  color: var(--color-brand);
+}
+
+.picker__empty {
+  padding: 48rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.picker__safe {
+  flex: none;
+  height: env(safe-area-inset-bottom);
+}

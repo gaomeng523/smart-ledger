@@ -1,0 +1,44 @@
+# ============================================================
+# smart-ledger 后端 · systemd 服务
+#
+# 安装：cp smart-ledger.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now smart-ledger
+# 查看：systemctl status smart-ledger / journalctl -u smart-ledger -f
+#
+# 前置：
+#   /opt/smart-ledger/smart-ledger-backend-1.0.0.jar   打包产物
+#   /etc/smart-ledger/env                              环境变量（chmod 600，见 env.example）
+#   /opt/smart-ledger/uploads                          上传目录（属主同运行用户）
+# ============================================================
+
+[Unit]
+Description=Smart Ledger Backend (Spring Boot)
+After=network.target mysql.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=smartledger
+Group=smartledger
+WorkingDirectory=/opt/smart-ledger
+
+# 所有敏感配置只走环境变量，禁止写进 jar 或命令行
+EnvironmentFile=/etc/smart-ledger/env
+
+# 若 java 不在 /usr/bin 下，用 `which java` 的实际路径替换
+ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /opt/smart-ledger/smart-ledger-backend-1.0.0.jar --spring.profiles.active=prod
+
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143
+
+StandardOutput=journal
+StandardError=journal
+
+# 基础加固
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

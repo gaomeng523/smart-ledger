@@ -1,0 +1,401 @@
+.sub {
+  padding: 24rpx 32rpx 48rpx;
+}
+
+/* 自定义导航通栏：抵消根容器左右内边距 */
+.nav-fix {
+  margin: 0 -32rpx;
+}
+
+.sub__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 88rpx;
+}
+
+.sub__new {
+  display: flex;
+  align-items: center;
+  /* §2.4 最小热区 88rpx */
+  min-height: 88rpx;
+  padding: 0 var(--gap-md);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-brand-light);
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-brand-text);
+}
+
+.sub__new--hover {
+  opacity: .7;
+}
+
+/* ---- 候选区 ---- */
+
+.candidates {
+  margin-top: var(--gap-sm);
+}
+
+.candidates__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.candidates__tip {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.cand {
+  margin-top: var(--gap-md);
+  padding: var(--gap-md) var(--gap-lg);
+  border: 1px dashed var(--color-accent-yellow);
+}
+
+.cand__top {
+  display: flex;
+  align-items: flex-start;
+}
+
+.cand__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.cand__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  /* §2.6 长文本禁止撑破容器 */
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.cand__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 8rpx;
+}
+
+.cand__meta {
+  margin-left: var(--gap-sm);
+  font-size: 24rpx;
+  color: var(--color-text-sub);
+}
+
+.cand__badge {
+  flex: none;
+  margin-left: var(--gap-sm);
+  padding: 0 var(--gap-xs2);
+  border-radius: var(--radius-pill);
+  font-size: 24rpx;
+  line-height: 38rpx;
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-sub);
+}
+
+/* ---- 我的订阅 ---- */
+
+.sub__section {
+  margin-top: var(--gap-lg);
+}
+
+.item {
+  margin-top: var(--gap-md);
+  padding: var(--gap-md) var(--gap-lg);
+}
+
+.item.is-paused {
+  opacity: .68;
+}
+
+.item__top {
+  display: flex;
+  align-items: flex-start;
+}
+
+.item__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.item__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 8rpx;
+}
+
+.item__meta {
+  margin-left: var(--gap-sm);
+  font-size: 24rpx;
+  color: var(--color-text-sub);
+}
+
+.due {
+  flex: none;
+  margin-left: var(--gap-sm);
+  padding: 0 var(--gap-xs2);
+  border-radius: var(--radius-pill);
+  font-size: 24rpx;
+  line-height: 40rpx;
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-sub);
+}
+
+.due.is-paused {
+  color: var(--color-text-hint);
+}
+
+.due.is-overdue {
+  background-color: var(--color-warning);
+  color: var(--color-bg-page);
+}
+
+.due.is-today {
+  background-color: var(--color-expense-strong);
+  color: var(--color-bg-page);
+}
+
+.due.is-soon {
+  background-color: var(--color-accent-yellow);
+  color: var(--color-bg-page);
+}
+
+/* ---- 金额 / 操作按钮 ---- */
+
+.amount {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.amount.is-expense {
+  color: var(--color-expense-strong);
+}
+
+.sub__ops {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--gap-md);
+}
+
+.op-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* §2.4 最小热区 88rpx */
+  min-height: 88rpx;
+  padding: 0 var(--gap-md);
+  margin: 0 var(--gap-sm) var(--gap-sm) 0;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.op-btn--primary {
+  border-color: transparent;
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-text);
+  font-weight: 600;
+}
+
+.op-btn--danger {
+  border-color: transparent;
+  color: var(--color-expense-strong);
+}
+
+/* ---- 弹层 ---- */
+
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 300;
+}
+
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  /* §2.6 半屏弹窗最高 78vh，超出部分在 __body 内部滚动，禁止页面级嵌套滚动 */
+  max-height: 78vh;
+}
+
+.panel__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--gap-lg) var(--gap-lg) var(--gap-sm);
+}
+
+.panel__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.panel__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+/* 用 scroll-view scroll-y 承载，键盘弹起时可内部滚动 */
+.panel__body {
+  flex: 1;
+  max-height: 58vh;
+  padding: 0 var(--gap-lg) var(--gap-md);
+}
+
+/* 标签在上、控件通栏在下：与 bill-form 保持同一节奏 */
+.panel__row {
+  display: block;
+  margin-bottom: var(--gap-md);
+}
+
+.panel__label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.panel__field {
+  width: 100%;
+  min-width: 0;
+}
+
+.panel__text,
+.panel__picker {
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  padding: 0 var(--gap-md);
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.panel__picker {
+  justify-content: space-between;
+}
+
+.panel__picker-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel__arrow {
+  flex: none;
+  margin-left: var(--gap-sm);
+  color: var(--color-text-hint);
+}
+
+.panel__amount {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  padding: 0 var(--gap-md);
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+}
+
+.panel__prefix {
+  flex: none;
+  margin-right: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.panel__input {
+  flex: 1;
+  min-width: 0;
+  height: 88rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.panel__ph {
+  color: var(--color-text-hint);
+  font-size: 28rpx;
+  font-weight: 400;
+}
+
+.panel__footer {
+  flex: none;
+  padding: 0 var(--gap-lg) var(--gap-md);
+}
+
+/* 安全区占位不参与 flex 压缩，否则全面屏上会被挤成 0 */
+.panel .safe-bottom {
+  flex: none;
+}
+
+.panel__save {
+  width: 100%;
+}
+
+/* ---- 分段时间选择 ---- */
+
+.seg {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  padding: 4rpx;
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+}
+
+.seg__item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* §2.4 最小热区 88rpx */
+  min-height: 88rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.seg__item.is-active {
+  background-color: var(--color-bg-card);
+  color: var(--color-brand-text);
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}

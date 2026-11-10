@@ -1,0 +1,170 @@
+<view class="page">
+  <nav-bar>
+    <view slot="left" class="mhead">
+      <text class="mhead__m">{{monthNum}}月</text>
+      <text class="mhead__y">{{yearText}}年</text>
+    </view>
+    <view slot="right" class="macts">
+      <view class="mact" hover-class="mact--hover" bindtap="onPrevMonth">
+        <ui-icon name="left" size="32" color="#8A8B92" />
+      </view>
+      <view class="mact" hover-class="mact--hover" bindtap="onNextMonth">
+        <ui-icon name="right" size="32" color="#8A8B92" />
+      </view>
+      <view class="mact" hover-class="mact--hover" bindtap="onSearchOpen">
+        <ui-icon name="search" size="34" color="#C4C5C1" />
+      </view>
+    </view>
+  </nav-bar>
+
+  <view class="body">
+    <!-- ===== 搜索 ===== -->
+    <block wx:if="{{searchMode}}">
+      <view class="search">
+        <view class="search__field">
+          <ui-icon name="search" size="30" color="#6E6F76" />
+          <input
+            class="search__input"
+            value="{{keyword}}"
+            focus
+            confirm-type="search"
+            placeholder="搜备注、分类、金额…"
+            placeholder-class="search__ph"
+            bindinput="onKeywordInput"
+            bindconfirm="onKeywordConfirm"
+          />
+          <text class="search__cancel" bindtap="onSearchClose">取消</text>
+        </view>
+        <view class="search__tools">
+          <view class="search__filter" hover-class="search__filter--hover" bindtap="onFilterOpen">
+            <ui-icon name="filter" size="26" color="#9A9BA1" />
+            <text>筛选</text>
+          </view>
+          <text class="search__hint">本月命中 {{searchTotal}} 笔</text>
+        </view>
+      </view>
+
+      <view wx:if="{{searchLoading}}" class="search__empty">正在搜索…</view>
+
+      <block wx:elif="{{searchGroups.length}}">
+        <view wx:for="{{searchGroups}}" wx:key="date" class="card sgroup">
+          <view class="sgroup__head">
+            <text class="sgroup__date">{{item.label}}</text>
+            <text class="sgroup__count">{{item.items.length}} 笔</text>
+          </view>
+          <view
+            wx:for="{{item.items}}"
+            wx:for-item="bill"
+            wx:for-index="idx"
+            wx:key="billId"
+            class="tx"
+            hover-class="tx--hover"
+            data-id="{{bill.billId}}"
+            bindtap="onBillTap"
+          >
+            <view class="tx__ico">
+              <category-icon icon="{{bill.icon}}" size="34" color="#C4C5C1" />
+            </view>
+            <view class="tx__main">
+              <text class="tx__name">{{bill.name}}</text>
+              <text class="tx__meta">{{bill.meta}}</text>
+            </view>
+            <text class="tx__amt num {{bill.income ? 'is-in' : ''}}">{{bill.amountText}}</text>
+          </view>
+        </view>
+      </block>
+
+      <view wx:else class="search__empty">
+        <ui-icon name="search" size="48" color="#3A3B42" />
+        <text>没有找到符合条件的账单</text>
+      </view>
+    </block>
+
+    <!-- ===== 月历 ===== -->
+    <block wx:else>
+      <view class="cal">
+        <view class="cal__head">
+          <text wx:for="{{weekHead}}" wx:key="*this" class="cal__wh">{{item}}</text>
+        </view>
+        <view class="cal__grid">
+          <view
+            wx:for="{{cells}}"
+            wx:key="key"
+            class="cell {{item.blank ? 'is-blank' : ''}} {{item.isSelected ? 'is-on' : ''}} {{item.isToday ? 'is-today' : ''}}"
+            data-date="{{item.date}}"
+            bindtap="onDayTap"
+          >
+            <block wx:if="{{!item.blank}}">
+              <text class="cell__day">{{item.day}}</text>
+              <text wx:if="{{item.amountText}}" class="cell__amt num">{{item.amountText}}</text>
+              <view wx:elif="{{item.count}}" class="cell__dot"></view>
+            </block>
+          </view>
+        </view>
+      </view>
+
+      <view class="seg">
+        <view
+          wx:for="{{segOptions}}"
+          wx:key="value"
+          class="seg__item {{seg === item.value ? 'is-on' : ''}}"
+          data-seg="{{item.value}}"
+          bindtap="onSegTap"
+        >{{item.label}}</view>
+      </view>
+
+      <view class="nowline">
+        <view class="nowline__dot"></view>
+        <text class="nowline__text">{{selectedLabel}} {{selectedWeek}}</text>
+        <text class="nowline__out">支出 ¥{{dayOutText}}</text>
+      </view>
+
+      <view class="card daycard">
+        <view class="daycard__head">
+          <text class="daycard__title">{{selectedLabel}}</text>
+          <text class="daycard__sub">{{dayCount}} 笔 · 支出 ¥{{dayOutText}}</text>
+        </view>
+
+        <view
+          wx:for="{{dayBills}}"
+          wx:key="billId"
+          class="tx"
+          hover-class="tx--hover"
+          data-id="{{item.billId}}"
+          bindtap="onBillTap"
+        >
+          <view class="tx__ico">
+            <category-icon icon="{{item.icon}}" size="34" color="#C4C5C1" />
+          </view>
+          <view class="tx__main">
+            <text class="tx__name">{{item.name}}</text>
+            <text class="tx__meta">{{item.meta}}</text>
+          </view>
+          <text class="tx__amt num {{item.income ? 'is-in' : ''}}">{{item.amountText}}</text>
+        </view>
+
+        <view wx:if="{{!dayBills.length}}" class="tx-empty">这天还没有账单</view>
+      </view>
+
+      <view wx:if="{{insightPrefix}}" class="insight">
+        <view class="insight__ico">
+          <ui-icon name="spark" size="26" color="#B49CFF" />
+        </view>
+        <text class="insight__text">{{insightPrefix}}<text class="insight__hl">{{insightHighlight}}</text>{{insightSuffix}}</text>
+      </view>
+
+      <view class="mfoot">本月共 {{monthCount}} 笔 · 支出 ¥{{monthOutText}} · 收入 ¥{{monthInText}}</view>
+    </block>
+  </view>
+</view>
+
+<filter-panel
+  visible="{{filterVisible}}"
+  value="{{filterValue}}"
+  tags="{{tagSuggestions}}"
+  resultCount="{{filterCount}}"
+  bind:change="onFilterChange"
+  bind:confirm="onFilterConfirm"
+  bind:reset="onFilterReset"
+  bind:close="onFilterClose"
+/>

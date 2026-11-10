@@ -1,0 +1,15 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/nav-bar/nav-bar",
+    "template-item": "../../../components/template-item/template-item",
+    "empty-state": "../../../components/empty-state/empty-state",
+    "skeleton": "../../../components/skeleton/skeleton",
+    "bill-form": "../../../components/bill-form/bill-form",
+    "dict-picker": "../../../components/dict-picker/dict-picker",
+    "mascot": "../../../components/mascot/mascot"
+  },
+  "navigationBarTitleText": "模板管理",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light"
+}

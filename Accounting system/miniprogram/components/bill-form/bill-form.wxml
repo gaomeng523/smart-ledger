@@ -1,0 +1,121 @@
+<view class="bf">
+  <!-- 降级表单顶部：吉祥物抱歉态（§4.1.2） -->
+  <view wx:if="{{mode === 'fallback'}}" class="bf__mascot">
+    <mascot state="{{mascotState}}" size="{{96}}" />
+    <text class="bf__mascot-text">没太听懂，你直接填一下？</text>
+  </view>
+
+  <!-- 金额 -->
+  <view class="bf__row">
+    <text class="bf__label">金额</text>
+    <view class="bf__field bf__field--amount {{marks.amount ? 'is-invalid' : ''}}">
+      <text class="bf__prefix">¥</text>
+      <input
+        class="bf__input bf__input--num"
+        type="digit"
+        placeholder="0.00"
+        placeholder-class="bf__ph"
+        value="{{value.amount}}"
+        focus="{{amountFocus}}"
+        bindinput="onAmountInput"
+      />
+    </view>
+    <text wx:if="{{marks.amount === 'missing'}}" class="bf__warn">待补充</text>
+  </view>
+
+  <!-- 收支类型 -->
+  <view class="bf__row">
+    <text class="bf__label">类型</text>
+    <view class="bf__field bf__field--plain {{marks.billType ? 'is-invalid' : ''}}">
+      <view class="bf__segment">
+        <view
+          class="bf__segment-item {{value.billType === expense ? 'is-active' : ''}}"
+          data-type="{{expense}}"
+          bindtap="onBillType"
+        >支出</view>
+        <view
+          class="bf__segment-item {{value.billType === income ? 'is-active' : ''}}"
+          data-type="{{income}}"
+          bindtap="onBillType"
+        >收入</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支付渠道 -->
+  <view class="bf__row">
+    <text class="bf__label">渠道</text>
+    <view class="bf__field bf__field--picker">
+      <dict-picker
+        type="channel"
+        value="{{value.payChannelCode}}"
+        dict="{{dict}}"
+        placeholder="请选择支付渠道"
+        invalid="{{!!marks.payChannelCode}}"
+        bind:change="onChannelChange"
+      />
+    </view>
+    <text wx:if="{{marks.payChannelCode === 'missing'}}" class="bf__warn">待补充</text>
+  </view>
+
+  <!-- 分类 -->
+  <view class="bf__row">
+    <text class="bf__label">分类</text>
+    <view class="bf__field bf__field--picker">
+      <dict-picker
+        type="category"
+        billType="{{value.billType}}"
+        value="{{value.categoryCode}}"
+        dict="{{dict}}"
+        placeholder="请选择分类"
+        invalid="{{!!marks.categoryCode}}"
+        bind:change="onCategoryChange"
+      />
+    </view>
+    <text wx:if="{{marks.categoryCode === 'missing'}}" class="bf__warn">待补充</text>
+  </view>
+
+  <!-- 日期 -->
+  <view class="bf__row">
+    <text class="bf__label">日期</text>
+    <view class="bf__field bf__field--plain {{marks.recordDate ? 'is-invalid' : ''}}">
+      <picker class="bf__picker" mode="date" value="{{value.recordDate}}" end="{{maxDate}}" bindchange="onDateChange">
+        <view class="bf__picker-inner">
+          <text class="bf__picker-text {{value.recordDate ? '' : 'bf__ph'}}">
+            {{value.recordDate || '请选择日期'}}
+          </text>
+          <text class="bf__arrow">›</text>
+        </view>
+      </picker>
+    </view>
+    <text wx:if="{{marks.recordDate === 'missing'}}" class="bf__warn">待补充</text>
+  </view>
+
+  <!-- 标签（V2 §4.10 ④） -->
+  <view wx:if="{{showTags}}" class="bf__row">
+    <text class="bf__label">标签</text>
+    <view class="bf__field bf__field--chips">
+      <tag-chips
+        value="{{value.tags}}"
+        suggestions="{{tagSuggestions}}"
+        mode="input"
+        bind:change="onTagsChange"
+      />
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="bf__row">
+    <text class="bf__label">备注</text>
+    <view class="bf__field bf__field--remark">
+      <input
+        class="bf__input"
+        placeholder="选填，最多 255 字"
+        placeholder-class="bf__ph"
+        maxlength="255"
+        value="{{value.remark}}"
+        bindinput="onRemarkInput"
+      />
+    </view>
+  </view>
+</view>

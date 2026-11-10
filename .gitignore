@@ -1,0 +1,47 @@
+# ============================================================
+# 仓库根级忽略规则（子目录的 .gitignore 仍然生效）
+# ============================================================
+
+# ---- 构建产物 ----
+target/
+dist/
+*.jar
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# ---- 依赖 ----
+node_modules/
+miniprogram_npm/
+
+# ---- IDE / 操作系统 ----
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+
+# ---- 本地与生产配置（含密钥，禁止入库）----
+**/application-local.yml
+**/application-prod.yml
+*.env
+!*.env.example
+deploy/env/smart-ledger.env
+
+# ---- 证书与私钥 ----
+*.pem
+*.key
+*.csr
+*.p12
+*.jks
+
+# ---- 用户上传的账单图片 ----
+**/uploads/
+!**/uploads/.gitkeep
+
+# ---- 小程序本地私有配置 ----
+project.private.config.json
+
+# ---- 日志 ----
+*.log
+logs/

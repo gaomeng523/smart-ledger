@@ -1,0 +1,36 @@
+<view wx:if="{{visible}}" class="pp">
+  <view class="pp__mask" catchtap="onCancel" catchtouchmove="noop"></view>
+
+  <view class="pp__panel">
+    <view class="pp__header">
+      <text class="pp__title">识别结果</text>
+      <text class="pp__confidence">置信度 {{confidenceText}}</text>
+    </view>
+
+    <view wx:if="{{warn}}" class="pp__warn">
+      <text class="pp__warn-icon">!</text>
+      <text class="pp__warn-text">识别把握较低，请核对后保存</text>
+    </view>
+
+    <scroll-view class="pp__body" scroll-y>
+      <bill-form
+        value="{{form}}"
+        dict="{{dict}}"
+        mode="create"
+        marks="{{marks}}"
+        tagSuggestions="{{tagSuggestions}}"
+        bind:change="onFormChange"
+      />
+    </scroll-view>
+
+    <view class="pp__footer">
+      <view class="pp__btn pp__btn--ghost" hover-class="pp__btn--hover" bindtap="onCancel">取消</view>
+      <view
+        class="pp__btn pp__btn--primary {{saving ? 'is-disabled' : ''}}"
+        hover-class="pp__btn--primary-hover"
+        bindtap="onConfirm"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+    <view class="pp__safe"></view>
+  </view>
+</view>

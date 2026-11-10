@@ -1,0 +1,234 @@
+/**
+ * 分类管理（设计稿 06 屏）
+ */
+.page {
+  min-height: 100vh;
+  background: radial-gradient(120% 55% at 50% 0%, #131417 0%, #0B0B0C 44%, #08090A 100%);
+}
+
+.body {
+  padding: 8rpx 32rpx 60rpx;
+}
+
+/* ---- 概览 ---- */
+
+.summary {
+  padding: 20rpx 8rpx 28rpx;
+}
+
+.summary__row {
+  display: flex;
+  gap: 56rpx;
+}
+
+.summary__v {
+  font-family: var(--font-brush);
+  font-size: 56rpx;
+  color: #F0F0EE;
+  line-height: 1.1;
+}
+
+.summary__unit {
+  font-family: var(--font-hand);
+  font-size: 20rpx;
+  color: #62636A;
+  margin-left: 10rpx;
+  letter-spacing: .06em;
+}
+
+.summary__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14rpx;
+  font-size: 20rpx;
+  color: #62636A;
+  letter-spacing: .04em;
+}
+
+.summary__link {
+  color: #6FA6FF;
+}
+
+/* ---- 列表 ---- */
+
+.card {
+  padding: 26rpx 26rpx 12rpx;
+  border-radius: 40rpx;
+  background: linear-gradient(165deg, #191A1D, #141518 70%);
+  border: 1rpx solid rgba(255, 255, 255, .055);
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4rpx 8rpx;
+}
+
+.card__title {
+  font-size: 27rpx;
+  color: #E0E1DD;
+  letter-spacing: .1em;
+}
+
+.card__aside {
+  font-size: 18rpx;
+  color: #4E4F56;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 20rpx 4rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, .04);
+}
+
+.row--hover {
+  opacity: .72;
+}
+
+.row__ico {
+  width: 68rpx;
+  height: 68rpx;
+  flex: none;
+  border-radius: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid rgba(255, 255, 255, .05);
+}
+
+.row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.row__line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.row__name {
+  font-size: 26rpx;
+  color: #DCDDD9;
+  letter-spacing: .04em;
+}
+
+.row__amt {
+  font-size: 24rpx;
+  color: #B9BABF;
+}
+
+.row__bar {
+  height: 6rpx;
+  margin: 12rpx 0 8rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .05);
+  overflow: hidden;
+}
+
+.row__bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+}
+
+.row__meta {
+  font-size: 18rpx;
+  color: #54555B;
+  letter-spacing: .04em;
+}
+
+/* ---- 二级 ---- */
+
+.sub {
+  padding: 4rpx 4rpx 12rpx 86rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, .04);
+}
+
+.sub__loading {
+  font-size: 20rpx;
+  color: #4E4F56;
+  padding: 14rpx 0;
+}
+
+.sub__row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 12rpx 0;
+}
+
+.sub__name {
+  flex: 1;
+  font-size: 22rpx;
+  color: #9A9BA1;
+  letter-spacing: .04em;
+}
+
+.sub__name.is-zero {
+  color: #4E4F56;
+}
+
+.sub__amt {
+  font-size: 21rpx;
+  color: #8A8B92;
+}
+
+.sub__amt.is-zero {
+  color: #3E3F46;
+}
+
+/* ---- AI 规则 ---- */
+
+.rules {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 22rpx;
+  padding: 26rpx 28rpx;
+  border-radius: 36rpx;
+  background-color: rgba(139, 108, 255, .055);
+  border: 1rpx solid rgba(139, 108, 255, .13);
+}
+
+.rules__ico {
+  width: 56rpx;
+  height: 56rpx;
+  flex: none;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(139, 108, 255, .16);
+}
+
+.rules__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.rules__title {
+  font-size: 25rpx;
+  color: #C9B8FF;
+  letter-spacing: .08em;
+}
+
+.rules__sub {
+  font-size: 19rpx;
+  color: #6E6F76;
+  letter-spacing: .02em;
+}
+
+.tip {
+  padding: 30rpx 12rpx 8rpx;
+  font-size: 18rpx;
+  line-height: 1.6;
+  color: #46474E;
+  letter-spacing: .03em;
+}

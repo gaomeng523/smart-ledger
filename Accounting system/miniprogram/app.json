@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/bill/list/list",
+    "pages/stat/stat/stat",
+    "pages/mine/mine/mine",
+    "pages/login/login",
+    "pages/asset/asset",
+    "pages/category/category",
+    "pages/bill/detail/detail",
+    "pages/template/list/list",
+    "pages/budget/budget/budget",
+    "pages/import/import/import",
+    "pages/alias/alias/alias",
+    "pages/savings/savings/savings",
+    "pages/subscription/subscription/subscription",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#0B0B0C",
+    "navigationBarBackgroundColor": "#0B0B0C",
+    "navigationBarTitleText": "AI 记账",
+    "navigationBarTextStyle": "white",
+    "navigationStyle": "custom",
+    "pageOrientation": "portrait"
+  },
+  "tabBar": {
+    "color": "#54555B",
+    "selectedColor": "#3D8BFF",
+    "backgroundColor": "#0B0B0C",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "AI 记账",
+        "iconPath": "assets/tabbar/tab-ai.png",
+        "selectedIconPath": "assets/tabbar/tab-ai-active.png"
+      },
+      {
+        "pagePath": "pages/bill/list/list",
+        "text": "日历",
+        "iconPath": "assets/tabbar/tab-cal.png",
+        "selectedIconPath": "assets/tabbar/tab-cal-active.png"
+      },
+      {
+        "pagePath": "pages/stat/stat/stat",
+        "text": "统计",
+        "iconPath": "assets/tabbar/tab-chart.png",
+        "selectedIconPath": "assets/tabbar/tab-chart-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/tabbar/tab-mine.png",
+        "selectedIconPath": "assets/tabbar/tab-mine-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

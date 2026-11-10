@@ -1,0 +1,7 @@
+<view class="donut">
+  <canvas type="2d" id="{{canvasId}}" class="donut__canvas" bindtap="onTap"></canvas>
+  <view class="donut__center">
+    <text class="donut__center-label">合计</text>
+    <text class="donut__center-value num">¥{{centerText}}</text>
+  </view>
+</view>

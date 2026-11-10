@@ -1,0 +1,21 @@
+<view class="bill" hover-class="bill--hover" catchtap="onTap">
+  <view class="bill__badge" style="background-color:{{badgeColor}};">
+    <category-icon wx:if="{{iconName}}" icon="{{iconName}}" size="40" color="#C9CAC6" />
+    <text wx:else class="bill__badge-text">{{badgeText}}</text>
+  </view>
+
+  <view class="bill__main">
+    <view class="bill__title">{{bill.categoryName || '未分类'}}</view>
+    <view class="bill__sub">
+      <text wx:if="{{dateText}}" class="bill__sub-item">{{dateText}}</text>
+      <text wx:if="{{bill.payChannelName}}" class="bill__sub-item">{{bill.payChannelName}}</text>
+      <text wx:if="{{remarkText}}" class="bill__sub-item bill__sub-item--remark">{{remarkText}}</text>
+    </view>
+
+    <view wx:if="{{bill.tags.length > 0}}" class="bill__tags">
+      <view wx:for="{{bill.tags}}" wx:for-item="tag" wx:key="*this" class="bill__tag">{{tag}}</view>
+    </view>
+  </view>
+
+  <view class="bill__amount num {{isIncome ? 'is-income' : 'is-expense'}}">{{amountText}}</view>
+</view>

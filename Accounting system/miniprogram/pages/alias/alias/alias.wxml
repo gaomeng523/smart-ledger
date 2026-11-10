@@ -1,0 +1,111 @@
+<view class="page">
+  <view class="nav-fix"><nav-bar back title="别名词典" /></view>
+
+  <!-- 副标题 -->
+  <view class="head">
+    <text class="head__sub">你怎么说，萌萌就怎么记</text>
+  </view>
+
+  <!-- 首屏骨架 -->
+  <skeleton wx:if="{{firstLoading}}" rows="3" />
+
+  <!-- 别名列表 -->
+  <block wx:elif="{{!empty}}">
+    <view class="alias-list">
+      <view wx:for="{{aliases}}" wx:key="aliasId" class="alias-row">
+        <view class="alias-row__top">
+          <view class="alias-row__map">
+            <text class="alias-row__keyword">{{item.keyword}}</text>
+            <text class="alias-row__arrow">→</text>
+            <text class="alias-row__target">{{item.targetName}}</text>
+          </view>
+          <text class="alias-row__hit">命中 {{item.hitCount || 0}} 次</text>
+        </view>
+        <view class="alias-row__ops">
+          <view class="tag alias-row__type">{{item.targetType === 1 ? '分类' : '渠道'}}</view>
+          <view class="alias-row__op" hover-class="alias-row__op--hover" data-row="{{item}}" bindtap="onEdit">编辑</view>
+          <view class="alias-row__op is-del" hover-class="alias-row__op--hover" data-row="{{item}}" bindtap="onDelete">删除</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空态 -->
+  <empty-state
+    wx:else
+    mascotState="empty"
+    text="还没有别名，把常说的词教给萌萌吧"
+    actionText="新增别名"
+    bind:action="onNew"
+  />
+
+  <!-- 新增按钮 -->
+  <view wx:if="{{!empty}}" class="foot">
+    <view class="btn btn-primary foot__btn" hover-class="btn--active" bindtap="onNew">+ 新增别名</view>
+  </view>
+</view>
+
+<!-- 新增 / 编辑半屏弹窗 -->
+<view wx:if="{{showPanel}}">
+  <view class="sheet__mask" bindtap="onPanelClose" catchtouchmove="noop"></view>
+  <view class="sheet__panel">
+    <view class="sheet__header">
+      <text class="sheet__title">{{editing ? '编辑别名' : '新增别名'}}</text>
+      <text class="sheet__close" bindtap="onPanelClose">关闭</text>
+    </view>
+
+    <scroll-view class="sheet__body" scroll-y>
+      <view class="sheet__field">
+        <text class="sheet__label">关键词</text>
+        <input
+          class="sheet__input"
+          maxlength="20"
+          placeholder="如：公司食堂"
+          placeholder-class="sheet__ph"
+          value="{{formKeyword}}"
+          bindinput="onKeywordInput"
+        />
+      </view>
+
+      <view class="sheet__field">
+        <text class="sheet__label">映射目标类型</text>
+        <view class="seg">
+          <view
+            class="seg__item {{formTargetType === 1 ? 'is-active' : ''}}"
+            data-type="1"
+            bindtap="onTypeChange"
+          >分类</view>
+          <view
+            class="seg__item {{formTargetType === 2 ? 'is-active' : ''}}"
+            data-type="2"
+            bindtap="onTypeChange"
+          >渠道</view>
+        </view>
+      </view>
+
+      <view class="sheet__field">
+        <text class="sheet__label">映射目标</text>
+        <view class="sheet__picker">
+          <dict-picker
+            type="{{formTargetType === 1 ? 'category' : 'channel'}}"
+            billType="{{0}}"
+            value="{{formTargetCode}}"
+            dict="{{dict}}"
+            placeholder="{{formTargetType === 1 ? '请选择分类' : '请选择渠道'}}"
+            bind:change="onTargetChange"
+          />
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="sheet__footer">
+      <view class="btn btn-ghost sheet__btn" hover-class="sheet__btn--hover" bindtap="onPanelClose">取消</view>
+      <view
+        class="btn btn-primary sheet__btn {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--active'}}"
+        bindtap="onSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+    <view class="sheet__safe"></view>
+  </view>
+</view>

@@ -1,0 +1,112 @@
+.mp {
+  display: inline-block;
+}
+
+.mp__trigger {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background-color: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+}
+
+.mp__trigger--hover {
+  opacity: .8;
+}
+
+.mp__value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.mp__caret {
+  margin-left: 8rpx;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+  line-height: 1;
+}
+
+.mp__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 300;
+}
+
+.mp__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: 32rpx;
+  border-top-right-radius: 32rpx;
+  box-shadow: var(--shadow-float);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mp__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.mp__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.mp__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.mp__list {
+  flex: 1;
+  max-height: 46vh;
+  padding: 0 32rpx;
+}
+
+.mp__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mp__option-text {
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.mp__option.is-active .mp__option-text {
+  color: var(--color-brand-text);
+  font-weight: 600;
+}
+
+.mp__check {
+  font-size: 30rpx;
+  color: var(--color-brand-text);
+}
+
+.mp__safe {
+  flex: none;
+  height: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,133 @@
+<view class="budget">
+  <view class="nav-fix"><nav-bar back title="预算设置" /></view>
+
+  <view class="budget__head">
+    <month-picker value="{{month}}" bind:change="onMonthChange" />
+  </view>
+
+  <skeleton wx:if="{{loading}}" rows="{{3}}" />
+
+  <empty-state
+    wx:elif="{{empty}}"
+    mascotState="empty"
+    text="还没有预算，先设一个吧"
+    actionText="设置总预算"
+    bind:action="openTotalModal"
+  />
+
+  <block wx:else>
+    <!-- 总预算卡片 -->
+    <view class="total card">
+      <view class="total__head">
+        <text class="total__label">本月预算</text>
+        <text class="total__value num">¥{{totalBudgetText}}</text>
+        <text wx:if="{{totalOver}}" class="tag tag--over total__tag">已超支</text>
+      </view>
+      <view class="bar">
+        <view class="bar__fill bar__fill--{{totalLevel}}" style="width: {{totalPercent}}%"></view>
+      </view>
+      <view class="total__foot">
+        <text class="total__used num">已用 {{totalPercentText}}</text>
+        <text class="total__remain num">剩余 ¥{{totalRemainText}}</text>
+      </view>
+    </view>
+
+    <!-- 分类预算列表 -->
+    <view class="budget__section">
+      <text class="section-title">分类预算</text>
+
+      <view wx:for="{{items}}" wx:key="budgetId" class="cat card">
+        <view class="cat__row">
+          <text class="cat__name">{{item.categoryName}}</text>
+          <text wx:if="{{item.over}}" class="tag tag--over cat__tag">已超支</text>
+          <view
+            class="cat__del"
+            hover-class="cat__del--hover"
+            data-id="{{item.budgetId}}"
+            data-name="{{item.categoryName}}"
+            catchtap="onDeleteItem"
+          >删除</view>
+        </view>
+        <view class="cat__meta">
+          <text class="cat__amount num">¥{{item.usedText}} / ¥{{item.amountText}}</text>
+          <text class="cat__percent num">{{item.percentText}}</text>
+        </view>
+        <view class="bar">
+          <view class="bar__fill bar__fill--{{item.level}}" style="width: {{item.percent}}%"></view>
+        </view>
+      </view>
+
+      <view class="budget__add" hover-class="budget__add--hover" bindtap="openCategoryModal">+ 添加分类预算</view>
+    </view>
+
+    <view class="budget__actions">
+      <view class="btn btn-ghost budget__total-btn" hover-class="budget__ghost--hover" bindtap="openTotalModal">设置总预算</view>
+    </view>
+  </block>
+
+  <!-- 半屏弹窗（mask 300 / panel 301） -->
+  <view wx:if="{{modalVisible}}" class="mask" bindtap="closeModal" catchtouchmove="noop"></view>
+  <view wx:if="{{modalVisible}}" class="panel">
+    <view class="panel__header">
+      <text class="panel__title">{{modalMode === 'category' ? '添加分类预算' : '设置总预算'}}</text>
+      <text class="panel__close" bindtap="closeModal">关闭</text>
+    </view>
+
+    <scroll-view class="panel__body" scroll-y>
+      <view wx:if="{{modalMode === 'category'}}" class="panel__row">
+        <text class="panel__label">分类</text>
+        <view class="panel__field">
+          <dict-picker
+            type="category"
+            billType="{{0}}"
+            value="{{form.categoryCode}}"
+            dict="{{dict}}"
+            placeholder="请选择分类"
+            bind:change="onCategoryChange"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">金额</text>
+        <view class="panel__amount">
+          <text class="panel__prefix">¥</text>
+          <input
+            class="panel__input"
+            type="digit"
+            placeholder="0.00"
+            placeholder-class="panel__ph"
+            value="{{form.amount}}"
+            bindinput="onAmountInput"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row panel__row--stack">
+        <view class="panel__row-between">
+          <text class="panel__label">预警</text>
+          <text class="panel__warn num">预警 {{form.warnPercent}}%</text>
+        </view>
+        <slider
+          min="50"
+          max="100"
+          step="5"
+          value="{{form.warnPercent}}"
+          activeColor="{{sliderActiveColor}}"
+          block-size="20"
+          bindchange="onWarnChange"
+        />
+      </view>
+    </scroll-view>
+
+    <view class="panel__footer">
+      <view
+        class="btn btn-primary panel__save {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--active'}}"
+        bindtap="onSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+
+    <view class="safe-bottom"></view>
+  </view>
+</view>

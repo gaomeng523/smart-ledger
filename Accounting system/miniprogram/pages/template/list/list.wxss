@@ -1,0 +1,171 @@
+.page {
+  padding: 24rpx 32rpx 48rpx;
+}
+
+/* 自定义导航通栏：抵消根容器左右内边距 */
+.nav-fix {
+  margin: 0 -32rpx;
+}
+
+/* ===== 顶部操作 ===== */
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24rpx;
+}
+
+.toolbar__new {
+  padding: 0 var(--gap-lg);
+}
+
+/* ===== 模板列表 ===== */
+
+.tpl-list__item {
+  margin-bottom: 24rpx;
+}
+
+/* ===== 撤销条 ===== */
+
+.undo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--gap-sm2) var(--gap-lg) calc(var(--gap-sm2) + env(safe-area-inset-bottom));
+  background-color: var(--color-brand-strong);
+  box-shadow: var(--shadow-float);
+}
+
+.undo__text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+}
+
+.undo__btn {
+  /* §2.4 最小热区 88rpx：胶囊本身高度靠 min-height 撑，padding 只留横向 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  padding: 0 32rpx;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-card);
+  color: var(--color-brand-text);
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.undo__btn--hover {
+  opacity: .8;
+}
+
+/* ===== 新建 / 编辑半屏弹窗（mask 300 / panel 301，与 dict-picker 同规范） ===== */
+
+.sheet__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 300;
+}
+
+.sheet__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+}
+
+.sheet__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.sheet__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sheet__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.sheet__body {
+  flex: 1;
+  max-height: 58vh;
+  padding: 0 32rpx;
+}
+
+.sheet__field {
+  margin: 0 0 24rpx;
+}
+
+.sheet__label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.sheet__input {
+  width: 100%;
+  min-height: 88rpx;
+  margin-top: 8rpx;
+  padding: 0 24rpx;
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.sheet__ph {
+  color: var(--color-text-hint);
+}
+
+.sheet__footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx 16rpx;
+}
+
+.sheet__btn {
+  flex: 1;
+}
+
+.sheet__btn + .sheet__btn {
+  margin-left: 24rpx;
+}
+
+.sheet__btn--hover {
+  opacity: .8;
+}
+
+.sheet__safe {
+  flex: none;
+  height: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,10 @@
+<view class="skeleton">
+  <view wx:for="{{list}}" wx:key="*this" class="skeleton__row">
+    <view class="skeleton__badge"></view>
+    <view class="skeleton__main">
+      <view class="skeleton__line skeleton__line--wide"></view>
+      <view class="skeleton__line skeleton__line--narrow"></view>
+    </view>
+    <view class="skeleton__amount"></view>
+  </view>
+</view>

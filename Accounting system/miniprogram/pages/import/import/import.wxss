@@ -1,0 +1,242 @@
+.import {
+  padding: 24rpx 32rpx 48rpx;
+}
+
+/* 自定义导航通栏：抵消根容器左右内边距 */
+.nav-fix {
+  margin: 0 -32rpx;
+}
+
+/* ---- 格式错误提示条 ---- */
+
+.banner {
+  margin-bottom: var(--gap-md);
+  padding: var(--gap-md) var(--gap-lg);
+  border-radius: var(--radius-card);
+  border-left: 8rpx solid var(--color-warning);
+  background-color: var(--color-bg-muted);
+}
+
+.banner__text {
+  display: block;
+  font-size: 26rpx;
+  color: var(--color-text);
+  overflow-wrap: break-word;
+}
+
+.banner__link {
+  /* §2.4 最小热区 88rpx：block 改 flex 后仍占满整行，只是可点高度增大 */
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  margin-top: var(--gap-xs);
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-warning-strong);
+}
+
+.banner__detail {
+  margin-top: var(--gap-sm);
+}
+
+.banner__group {
+  display: block;
+  margin-top: var(--gap-xs);
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.banner__item {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  color: var(--color-text-sub);
+  overflow-wrap: break-word;
+}
+
+/* ---- 步骤卡片 ---- */
+
+.import__card {
+  margin-bottom: var(--gap-md);
+}
+
+.import__step {
+  display: block;
+  margin-bottom: var(--gap-sm);
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ① 来源分段控件 */
+
+.import__segments {
+  display: flex;
+  padding: 8rpx;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-muted);
+}
+
+.import__segment {
+  flex: 1;
+  /* §2.4 最小热区 88rpx */
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--color-text-sub);
+  border-radius: var(--radius-pill);
+}
+
+.import__segment.is-active {
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-text);
+  font-weight: 600;
+}
+
+/* ② 文件 */
+
+.import__file-row {
+  display: flex;
+  align-items: center;
+}
+
+.import__choose {
+  flex: none;
+  min-height: 88rpx;
+}
+
+.import__choose.is-disabled {
+  opacity: .5;
+}
+
+.import__ghost--hover {
+  opacity: .7;
+}
+
+.import__file-meta {
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--gap-md);
+}
+
+.import__file-name {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import__file-size {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.import__hint {
+  display: block;
+  margin-top: var(--gap-sm);
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+/* ③ 预览 */
+
+.import__summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.import__sum {
+  font-size: 30rpx;
+  color: var(--color-text-sub);
+}
+
+.import__dot {
+  margin: 0 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.import__ok {
+  color: var(--color-brand-text);
+  font-weight: 600;
+}
+
+.import__fail {
+  color: var(--color-warning-strong);
+  font-weight: 600;
+}
+
+.import__fail-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  margin-top: var(--gap-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.import__fail-toggle-text {
+  font-size: 28rpx;
+  color: var(--color-text-sub);
+}
+
+.import__caret {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.import__fail-list {
+  padding-top: var(--gap-xs);
+}
+
+.import__fail-item {
+  display: flex;
+  align-items: baseline;
+  padding: 12rpx 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.import__fail-line {
+  flex: none;
+  width: 180rpx;
+  font-size: 26rpx;
+  color: var(--color-expense-strong);
+}
+
+.import__fail-reason {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+  overflow-wrap: break-word;
+}
+
+.import__fail-empty {
+  padding: var(--gap-md) 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.import__action {
+  width: 100%;
+  margin-top: var(--gap-md);
+}
+
+.import__done {
+  margin-top: var(--gap-md);
+}
+
+.import__done-text {
+  display: block;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-brand-text);
+}

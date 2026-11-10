@@ -1,0 +1,104 @@
+<view class="import">
+  <view class="nav-fix"><nav-bar back title="导入账单" /></view>
+
+  <!-- 格式错误提示条（code 1006，§4.8-4） -->
+  <view wx:if="{{showFormatTip}}" class="banner">
+    <text class="banner__text">文件格式不支持，请使用微信/支付宝导出的 CSV</text>
+    <text class="banner__link" bindtap="toggleFormat">查看支持的格式 {{formatExpanded ? '▴' : '▾'}}</text>
+    <view wx:if="{{formatExpanded}}" class="banner__detail">
+      <text class="banner__group">必需列</text>
+      <text class="banner__item">· 交易时间（支持 yyyy-MM-dd、yyyy-MM-dd HH:mm:ss 等）</text>
+      <text class="banner__item">· 金额</text>
+      <text class="banner__group">可选列</text>
+      <text class="banner__item">· 收/支（支出 / 收入）</text>
+      <text class="banner__item">· 商品说明</text>
+      <text class="banner__item">· 支付方式、交易状态</text>
+    </view>
+  </view>
+
+  <!-- ① 来源 -->
+  <view class="card import__card">
+    <text class="import__step">① 来源</text>
+    <view class="import__segments">
+      <view
+        wx:for="{{sources}}"
+        wx:key="value"
+        class="import__segment {{sourceType === item.value ? 'is-active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onSourceTap"
+      >{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- ② 文件 -->
+  <view class="card import__card">
+    <text class="import__step">② 文件</text>
+    <view class="import__file-row">
+      <view
+        class="btn btn-ghost import__choose {{previewing || importing ? 'is-disabled' : ''}}"
+        hover-class="{{previewing || importing ? '' : 'import__ghost--hover'}}"
+        bindtap="onChooseFile"
+      >{{previewing ? '试算中…' : '选择 CSV 文件'}}</view>
+      <view wx:if="{{file}}" class="import__file-meta">
+        <text class="import__file-name">{{file.name}}</text>
+        <text class="import__file-size num">{{file.sizeText}}</text>
+      </view>
+    </view>
+    <text class="import__hint">仅支持 .csv 文件，大小不超过 5MB</text>
+  </view>
+
+  <!-- ③ 预览（试算中） -->
+  <view wx:if="{{previewing}}" class="card import__card">
+    <text class="import__step">③ 预览</text>
+    <text class="import__hint">正在试算，请稍候…</text>
+  </view>
+
+  <!-- ③ 预览（试算结果） -->
+  <view wx:elif="{{result}}" class="card import__card">
+    <text class="import__step">③ 预览</text>
+    <view class="import__summary">
+      <text class="import__sum">共 <text class="num">{{result.totalCount}}</text> 条</text>
+      <text class="import__dot">·</text>
+      <text class="import__sum">可导入 <text class="num import__ok">{{result.successCount}}</text></text>
+      <text class="import__dot">·</text>
+      <text class="import__sum">失败 <text class="num import__fail">{{result.failCount}}</text></text>
+    </view>
+
+    <view wx:if="{{result.failCount > 0}}" class="import__fail-toggle" bindtap="toggleFailDetail">
+      <text class="import__fail-toggle-text">失败明细</text>
+      <text class="import__caret">{{showFailDetail ? '▴' : '▾'}}</text>
+    </view>
+    <view wx:if="{{showFailDetail}}" class="import__fail-list">
+      <view wx:for="{{result.failDetail}}" wx:key="line" class="import__fail-item">
+        <text class="import__fail-line num">第 {{item.line}} 行</text>
+        <text class="import__fail-reason">{{item.reason}}</text>
+      </view>
+      <view wx:if="{{result.failDetail.length === 0}}" class="import__fail-empty">无失败明细</view>
+    </view>
+
+    <block wx:if="{{!importedId}}">
+      <view
+        class="btn btn-primary import__action {{previewing || importing ? 'btn--disabled' : ''}}"
+        hover-class="{{previewing || importing ? '' : 'btn--active'}}"
+        bindtap="onConfirm"
+      >{{importing ? '导入中…' : '确认导入'}}</view>
+    </block>
+    <view wx:else class="import__done">
+      <text class="import__done-text">已导入 {{result.successCount}} 条</text>
+      <view
+        class="btn btn-danger-ghost import__action"
+        hover-class="{{rollingBack ? '' : 'import__ghost--hover'}}"
+        bindtap="onRollback"
+      >{{rollingBack ? '撤销中…' : '撤销本次导入'}}</view>
+    </view>
+  </view>
+
+  <!-- 未选文件时的引导空态 -->
+  <empty-state
+    wx:if="{{!file && !previewing && !result}}"
+    mascotState="empty"
+    text="还没有选择文件，先选一个 CSV 吧"
+  />
+
+  <view class="safe-bottom"></view>
+</view>

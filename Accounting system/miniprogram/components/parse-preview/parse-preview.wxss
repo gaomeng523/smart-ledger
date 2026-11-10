@@ -1,0 +1,131 @@
+.pp {
+  position: relative;
+}
+
+.pp__mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 200;
+}
+
+.pp__panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+}
+
+.pp__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.pp__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.pp__confidence {
+  font-size: 24rpx;
+  color: var(--color-text-hint);
+}
+
+.pp__warn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  margin: 0 32rpx 16rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 24rpx;
+  background-color: var(--color-bg-muted);
+}
+
+.pp__warn-icon {
+  flex: none;
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background-color: var(--color-warning-strong);
+  color: #1C1D20;
+  font-size: 24rpx;
+  line-height: 32rpx;
+  text-align: center;
+}
+
+.pp__warn-text {
+  font-size: 24rpx;
+  color: var(--color-text-sub);
+}
+
+.pp__body {
+  flex: 1;
+  max-height: 56vh;
+  padding: 0 32rpx;
+}
+
+.pp__footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx 16rpx;
+}
+
+.pp__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.pp__btn--ghost {
+  background-color: transparent;
+  color: var(--color-text-sub);
+  border: 1px solid var(--color-border);
+}
+
+.pp__btn--primary {
+  margin-left: 24rpx;
+  background-color: var(--color-brand-strong);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-btn);
+}
+
+.pp__btn--primary-hover {
+  background-color: var(--color-brand-active);
+}
+
+.pp__btn--primary.is-disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-hint);
+  box-shadow: none;
+}
+
+.pp__btn--hover {
+  opacity: .8;
+}
+
+.pp__safe {
+  flex: none;
+  height: env(safe-area-inset-bottom);
+}

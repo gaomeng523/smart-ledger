@@ -1,0 +1,205 @@
+.lg {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0 52rpx;
+  box-sizing: border-box;
+  background: radial-gradient(120% 60% at 50% 0%, #171922 0%, #0B0B0C 48%, #08090A 100%);
+}
+
+.lg__status {
+  flex: none;
+}
+
+/* ---- 品牌区 ---- */
+
+.lg__hero {
+  flex: none;
+  padding-top: 96rpx;
+}
+
+.lg__logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 32% 26%, #B9C6FF, #6E7CE0 42%, #2B2C4A 78%, #15161F);
+  box-shadow: 0 0 0 1rpx rgba(255, 255, 255, .12), 0 24rpx 56rpx -22rpx rgba(110, 124, 224, .85);
+}
+
+.lg__logo-text {
+  font-family: var(--font-brush);
+  font-size: 68rpx;
+  color: rgba(255, 255, 255, .92);
+}
+
+.lg__brand {
+  margin-top: 44rpx;
+  font-family: var(--font-brush);
+  font-size: 64rpx;
+  letter-spacing: .1em;
+  color: var(--text);
+}
+
+.lg__slogan {
+  margin-top: 18rpx;
+  font-size: 26rpx;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+/* ---- 特性列表 ---- */
+
+.lg__features {
+  flex: 1;
+  padding-top: 84rpx;
+}
+
+.lg__feature {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 18rpx 0;
+}
+
+.lg__feature-text {
+  font-size: 26rpx;
+  color: #B8B9B6;
+}
+
+/* ---- 底部操作 ---- */
+
+.lg__foot {
+  flex: none;
+  padding-bottom: 24rpx;
+}
+
+.lg__btn {
+  height: 104rpx;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31rpx;
+  letter-spacing: .06em;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #3D8BFF, #2E6BE0);
+  box-shadow: 0 20rpx 44rpx -20rpx rgba(61, 139, 255, .9);
+}
+
+.lg__btn--hover {
+  opacity: .9;
+}
+
+.lg__btn.is-loading {
+  opacity: .7;
+}
+
+.lg__agree {
+  display: block;
+  margin-top: 26rpx;
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--dim);
+}
+
+.lg__skip {
+  display: block;
+  margin-top: 26rpx;
+  text-align: center;
+  font-size: 23rpx;
+  color: var(--muted);
+}
+
+/* ---- 头像 / 昵称 ---- */
+
+.lg__setup {
+  flex: 1;
+  padding-top: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lg__avatar {
+  position: relative;
+  width: 172rpx;
+  height: 172rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  background: radial-gradient(circle at 32% 26%, #B9C6FF, #6E7CE0 42%, #2B2C4A 78%, #15161F);
+  box-shadow: 0 0 0 1rpx rgba(255, 255, 255, .12), 0 20rpx 48rpx -20rpx rgba(110, 124, 224, .8);
+}
+
+.lg__avatar-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 172rpx;
+  height: 172rpx;
+  display: block;
+}
+
+/* 透明按钮铺满圆形，只负责触发 chooseAvatar，避免 button 默认样式撑宽 */
+.lg__avatar-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 172rpx;
+  height: 172rpx;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.lg__avatar-btn::after {
+  border: none;
+}
+
+.lg__avatar-text {
+  font-family: var(--font-brush);
+  font-size: 72rpx;
+  color: rgba(255, 255, 255, .92);
+}
+
+.lg__hint {
+  margin-top: 22rpx;
+  font-size: 21rpx;
+  color: var(--dim);
+}
+
+.lg__field {
+  width: 100%;
+  margin-top: 64rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 28rpx 32rpx;
+  box-sizing: border-box;
+  background-color: var(--card);
+  border: 1rpx solid rgba(255, 255, 255, .055);
+  border-radius: 28rpx;
+}
+
+.lg__field-label {
+  font-size: 27rpx;
+  color: var(--muted);
+}
+
+.lg__input {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text);
+}
+
+.lg__ph {
+  color: var(--dim);
+}

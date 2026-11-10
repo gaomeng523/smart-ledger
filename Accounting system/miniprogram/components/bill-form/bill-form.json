@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "mascot": "../mascot/mascot",
+    "dict-picker": "../dict-picker/dict-picker",
+    "tag-chips": "../tag-chips/tag-chips"
+  }
+}

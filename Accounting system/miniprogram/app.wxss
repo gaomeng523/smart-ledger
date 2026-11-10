@@ -1,0 +1,284 @@
+/**
+ * 全局设计令牌（深色 · AI 记账）
+ * 权威来源：ai-ledger-ui.html（6 屏概念稿）
+ * 约定：业务样式只引用变量，不写死色值。
+ */
+@import "./styles/fonts.wxss";
+
+page {
+  /* ---- 色彩 ---- */
+  --bg: #08090A;
+  --screen: #0B0B0C;
+  --card: #161719;
+  --card-2: #1C1D20;
+  --cell: #0E0F11;
+  --line: rgba(255, 255, 255, .055);
+  --line-strong: rgba(255, 255, 255, .09);
+  --text: #EDEDEC;
+  --muted: #7B7C82;
+  --dim: #54555B;
+  --blue: #3D8BFF;
+  --red: #FF6B6B;
+  --green: #57D9A3;
+  --amber: #FFB020;
+  --ai: #8B6CFF;
+
+  /* ---- 兼容旧变量（其余功能页复用） ---- */
+  --color-brand: #3D8BFF;
+  --color-brand-text: #6FA6FF;
+  --color-brand-strong: #3D8BFF;
+  --color-brand-active: #2F6FE6;
+  --color-brand-light: rgba(61, 139, 255, .14);
+  --color-expense: #FF6B6B;
+  --color-expense-strong: #FF8B8B;
+  --color-income: #57D9A3;
+  --color-income-text: #8FE0BE;
+  --color-accent-yellow: #FFB020;
+  --color-accent-pink: #FF8FA3;
+  --color-accent-mint: #57D9A3;
+  --color-warning: #FFB020;
+  --color-warning-strong: #FFCE8A;
+  --color-info: #6C8CFF;
+  --color-info-strong: #7C9BFF;
+  --color-text: #EDEDEC;
+  --color-text-sub: #7B7C82;
+  --color-text-hint: #7B7C82;
+  --color-text-placeholder: #54555B;
+  --color-border: rgba(255, 255, 255, .055);
+  --color-bg-muted: #1C1D20;
+  --color-bg-page: #0B0B0C;
+  --color-bg-card: #161719;
+  --color-mask: rgba(0, 0, 0, .55);
+
+  /* ---- 圆角 ---- */
+  --radius-card: 40rpx;
+  --radius-cell: 24rpx;
+  --radius-input: 46rpx;
+  --radius-btn: 24rpx;
+  --radius-pill: 999rpx;
+
+  /* ---- 阴影 ---- */
+  --shadow-card: none;
+  --shadow-float: 0 -12rpx 40rpx rgba(0, 0, 0, .5);
+  --shadow-btn: 0 16rpx 40rpx -16rpx rgba(47, 111, 230, .9);
+
+  /* ---- 间距 ---- */
+  --gap-page: 32rpx;
+  --gap-xxs: 4rpx;
+  --gap-xs: 8rpx;
+  --gap-xs2: 12rpx;
+  --gap-sm: 16rpx;
+  --gap-sm2: 20rpx;
+  --gap-md: 24rpx;
+  --gap-lg: 32rpx;
+  --gap-xl: 48rpx;
+
+  /* ---- 字体 ---- */
+  --font-hand: "LXGWWenKai", "LXGW WenKai", "Kaiti SC", STKaiti, KaiTi, serif;
+  --font-brush: "MaShanZheng", "LXGW WenKai", cursive;
+  --font-sans: "Inter", "SF Pro Text", -apple-system, "PingFang SC", sans-serif;
+
+  background-color: var(--screen);
+  color: var(--text);
+  font-size: 26rpx;
+  line-height: 1.6;
+  font-family: var(--font-hand);
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+text,
+input,
+textarea,
+button,
+scroll-view {
+  box-sizing: border-box;
+}
+
+input,
+textarea,
+button {
+  font-family: inherit;
+}
+
+/* 金额：等宽数字 */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ---- 容器 ---- */
+
+.page {
+  min-height: 100vh;
+  background-color: var(--screen);
+}
+
+.page-pad {
+  padding: 0 var(--gap-page);
+}
+
+.card {
+  background-color: var(--card);
+  border: 1rpx solid rgba(255, 255, 255, .035);
+  border-radius: var(--radius-card);
+  padding: 28rpx;
+  color: var(--text);
+}
+
+.card--flat {
+  background-color: var(--card-2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ---- 文字 ---- */
+
+.text-sub {
+  color: var(--muted);
+}
+
+.text-hint {
+  color: var(--dim);
+}
+
+.text-title {
+  font-size: 40rpx;
+  color: var(--text);
+  letter-spacing: .04em;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #DADBD8;
+  letter-spacing: .12em;
+}
+
+.divider {
+  height: 1rpx;
+  background-color: var(--line);
+}
+
+/* ---- 分段控件 ---- */
+
+.seg {
+  display: flex;
+  background-color: #0A0B0C;
+  border-radius: var(--radius-pill);
+  padding: 8rpx;
+}
+
+.seg__item {
+  flex: 1;
+  text-align: center;
+  font-size: 25rpx;
+  color: #75767C;
+  padding: 12rpx 0;
+  border-radius: var(--radius-pill);
+  letter-spacing: .04em;
+}
+
+.seg__item.is-on {
+  background-color: #26272B;
+  color: #F2F2EF;
+}
+
+/* ---- 标签 ---- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 21rpx;
+  color: #FFCE8A;
+  background-color: rgba(255, 176, 32, .12);
+  padding: 6rpx 18rpx;
+  border-radius: 16rpx;
+  letter-spacing: .03em;
+}
+
+.tag-ai {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18rpx;
+  color: #B9A6FF;
+  background-color: rgba(139, 108, 255, .13);
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  letter-spacing: .05em;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 40rpx;
+  padding: 0 var(--gap-sm);
+  border-radius: var(--radius-pill);
+  font-size: 22rpx;
+  background-color: rgba(61, 139, 255, .14);
+  color: #6FA6FF;
+}
+
+/* ---- 按钮 ---- */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  padding: 0 var(--gap-lg);
+  border: 1rpx solid var(--line-strong);
+  border-radius: var(--radius-btn);
+  font-size: 28rpx;
+  letter-spacing: .06em;
+  background-color: transparent;
+  color: #B9BABF;
+  line-height: 1.2;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn-primary {
+  border: none;
+  background: linear-gradient(150deg, #578FF7, #2F6FE6);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-btn);
+}
+
+.btn-primary.btn--active {
+  background: #2F6FE6;
+}
+
+.btn-primary.btn--disabled {
+  background: #26272B;
+  color: var(--dim);
+  box-shadow: none;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1rpx solid var(--line-strong);
+}
+
+.btn-danger-ghost {
+  background-color: transparent;
+  color: #FF8B8B;
+  border: 1rpx solid rgba(255, 107, 107, .4);
+}
+
+/* ---- 安全区 ---- */
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

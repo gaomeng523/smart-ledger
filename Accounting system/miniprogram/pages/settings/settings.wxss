@@ -1,0 +1,76 @@
+.page {
+  min-height: 100vh;
+  background: radial-gradient(120% 55% at 50% 0%, #121316 0%, #0B0B0C 46%, #08090A 100%);
+}
+
+.body {
+  padding: 8rpx 28rpx 0;
+}
+
+.group {
+  margin-top: 36rpx;
+}
+
+.group__title {
+  display: block;
+  margin: 0 0 16rpx 12rpx;
+  font-size: 24rpx;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+.group__hint {
+  display: block;
+  margin: 14rpx 12rpx 0;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--dim);
+}
+
+/* 设置项列表：卡片自身不留内边距，行内控制间距，分隔线通栏 */
+.card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.st__row {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  padding: 32rpx 28rpx;
+}
+
+.st__row + .st__row {
+  border-top: 1rpx solid var(--line);
+}
+
+.st__row--hover {
+  background-color: rgba(255, 255, 255, .025);
+}
+
+.st__label {
+  flex: 1;
+  font-size: 29rpx;
+  color: var(--text);
+}
+
+.st__label--danger {
+  color: var(--red);
+}
+
+.st__value {
+  font-size: 25rpx;
+  color: var(--muted);
+}
+
+.st__foot {
+  margin-top: 64rpx;
+  text-align: center;
+}
+
+.st__foot-text {
+  font-family: var(--font-hand);
+  font-size: 26rpx;
+  letter-spacing: .06em;
+  color: var(--dim);
+}

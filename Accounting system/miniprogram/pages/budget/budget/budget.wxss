@@ -1,0 +1,333 @@
+.budget {
+  padding: 24rpx 32rpx 48rpx;
+}
+
+/* 自定义导航通栏：抵消根容器左右内边距 */
+.nav-fix {
+  margin: 0 -32rpx;
+}
+
+.budget__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 88rpx;
+}
+
+/* ---- 总预算卡片 ---- */
+
+.total {
+  margin-top: var(--gap-sm);
+}
+
+.total__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.total__label {
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.total__value {
+  margin-left: var(--gap-sm);
+  font-size: 48rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.total__tag {
+  margin-left: var(--gap-sm);
+}
+
+.total__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--gap-sm);
+}
+
+.total__used,
+.total__remain {
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+/* ---- 进度条（三档配色，§4.7-3） ---- */
+
+.bar {
+  height: 16rpx;
+  margin-top: var(--gap-md);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-muted);
+  overflow: hidden;
+}
+
+.bar__fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+}
+
+.bar__fill--normal {
+  background-color: var(--color-brand);
+}
+
+.bar__fill--warn {
+  background-color: var(--color-accent-yellow);
+}
+
+.bar__fill--over {
+  background-color: var(--color-warning);
+}
+
+/* ---- 分类预算 ---- */
+
+.budget__section {
+  margin-top: var(--gap-lg);
+}
+
+.cat {
+  margin-top: var(--gap-md);
+  padding: var(--gap-md) var(--gap-lg);
+}
+
+.cat__row {
+  display: flex;
+  align-items: center;
+}
+
+.cat__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat__tag {
+  margin-left: var(--gap-sm);
+}
+
+.cat__del {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88rpx;
+  /* §2.4 最小热区 88rpx */
+  min-height: 88rpx;
+  margin-left: var(--gap-sm);
+  font-size: 26rpx;
+  color: var(--color-expense-strong);
+}
+
+.cat__del--hover {
+  opacity: .6;
+}
+
+.cat__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.cat__amount {
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.cat__percent {
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+.cat .bar {
+  margin-top: var(--gap-sm);
+}
+
+.budget__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  margin-top: var(--gap-md);
+  border-radius: var(--radius-card);
+  border: 1px dashed var(--color-border);
+  background-color: var(--color-bg-card);
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-brand-text);
+}
+
+.budget__add--hover {
+  opacity: .7;
+}
+
+.budget__actions {
+  margin-top: var(--gap-md);
+}
+
+.budget__total-btn {
+  width: 100%;
+}
+
+.budget__ghost--hover {
+  opacity: .7;
+}
+
+/* 已超支标签：警示底 + 深色文字（避免白字压在点缀色上，§2.2-2） */
+.tag--over {
+  background-color: var(--color-warning);
+  color: var(--color-bg-page);
+}
+
+/* ---- 半屏弹窗（z-index 300 / 301，与 dict-picker 浮层规范一致） ---- */
+
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--color-mask);
+  z-index: 300;
+}
+
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  background-color: var(--color-bg-card);
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  /* §2.6 半屏弹窗最高 78vh，超出部分在 __body 内部滚动，禁止页面级嵌套滚动 */
+  max-height: 78vh;
+}
+
+.panel__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--gap-lg) var(--gap-lg) var(--gap-sm);
+}
+
+.panel__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.panel__close {
+  /* §2.4 最小热区 88rpx × 88rpx：文字尺寸不变，用 min-height + flex 居中把可点范围抬高 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: 26rpx;
+  color: var(--color-text-hint);
+}
+
+/* 用 scroll-view scroll-y 承载，键盘弹起时可内部滚动 */
+.panel__body {
+  flex: 1;
+  max-height: 58vh;
+  padding: 0 var(--gap-lg) var(--gap-md);
+}
+
+/* 标签在上、控件通栏在下：与其它半屏表单保持同一节奏 */
+.panel__row {
+  display: block;
+  margin-bottom: var(--gap-md);
+}
+
+.panel__row--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.panel__row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel__label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+/* 行内自带右侧数值的行（如预警），标签不需要下间距 */
+.panel__row-between .panel__label {
+  margin-bottom: 0;
+}
+
+.panel__field {
+  width: 100%;
+  min-width: 0;
+}
+
+.panel__amount {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  padding: 0 var(--gap-md);
+  border-radius: var(--radius-input);
+  background-color: var(--color-bg-muted);
+}
+
+.panel__prefix {
+  flex: none;
+  margin-right: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.panel__input {
+  flex: 1;
+  min-width: 0;
+  height: 88rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.panel__ph {
+  color: var(--color-text-hint);
+  font-size: 30rpx;
+  font-weight: 400;
+}
+
+.panel__warn {
+  font-size: 26rpx;
+  color: var(--color-text-sub);
+}
+
+.panel__footer {
+  flex: none;
+  padding: 0 var(--gap-lg) var(--gap-md);
+}
+
+/* 安全区占位不参与 flex 压缩，否则全面屏上会被挤成 0 */
+.panel .safe-bottom {
+  flex: none;
+}
+
+.panel__save {
+  width: 100%;
+}

@@ -1,0 +1,4 @@
+# 吉祥物「萌萌」素材目录（07-§2.7）—— 可选
+# V1 由 mascot 组件用纯 WXSS 代码绘制，无需图片；若放入以下位图，组件会自动优先使用：
+#   mengmeng-idle.png / mengmeng-thinking.png / mengmeng-success.png / mengmeng-empty.png / mengmeng-sorry.png
+# 建议 PNG 透明背景，2x/3x 导出，规格见 07-§2.7

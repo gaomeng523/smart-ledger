@@ -1,0 +1,186 @@
+<view class="sub">
+  <view class="nav-fix"><nav-bar back title="订阅管理" /></view>
+
+  <view class="sub__head">
+    <view class="sub__new" hover-class="sub__new--hover" bindtap="openNew">+ 添加订阅</view>
+  </view>
+
+  <skeleton wx:if="{{loading}}" rows="{{3}}" />
+
+  <block wx:else>
+    <!-- 候选识别区 -->
+    <view wx:if="{{candidates.length > 0}}" class="candidates">
+      <view class="candidates__head">
+        <text class="section-title">发现可能的订阅</text>
+        <text class="candidates__tip">根据近 6 个月账单识别</text>
+      </view>
+
+      <view wx:for="{{candidates}}" wx:key="index" class="cand card">
+        <view class="cand__top">
+          <view class="cand__main">
+            <text class="cand__title">{{item.title}}</text>
+            <view class="cand__sub">
+              <text class="amount num is-expense">¥{{item.amountText}}</text>
+              <text class="cand__meta">{{item.cycleText}}</text>
+              <text class="cand__meta">{{item.categoryName}} · {{item.payChannelName}}</text>
+            </view>
+          </view>
+          <text class="cand__badge">近6月 {{item.occurrences}} 次</text>
+        </view>
+        <view class="sub__ops">
+          <view class="op-btn op-btn--primary" data-index="{{index}}" catchtap="onConfirmCandidate">加入订阅</view>
+          <view class="op-btn" data-index="{{index}}" catchtap="onSkipCandidate">不是订阅</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 我的订阅 -->
+    <view class="sub__section">
+      <text class="section-title">我的订阅</text>
+
+      <empty-state
+        wx:if="{{items.length === 0}}"
+        mascotState="empty"
+        text="还没有订阅，确认上方候选或手动添加"
+        actionText="添加订阅"
+        bind:action="openNew"
+      />
+
+      <view wx:else>
+        <view wx:for="{{items}}" wx:key="id" class="item card {{item.paused ? 'is-paused' : ''}}">
+          <view class="item__top">
+            <view class="item__main">
+              <text class="item__title">{{item.title}}</text>
+              <view class="item__sub">
+                <text class="amount num is-expense">¥{{item.amountText}}</text>
+                <text class="item__meta">{{item.cycleText}}</text>
+                <text class="item__meta">{{item.categoryName}} · {{item.payChannelName}}</text>
+              </view>
+            </view>
+            <text class="due {{item.dueCls}}">{{item.dueText}}</text>
+          </view>
+          <view class="sub__ops">
+            <view class="op-btn" data-id="{{item.id}}" catchtap="openEdit">编辑</view>
+            <view class="op-btn" data-id="{{item.id}}" catchtap="onToggle">{{item.paused ? '恢复提醒' : '暂停'}}</view>
+            <view class="op-btn op-btn--danger" data-id="{{item.id}}" catchtap="onDelete">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+
+  <!-- ===== 新建 / 确认 / 编辑弹层 ===== -->
+  <view wx:if="{{sheetVisible}}" class="mask" bindtap="closeSheet" catchtouchmove="noop"></view>
+  <view wx:if="{{sheetVisible}}" class="panel">
+    <view class="panel__header">
+      <text class="panel__title">{{sheetMode === 'edit' ? '编辑订阅' : (sheetMode === 'confirm' ? '确认订阅' : '添加订阅')}}</text>
+      <text class="panel__close" bindtap="closeSheet">关闭</text>
+    </view>
+
+    <scroll-view class="panel__body" scroll-y>
+      <view class="panel__row">
+        <text class="panel__label">名称</text>
+        <view class="panel__field">
+          <input
+            class="panel__text"
+            placeholder="如：视频会员"
+            placeholder-class="panel__ph"
+            maxlength="20"
+            value="{{form.title}}"
+            bindinput="onTitleInput"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">参考金额</text>
+        <view class="panel__amount">
+          <text class="panel__prefix">¥</text>
+          <input
+            class="panel__input"
+            type="digit"
+            placeholder="0.00"
+            placeholder-class="panel__ph"
+            value="{{form.avgAmount}}"
+            bindinput="onAmountInput"
+          />
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">周期</text>
+        <view class="seg">
+          <view
+            wx:for="{{cycles}}"
+            wx:key="value"
+            class="seg__item {{form.cycleDays === item.value ? 'is-active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onCycleSelect"
+          >{{item.label}}</view>
+        </view>
+      </view>
+
+      <view class="panel__row">
+        <text class="panel__label">下次扣费</text>
+        <view class="panel__field">
+          <picker mode="date" value="{{form.nextDate}}" bindchange="onNextDateChange">
+            <view class="panel__picker">
+              <text class="panel__picker-text">{{form.nextDate || '请选择日期'}}</text>
+              <text class="panel__arrow">›</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- 手动新建时可选分类 / 渠道 -->
+      <block wx:if="{{sheetMode === 'new'}}">
+        <view class="panel__row">
+          <text class="panel__label">分类</text>
+          <view class="panel__field">
+            <dict-picker
+              type="category"
+              billType="{{0}}"
+              value="{{form.categoryCode}}"
+              dict="{{dict}}"
+              placeholder="请选择分类"
+              bind:change="onCategoryChange"
+            />
+          </view>
+        </view>
+        <view class="panel__row">
+          <text class="panel__label">支付渠道</text>
+          <view class="panel__field">
+            <dict-picker
+              type="channel"
+              value="{{form.payChannelCode}}"
+              dict="{{dict}}"
+              placeholder="请选择支付渠道"
+              bind:change="onChannelChange"
+            />
+          </view>
+        </view>
+      </block>
+
+      <!-- 编辑时可切换状态 -->
+      <view wx:if="{{sheetMode === 'edit'}}" class="panel__row">
+        <text class="panel__label">状态</text>
+        <view class="seg">
+          <view class="seg__item {{form.status === 1 ? 'is-active' : ''}}" data-value="{{1}}" bindtap="onStatusSelect">正常</view>
+          <view class="seg__item {{form.status === 0 ? 'is-active' : ''}}" data-value="{{0}}" bindtap="onStatusSelect">暂停</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="panel__footer">
+      <view
+        class="btn btn-primary panel__save {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--active'}}"
+        bindtap="onSheetSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+
+    <view class="safe-bottom"></view>
+  </view>
+</view>

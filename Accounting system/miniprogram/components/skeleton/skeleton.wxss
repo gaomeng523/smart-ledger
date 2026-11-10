@@ -1,0 +1,64 @@
+.skeleton {
+  padding: 0;
+}
+
+.skeleton__row {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+}
+
+.skeleton__badge {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .06);
+  flex: none;
+}
+
+.skeleton__main {
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.skeleton__line {
+  height: 28rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .06);
+}
+
+.skeleton__line--wide {
+  width: 40%;
+}
+
+.skeleton__line--narrow {
+  width: 60%;
+  height: 22rpx;
+  margin-top: 16rpx;
+}
+
+.skeleton__amount {
+  width: 120rpx;
+  height: 32rpx;
+  border-radius: 999rpx;
+  background-color: rgba(255, 255, 255, .06);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton__badge,
+  .skeleton__line,
+  .skeleton__amount {
+    animation: skeleton-breathe 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .55;
+  }
+}

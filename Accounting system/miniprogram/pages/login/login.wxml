@@ -1,0 +1,65 @@
+<view class="lg">
+  <view class="lg__status" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="lg__hero">
+    <view class="lg__logo">
+      <text class="lg__logo-text">记</text>
+    </view>
+    <view class="lg__brand">AI 记账</view>
+    <view class="lg__slogan">一句话或一张小票，把账记下来</view>
+  </view>
+
+  <!-- 步骤一：一键登录 -->
+  <block wx:if="{{step === 'login'}}">
+    <view class="lg__features">
+      <view class="lg__feature" wx:for="{{features}}" wx:key="text">
+        <ui-icon name="{{item.icon}}" size="30" color="{{item.color}}" />
+        <text class="lg__feature-text">{{item.text}}</text>
+      </view>
+    </view>
+
+    <view class="lg__foot">
+      <view class="lg__btn {{loading ? 'is-loading' : ''}}" hover-class="lg__btn--hover" bindtap="onLogin">
+        {{loading ? '正在登录…' : '微信一键登录'}}
+      </view>
+      <text class="lg__agree" bindtap="onPrivacy">登录即表示同意《隐私与数据说明》</text>
+    </view>
+  </block>
+
+  <!-- 步骤二：头像 / 昵称 -->
+  <block wx:else>
+    <view class="lg__setup">
+      <view class="lg__avatar">
+        <image wx:if="{{avatarPath}}" class="lg__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
+        <text wx:else class="lg__avatar-text">{{avatarText}}</text>
+        <button
+          class="lg__avatar-btn"
+          open-type="chooseAvatar"
+          hover-class="none"
+          bindchooseavatar="onChooseAvatar"
+        ></button>
+      </view>
+      <text class="lg__hint">点头像，选「用微信头像」</text>
+
+      <view class="lg__field">
+        <text class="lg__field-label">昵称</text>
+        <input
+          class="lg__input"
+          type="nickname"
+          placeholder="点一下，可用微信昵称"
+          placeholder-class="lg__ph"
+          maxlength="12"
+          value="{{nickname}}"
+          bindinput="onNicknameInput"
+        />
+      </view>
+    </view>
+
+    <view class="lg__foot">
+      <view class="lg__btn" hover-class="lg__btn--hover" bindtap="onFinish">开始记账</view>
+      <text class="lg__skip" bindtap="onSkip">跳过，直接开始</text>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+</view>

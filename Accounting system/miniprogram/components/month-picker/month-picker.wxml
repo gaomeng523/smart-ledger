@@ -1,0 +1,28 @@
+<view class="mp">
+  <view class="mp__trigger" hover-class="mp__trigger--hover" bindtap="open">
+    <text class="mp__value">{{selectedText || '选择月份'}}</text>
+    <text class="mp__caret">▾</text>
+  </view>
+
+  <view wx:if="{{show}}" class="mp__mask" bindtap="close" catchtouchmove="noop"></view>
+
+  <view wx:if="{{show}}" class="mp__panel">
+    <view class="mp__header">
+      <text class="mp__title">选择月份</text>
+      <text class="mp__close" bindtap="close">关闭</text>
+    </view>
+    <scroll-view class="mp__list" scroll-y>
+      <view
+        wx:for="{{list}}"
+        wx:key="value"
+        class="mp__option {{item.value === value ? 'is-active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="choose"
+      >
+        <text class="mp__option-text">{{item.text}}</text>
+        <text wx:if="{{item.value === value}}" class="mp__check">✓</text>
+      </view>
+    </scroll-view>
+    <view class="mp__safe"></view>
+  </view>
+</view>

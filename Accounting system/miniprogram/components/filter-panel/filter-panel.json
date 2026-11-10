@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tag-chips": "../tag-chips/tag-chips"
+  }
+}

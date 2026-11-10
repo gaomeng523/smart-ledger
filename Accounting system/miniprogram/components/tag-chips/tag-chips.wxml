@@ -1,0 +1,48 @@
+<view class="tc">
+  <!-- input 模式：已选标签 + 输入 + 历史联想 -->
+  <block wx:if="{{mode === 'input'}}">
+    <view class="tc__chips">
+      <view wx:for="{{value}}" wx:key="*this" class="tc__chip is-active">
+        <text class="tc__chip-text">{{item}}</text>
+        <text class="tc__chip-del" data-tag="{{item}}" catchtap="onRemove">✕</text>
+      </view>
+      <view class="tc__input-wrap">
+        <input
+          class="tc__input"
+          placeholder="{{placeholder}}"
+          placeholder-class="tc__ph"
+          value="{{input}}"
+          maxlength="12"
+          confirm-type="done"
+          bindinput="onInput"
+          bindconfirm="onConfirm"
+        />
+      </view>
+    </view>
+
+    <view wx:if="{{candidates.length > 0}}" class="tc__suggest">
+      <text class="tc__suggest-label">常用</text>
+      <view
+        wx:for="{{candidates}}"
+        wx:key="*this"
+        class="tc__chip is-ghost"
+        data-tag="{{item}}"
+        bindtap="onCandidateTap"
+      >+{{item}}</view>
+    </view>
+  </block>
+
+  <!-- filter 模式：全部候选多选 -->
+  <block wx:else>
+    <view wx:if="{{allTags.length > 0}}" class="tc__chips">
+      <view
+        wx:for="{{allTags}}"
+        wx:key="*this"
+        class="tc__chip {{value.indexOf(item) >= 0 ? 'is-active' : 'is-ghost'}}"
+        data-tag="{{item}}"
+        bindtap="onToggle"
+      >{{item}}</view>
+    </view>
+    <text wx:else class="tc__empty">还没有可用标签</text>
+  </block>
+</view>
