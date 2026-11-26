@@ -8,6 +8,7 @@
 - **一句话多笔**：输入「买衣服 3100，车票 398」自动拆成两笔，汇总确认后一次入库
 - **拍照识小票**：上传小票或支付截图，视觉模型提取金额、商户、日期与分类，字段可修改后保存
 - **检索增强分类**：解析前用向量检索召回相似历史记账作为 few-shot，统一分类口径（见下方评测）
+- **智能账单问答**：直接问「这个月吃饭花了多少」「比上月多花多少」，模型把问题翻译成只读 SQL → 查询 → 中文回答（见下方评测）
 - **日历账单**：按日聚合收支，支持按类型、分类筛选与本月汇总
 - **分类统计**：9 个支出一级分类 + 5 个收入一级分类，共 54 个二级分类，支持按一级汇总并下钻查看二级明细
 - **预算管理**：月度预算与分类预算，超支预警
@@ -38,12 +39,14 @@
     │   │   ├── controller/        15 个 REST 控制器
     │   │   ├── service/           业务逻辑
     │   │   ├── ai/                文本/视觉解析、Prompt 构建、结果校验
+    │   │   ├── ai/ask/            智能问答：Prompt、只读 SQL 守卫、参数化执行
     │   │   ├── ai/rag/            向量检索：示例库加载、余弦召回、失败降级
-    │   │   ├── ai/eval/           离线评测器（规则 / 模型 / RAG 三组对照）
+    │   │   ├── ai/eval/           离线评测器（解析三组对照 + 问答评测）
     │   │   ├── mapper/            MyBatis-Plus 数据访问
     │   │   ├── entity/ dto/       实体与传输对象
     │   │   ├── config/            拦截器、缓存、静态资源映射
     │   │   └── common/            统一响应、异常处理、工具类
+    │   ├── src/test/              单元测试（SQL 守卫、问答编排、答案比对、统计口径）
     │   ├── tools/eval/            评测集生成脚本与历史报告
     │   └── src/main/resources/
     │       ├── ai/                检索示例库与评测集（JSONL）
@@ -96,6 +99,44 @@ java -jar target/smart-ledger-backend-1.0.0.jar \
 ```
 
 完整结果见 `backend/tools/eval/reports/eval-2026-11-26.json`。
+
+## 智能账单问答（NL → SQL）
+
+`POST /api/ai/ask`，请求 `{"question": "这个月吃饭花了多少"}`，返回中文回答、命中的 SQL 与结果集。
+
+链路：问题 → 模型生成 SQL（Prompt 内置表结构、分类树与「本月/上月/近三个月」的日期区间，避免模型自己算日期）→ `SqlGuard` 硬校验 → 参数化只读执行 → 模型把结果转成一句话。
+
+模型输出默认不可信，因此有三层约束：
+
+- `SqlGuard`：只允许单条 `SELECT`，禁止写操作/DDL/UNION/注释/多语句，`FROM`/`JOIN` 仅白名单表 `bill`
+- 用户隔离：SQL 必须含 `openid = :openid`，openid 由服务端以命名参数绑定，模型无法指定他人数据
+- 执行侧：自动补 `deleted = 0`、LIMIT 收敛到 200、3 秒查询超时、只读事务；回答模型失败时用结果集模板兜底
+
+在 60 条自建问答集上的实测（32 条固定种子账单，日期按「相对当前月」生成，换月重跑结果一致）：
+
+| 指标 | 结果 |
+|---|---|
+| 查询执行准确率 | 100%（60/60） |
+| 回答准确率 | 100%（60/60） |
+| 平均延迟 | 1807 ms |
+| P95 延迟 | 2445 ms |
+
+复现：
+
+```bash
+# 1. 生成种子账单与 60 条问句
+python backend/tools/eval/gen_ask_dataset.py
+
+# 2. 跑评测（写入评测专用 openid 的账单，不影响真实用户数据）
+java -jar target/smart-ledger-backend-1.0.0.jar \
+  --spring.profiles.active=prod \
+  --spring.main.web-application-type=none \
+  --smartledger.eval.ask-enabled=true \
+  --smartledger.ai.enabled=true \
+  --smartledger.ai.rate-limit-per-minute=0
+```
+
+完整结果见 `backend/tools/eval/reports/ask-eval-2026-11-26.json`。单测：`./mvnw test`（24 个用例，CI 每次提交执行）。
 
 ## 快速开始
 

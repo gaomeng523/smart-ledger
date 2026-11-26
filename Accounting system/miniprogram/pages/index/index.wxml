@@ -228,7 +228,7 @@
         <input
           class="ib__input"
           value="{{text}}"
-          placeholder="说一句，或粘贴账单…"
+          placeholder="说一句记账，或问这个月花了多少"
           placeholder-class="ib__ph"
           confirm-type="send"
           cursor-spacing="24"

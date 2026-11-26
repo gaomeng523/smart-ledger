@@ -4,6 +4,7 @@
  * 左缘右滑唤出「我的」抽屉。
  */
 const billApi = require('../../api/bill');
+const aiApi = require('../../api/ai');
 const statApi = require('../../api/stat');
 const templateApi = require('../../api/template');
 const subscriptionApi = require('../../api/subscription');
@@ -15,8 +16,29 @@ const auth = require('../../utils/auth');
 const avatar = require('../../utils/avatar');
 const { CODE, BILL_TYPE, SOURCE } = require('../../config/const');
 
+/** 快捷提问短语：始终保留，作为智能问答入口 */
+const ASK_CHIP = '这个月花了多少';
+
 /** 无模板时的默认快捷短语 */
-const QUICK_DEFAULT = ['早餐 12', '打车 32', '咖啡 18', '房租 3200'];
+const QUICK_DEFAULT = ['早餐 12', '打车 32', ASK_CHIP];
+
+/** 问句特征词：命中且不含数字时走智能问答，而不是记账解析 */
+const ASK_WORDS = ['多少', '几笔', '几号', '几次', '比上个月', '比上月', '还剩'];
+
+/**
+ * 判断输入是不是「问账本」而不是「记一笔」。
+ * 带阿拉伯数字的一律按记账处理（「午饭 30」），避免把金额当问题。
+ */
+function isAskText(text) {
+  const value = String(text || '').trim();
+  if (!value || /\d/.test(value)) {
+    return false;
+  }
+  if (/[?？]$/.test(value)) {
+    return true;
+  }
+  return ASK_WORDS.some((word) => value.indexOf(word) >= 0);
+}
 
 /** 快捷短语 → 带分类色圆点的展示结构 */
 function toChips(list) {
@@ -301,7 +323,12 @@ Page({
             const amount = Number(item.amount);
             return item.title + (amount > 0 ? ' ' + format.formatMoney(amount) : '');
           });
-        this.setData({ quickChips: chips.length ? toChips(chips) : toChips(QUICK_DEFAULT) });
+        // 模板短语后面固定跟一个提问入口，保证问答能力随时可发现
+        const chipTexts = chips.length ? chips : QUICK_DEFAULT;
+        const finalChips = chipTexts.indexOf(ASK_CHIP) >= 0
+          ? chipTexts
+          : chipTexts.slice(0, 3).concat(ASK_CHIP);
+        this.setData({ quickChips: toChips(finalChips) });
       })
       .catch(() => this.setData({ quickChips: toChips(QUICK_DEFAULT) }));
   },
@@ -361,6 +388,11 @@ Page({
     if (auth.requireLogin()) {
       return;
     }
+    // 问账本（不含金额的问句）→ 智能问答，不生成记账草稿
+    if (isAskText(text)) {
+      this.askQuestion(text);
+      return;
+    }
     this.sourceText = text;
     this.appendMessage(text);
     this.multiDrafts = null;
@@ -396,6 +428,41 @@ Page({
         this.setData({ parsing: false });
         this.handleParseError(err);
       });
+  },
+
+  /** 智能问答：问句不记账，直接查账本并回答 */
+  askQuestion(text) {
+    this.appendMessage(text);
+    this.setData({ text: '', canSend: false, parsing: true });
+    this.scrollToEnd();
+
+    aiApi.ask(text, { silent: true })
+      .then((res) => {
+        this.setData({ parsing: false });
+        this.appendAi((res && res.answer) || '没查到符合条件的账单。');
+      })
+      .catch((err) => {
+        this.setData({ parsing: false });
+        this.handleAskError(err);
+      });
+  },
+
+  handleAskError(err) {
+    const code = err && err.code;
+
+    if (code === CODE.AI_SQL_REJECTED || code === CODE.AI_OUTPUT_INVALID) {
+      this.appendAi('这个问题我没查明白，换个说法试试？比如「这个月吃饭花了多少」。');
+      return;
+    }
+    if (code === CODE.PARSE_TOO_FREQUENT) {
+      this.appendAi('问得有点快，等我几秒再试～');
+      return;
+    }
+    if (code === CODE.NETWORK_ERROR) {
+      this.appendAi('网络好像断了，检查一下再问我？');
+      return;
+    }
+    this.appendAi((err && err.message) || '暂时回答不了，稍后再试试？');
   },
 
   /** 多笔：逐段并行解析，聚合成汇总卡 */

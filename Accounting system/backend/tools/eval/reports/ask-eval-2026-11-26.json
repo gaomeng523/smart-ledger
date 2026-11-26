@@ -1,0 +1,11 @@
+{
+  "mode" : "ask",
+  "model" : "deepseek-flash",
+  "seedBills" : 32,
+  "datasetSize" : 60,
+  "executionAccuracy" : 100.0,
+  "answerAccuracy" : 100.0,
+  "avgLatencyMs" : 1807,
+  "p95LatencyMs" : 2445,
+  "failures" : [ ]
+}

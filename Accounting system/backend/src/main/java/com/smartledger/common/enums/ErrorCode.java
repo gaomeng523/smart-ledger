@@ -24,7 +24,8 @@ public enum ErrorCode {
     AMOUNT_UNRECOGNIZED(1004, "金额无法识别，请手动补充"),
     DUPLICATE_BILL(1005, "疑似重复记账"),
     IMPORT_FORMAT_ERROR(1006, "导入文件格式错误"),
-    PARSE_TOO_FREQUENT(1007, "解析过于频繁，请稍后再试");
+    PARSE_TOO_FREQUENT(1007, "解析过于频繁，请稍后再试"),
+    AI_SQL_REJECTED(1008, "查询语句未通过安全校验");
 
     private final int code;
     private final String message;
