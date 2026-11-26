@@ -1,0 +1,78 @@
+{
+  "model" : "deepseek-flash",
+  "datasetSize" : 108,
+  "ragBankSize" : 0,
+  "execution" : "sequential",
+  "modes" : {
+    "rag" : {
+      "mode" : "rag",
+      "total" : 108,
+      "failures" : 0,
+      "totalPromptTokens" : 71006,
+      "totalCompletionTokens" : 27159,
+      "failureSamples" : [ {
+        "text" : "买锅碗花了128块",
+        "expectAmount" : 128,
+        "gotAmount" : 128.00,
+        "expectCategory" : "SHOPPING_HOME",
+        "gotCategory" : "SHOPPING_DAILY"
+      }, {
+        "text" : "医院看病花了320块",
+        "expectAmount" : 320,
+        "gotAmount" : 320.00,
+        "expectCategory" : "MED_CLINIC",
+        "gotCategory" : "MEDICAL"
+      }, {
+        "text" : "买笔记本花了12块",
+        "expectAmount" : 12,
+        "gotAmount" : 12.00,
+        "expectCategory" : "STUDY_TOOL",
+        "gotCategory" : "SHOPPING_DAILY"
+      }, {
+        "text" : "前天买学习资料68元",
+        "expectAmount" : 68,
+        "gotAmount" : 68.00,
+        "expectCategory" : "STUDY_TOOL",
+        "gotCategory" : "STUDY"
+      }, {
+        "text" : "值班费到账300",
+        "expectAmount" : 300,
+        "gotAmount" : 300.00,
+        "expectCategory" : "SALARY_OVERTIME",
+        "gotCategory" : "BONUS_ALLOWANCE"
+      }, {
+        "text" : "加班津贴，260元，微信到账",
+        "expectAmount" : 260,
+        "gotAmount" : 260.00,
+        "expectCategory" : "SALARY_OVERTIME",
+        "gotCategory" : "BONUS_ALLOWANCE"
+      }, {
+        "text" : "利息收入，42元，银行卡到账",
+        "expectAmount" : 42,
+        "gotAmount" : 42.00,
+        "expectCategory" : "INVEST_INTEREST",
+        "gotCategory" : "INVEST"
+      }, {
+        "text" : "意外收入到账500",
+        "expectAmount" : 500,
+        "gotAmount" : 500.00,
+        "expectCategory" : "INCOME_MISC",
+        "gotCategory" : "INCOME_OTHER"
+      }, {
+        "text" : "卖闲置，88元，现金到账",
+        "expectAmount" : 88,
+        "gotAmount" : 88.00,
+        "expectCategory" : "INCOME_MISC",
+        "gotCategory" : "INCOME_OTHER"
+      } ],
+      "amountAccuracy" : 1.0,
+      "categoryAccuracy" : 0.9167,
+      "fullPassRate" : 0.9167,
+      "avgLatencyMs" : 1967.9259,
+      "p95LatencyMs" : 5067,
+      "retrievalAvgMs" : 173.6019,
+      "retrievalP95Ms" : 298,
+      "avgPromptTokens" : 657.463
+    }
+  }
+}

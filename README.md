@@ -75,13 +75,14 @@
 | 大模型 | DeepSeek 结构化输出 + JSON 校验 + 失败重试 | 约 ¥0.002 / 次 |
 | 大模型 + RAG | 解析前用 `text-embedding-v4` 召回 Top-5 相似历史记账作为 few-shot | 约 ¥0.003 / 次 |
 
-在自建评测集上的实测结果（216 条：108 条检索示例 + 108 条测试集，覆盖 54 个二级分类，两组句式刻意不重叠）：
+在自建评测集上的实测结果（216 条：108 条检索示例 + 108 条测试集，覆盖 54 个二级分类，两组句式刻意不重叠；三组链路**顺序采样**）：
 
-| 链路 | 金额准确率 | 分类 Top-1 | 全字段通过率 | 平均延迟 | P95 |
+| 链路 | 金额准确率 | 分类 Top-1 | 平均延迟 | P95 | 平均 prompt token |
 |---|---|---|---|---|---|
-| 本地规则 | 100% | 58.33% | 58.33% | 3 ms | 1 ms |
-| 大模型 | 100% | 82.41% | 82.41% | 1232 ms | 2001 ms |
-| 大模型 + RAG | 100% | **90.74%** | **90.74%** | 1904 ms | 6351 ms |
+| 本地规则 | 100% | 58.33% | 3 ms | 1 ms | 0 |
+| 大模型 | 100% | 81.48% | 1351 ms | 2493 ms | 480 |
+| 大模型 + RAG（top-5） | 100% | 91.67% | 1968 ms | 5067 ms | 657 |
+| 大模型 + RAG（top-3，两次） | 100% | 91.67% / 94.44% | 1891~2004 ms | 4393~4496 ms | 596 |
 
 复现方式：
 
@@ -89,16 +90,28 @@
 # 1. 重新生成评测集（固定随机种子）
 python backend/tools/eval/gen_eval_dataset.py
 
-# 2. 跑三组对照（需数据库与模型 Key）
+# 2. 跑对照（需数据库与模型 Key）；modes 可指定 rules / ai / rag，多组顺序执行
 java -jar target/smart-ledger-backend-1.0.0.jar \
   --spring.profiles.active=prod \
   --spring.main.web-application-type=none \
   --smartledger.eval.enabled=true \
+  --smartledger.eval.modes=ai,rag \
   --smartledger.ai.enabled=true \
   --smartledger.ai.rag.enabled=true
+
+# 3. 消融：只看召回条数的影响
+#    --smartledger.ai.rag.top-k=3
 ```
 
-完整结果见 `backend/tools/eval/reports/eval-2026-11-26.json`。
+完整结果见 `backend/tools/eval/reports/`：`eval-ai-rag-k3-seq-2026-11-26.json`、`eval-rag-k5-seq-2026-11-26.json`、`eval-rag-k3-seq-rerun-2026-11-26.json`。
+
+### 延迟分析与调优
+
+最初的版本里模型组与 RAG 组是并行跑的，P95 报成了 6351 ms——其中包含两组互相抢网络与 CPU 的干扰。改成顺序采样并拆分阶段耗时后：
+
+- 检索阶段很轻：平均 **174 ms**、P95 **283 ms**（单独压测向量接口：中位数 173 ms、P95 258 ms），瓶颈在模型调用侧；
+- 召回条数 5 → 3：平均 prompt token 657 → 596（**-9%**），P95 5067 → 4393~4496 ms（**-11%~-13%**），分类准确率两次分别为 91.67% / 94.44%，与 top-5 的 91.67% 处于同一波动区间，没有明显退化，因此默认值定为 3；
+- 向量召回超时由 8 s 收到 2.5 s（实测 P95 仅 258 ms），超时即降级为「不检索、直接走模型」，避免偶发网络长尾卡住整次解析。
 
 ## 智能账单问答（NL → SQL）
 

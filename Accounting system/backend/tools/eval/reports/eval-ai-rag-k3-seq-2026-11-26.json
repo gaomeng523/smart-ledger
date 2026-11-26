@@ -1,0 +1,196 @@
+{
+  "model" : "deepseek-flash",
+  "datasetSize" : 108,
+  "ragBankSize" : 0,
+  "execution" : "sequential",
+  "modes" : {
+    "ai" : {
+      "mode" : "ai",
+      "total" : 108,
+      "failures" : 0,
+      "totalPromptTokens" : 51791,
+      "totalCompletionTokens" : 20497,
+      "failureSamples" : [ {
+        "text" : "今天高德打车51元",
+        "expectAmount" : 51,
+        "gotAmount" : 51.00,
+        "expectCategory" : "TRAFFIC_TAXI",
+        "gotCategory" : "TRAFFIC"
+      }, {
+        "text" : "理发花了68块",
+        "expectAmount" : 68,
+        "gotAmount" : 68.00,
+        "expectCategory" : "SHOPPING_BEAUTY",
+        "gotCategory" : "EXPENSE_OTHER"
+      }, {
+        "text" : "买锅碗花了128块",
+        "expectAmount" : 128,
+        "gotAmount" : 128.00,
+        "expectCategory" : "SHOPPING_HOME",
+        "gotCategory" : "SHOPPING_DAILY"
+      }, {
+        "text" : "医院看病花了320块",
+        "expectAmount" : 320,
+        "gotAmount" : 320.00,
+        "expectCategory" : "MED_CLINIC",
+        "gotCategory" : "MEDICAL"
+      }, {
+        "text" : "买笔记本花了12块",
+        "expectAmount" : 12,
+        "gotAmount" : 12.00,
+        "expectCategory" : "STUDY_TOOL",
+        "gotCategory" : "SHOPPING_DAILY"
+      }, {
+        "text" : "前天买学习资料68元",
+        "expectAmount" : 68,
+        "gotAmount" : 68.00,
+        "expectCategory" : "STUDY_TOOL",
+        "gotCategory" : "STUDY_BOOK"
+      }, {
+        "text" : "前天跨境手续费45元",
+        "expectAmount" : 45,
+        "gotAmount" : 45.00,
+        "expectCategory" : "OTHER_FEE",
+        "gotCategory" : "EXPENSE_OTHER"
+      }, {
+        "text" : "月薪到账到账12000",
+        "expectAmount" : 12000,
+        "gotAmount" : 12000.00,
+        "expectCategory" : "SALARY_BASE",
+        "gotCategory" : "SALARY"
+      }, {
+        "text" : "值班费到账300",
+        "expectAmount" : 300,
+        "gotAmount" : 300.00,
+        "expectCategory" : "SALARY_OVERTIME",
+        "gotCategory" : "BONUS"
+      }, {
+        "text" : "加班津贴，260元，微信到账",
+        "expectAmount" : 260,
+        "gotAmount" : 260.00,
+        "expectCategory" : "SALARY_OVERTIME",
+        "gotCategory" : "BONUS_ALLOWANCE"
+      }, {
+        "text" : "年终奖到账，28000元，微信到账",
+        "expectAmount" : 28000,
+        "gotAmount" : 28000.00,
+        "expectCategory" : "SALARY_ANNUAL",
+        "gotCategory" : "SALARY"
+      }, {
+        "text" : "存款利息到账350",
+        "expectAmount" : 350,
+        "gotAmount" : 350.00,
+        "expectCategory" : "INVEST_INTEREST",
+        "gotCategory" : "INVEST"
+      }, {
+        "text" : "利息收入，42元，银行卡到账",
+        "expectAmount" : 42,
+        "gotAmount" : 42.00,
+        "expectCategory" : "INVEST_INTEREST",
+        "gotCategory" : "INVEST"
+      }, {
+        "text" : "股票收益到账800",
+        "expectAmount" : 800,
+        "gotAmount" : 800.00,
+        "expectCategory" : "INVEST_FUND",
+        "gotCategory" : "INVEST"
+      }, {
+        "text" : "股票分红到账1200",
+        "expectAmount" : 1200,
+        "gotAmount" : 1200.00,
+        "expectCategory" : "INVEST_DIVIDEND",
+        "gotCategory" : "INVEST"
+      }, {
+        "text" : "报销到账到账260",
+        "expectAmount" : 260,
+        "gotAmount" : 260.00,
+        "expectCategory" : "REIMBURSE_COMPANY",
+        "gotCategory" : "REIMBURSE"
+      }, {
+        "text" : "报销款，560元，微信到账",
+        "expectAmount" : 560,
+        "gotAmount" : 560.00,
+        "expectCategory" : "REIMBURSE_COMPANY",
+        "gotCategory" : "REIMBURSE"
+      }, {
+        "text" : "红包收入，52元，微信到账",
+        "expectAmount" : 52,
+        "gotAmount" : 52.00,
+        "expectCategory" : "INCOME_REDPACKET",
+        "gotCategory" : "INCOME_OTHER"
+      }, {
+        "text" : "意外收入到账500",
+        "expectAmount" : 500,
+        "gotAmount" : 500.00,
+        "expectCategory" : "INCOME_MISC",
+        "gotCategory" : "INCOME_OTHER"
+      }, {
+        "text" : "卖闲置，88元，现金到账",
+        "expectAmount" : 88,
+        "gotAmount" : 88.00,
+        "expectCategory" : "INCOME_MISC",
+        "gotCategory" : "INCOME_OTHER"
+      } ],
+      "amountAccuracy" : 1.0,
+      "categoryAccuracy" : 0.8148,
+      "fullPassRate" : 0.8148,
+      "avgLatencyMs" : 1351.0093,
+      "p95LatencyMs" : 2493,
+      "retrievalAvgMs" : 0.0,
+      "retrievalP95Ms" : 0,
+      "avgPromptTokens" : 479.5463
+    },
+    "rag" : {
+      "mode" : "rag",
+      "total" : 108,
+      "failures" : 0,
+      "totalPromptTokens" : 64372,
+      "totalCompletionTokens" : 29809,
+      "failureSamples" : [ {
+        "text" : "买锅碗花了128块",
+        "expectAmount" : 128,
+        "gotAmount" : 128.00,
+        "expectCategory" : "SHOPPING_HOME",
+        "gotCategory" : "SHOPPING_DAILY"
+      }, {
+        "text" : "医院看病花了320块",
+        "expectAmount" : 320,
+        "gotAmount" : 320.00,
+        "expectCategory" : "MED_CLINIC",
+        "gotCategory" : "MEDICAL"
+      }, {
+        "text" : "11月10日看牙医800元",
+        "expectAmount" : 800,
+        "gotAmount" : 800.00,
+        "expectCategory" : "MED_CLINIC",
+        "gotCategory" : "MEDICAL"
+      }, {
+        "text" : "值班费到账300",
+        "expectAmount" : 300,
+        "gotAmount" : 300.00,
+        "expectCategory" : "SALARY_OVERTIME",
+        "gotCategory" : "BONUS_ALLOWANCE"
+      }, {
+        "text" : "报销到账到账260",
+        "expectAmount" : 260,
+        "gotAmount" : 260.00,
+        "expectCategory" : "REIMBURSE_COMPANY",
+        "gotCategory" : "REIMBURSE"
+      }, {
+        "text" : "卖闲置，88元，现金到账",
+        "expectAmount" : 88,
+        "gotAmount" : 88.00,
+        "expectCategory" : "INCOME_MISC",
+        "gotCategory" : "INCOME_OTHER"
+      } ],
+      "amountAccuracy" : 1.0,
+      "categoryAccuracy" : 0.9444,
+      "fullPassRate" : 0.9444,
+      "avgLatencyMs" : 1890.9167,
+      "p95LatencyMs" : 4393,
+      "retrievalAvgMs" : 169.8148,
+      "retrievalP95Ms" : 283,
+      "avgPromptTokens" : 596.037
+    }
+  }
+}

@@ -68,11 +68,13 @@ smartledger:
       base-url: ${EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
       api-key: ${DASHSCOPE_API_KEY:}
       embedding-model: ${EMBEDDING_MODEL:text-embedding-v4}
-      top-k: 5
+      # 5 条 → 3 条：Prompt token 降约 9%，P95 由约 5.1s 降到约 4.4s，准确率无显著下降（见 README 消融）
+      top-k: 3
       min-score: 0.45
       bank-path: classpath:ai/rag-bank.jsonl
       connect-timeout: 3000
-      read-timeout: 8000
+      # 实测向量接口 P95 约 260ms（单条），这里留足余量并避免异常长尾拖慢解析
+      read-timeout: 2500
   vision:
     # 拍照识别（多模态）：OpenAI 兼容协议，默认对接阿里云百炼通义千问视觉模型
     # 置 false 时拍照仅保存小票图片，不返回识别结果

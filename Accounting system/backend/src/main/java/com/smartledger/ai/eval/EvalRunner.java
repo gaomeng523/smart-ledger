@@ -25,13 +25,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * 离线评测器（仅在 smartledger.eval.enabled=true 时启动）。
@@ -58,6 +56,10 @@ public class EvalRunner implements ApplicationRunner {
     @org.springframework.beans.factory.annotation.Value("${smartledger.eval.dataset:classpath:ai/eval-test.jsonl}")
     private String datasetPath;
 
+    /** 要跑的链路，逗号分隔：rules / ai / rag；多组时按顺序执行，避免并行抢占导致延迟失真 */
+    @org.springframework.beans.factory.annotation.Value("${smartledger.eval.modes:rules,ai,rag}")
+    private String modeList;
+
     @org.springframework.beans.factory.annotation.Value("${smartledger.eval.output:/tmp/eval-report.json}")
     private String outputPath;
 
@@ -80,39 +82,35 @@ public class EvalRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         List<EvalItem> dataset = loadDataset();
-        log.info("评测集加载完成: {} 条, 模型 {}", dataset.size(), aiProperties.getModel());
-
-        ModeReport rules = runRules(dataset);
-
-        ModeReport ai = null;
-        ModeReport rag = null;
-        if (aiProperties.isEnabled()) {
-            ExecutorService pool = Executors.newFixedThreadPool(2);
-            try {
-                Future<ModeReport> aiFuture = pool.submit(() -> runModel(dataset, false));
-                Future<ModeReport> ragFuture = pool.submit(() -> runModel(dataset, true));
-                ai = aiFuture.get();
-                rag = ragFuture.get();
-            } finally {
-                pool.shutdownNow();
-            }
-        } else {
-            log.warn("AI 未开启（smartledger.ai.enabled=false），跳过模型与 RAG 对照组");
-        }
+        List<String> selected = Arrays.stream(modeList.split(","))
+                .map(String::trim)
+                .filter(mode -> !mode.isEmpty())
+                .collect(Collectors.toList());
+        log.info("评测集加载完成: {} 条, 模型 {}, 模式 {}（顺序执行）",
+                dataset.size(), aiProperties.getModel(), selected);
 
         Map<String, Object> report = new LinkedHashMap<>();
         report.put("model", aiProperties.getModel());
         report.put("datasetSize", dataset.size());
-        report.put("ragBankSize", ragService.size());
+        report.put("execution", "sequential");
+
         Map<String, Object> modes = new LinkedHashMap<>();
-        modes.put("rules", rules);
-        if (ai != null) {
-            modes.put("ai", ai);
-        }
-        if (rag != null) {
-            modes.put("rag", rag);
+        for (String mode : selected) {
+            switch (mode) {
+                case "rules" -> modes.put("rules", runRules(dataset));
+                case "ai", "rag" -> {
+                    if (!aiProperties.isEnabled()) {
+                        log.warn("AI 未开启（smartledger.ai.enabled=false），跳过 {} 组", mode);
+                        continue;
+                    }
+                    modes.put(mode, runModel(dataset, "rag".equals(mode)));
+                }
+                default -> log.warn("未知评测模式，已跳过: {}", mode);
+            }
         }
         report.put("modes", modes);
+        // 示例库为懒加载，跑完检索后再取规模才有值
+        report.put("ragBankSize", ragService.size());
 
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(report);
         Files.writeString(Path.of(outputPath), json, StandardCharsets.UTF_8);
@@ -140,8 +138,12 @@ public class EvalRunner implements ApplicationRunner {
         ModeReport report = new ModeReport(useRag ? "rag" : "ai");
         for (EvalItem item : dataset) {
             String prompt;
+            long retrieveStart = System.currentTimeMillis();
             try {
                 List<RagExample> examples = useRag ? ragService.retrieve(item.text) : List.of();
+                if (useRag) {
+                    report.addRetrieval(System.currentTimeMillis() - retrieveStart);
+                }
                 prompt = promptBuilder.buildSystemPrompt(examples);
             } catch (Exception e) {
                 report.fail(item, e);
@@ -209,11 +211,19 @@ public class EvalRunner implements ApplicationRunner {
         private long totalLatency;
         private long totalPromptTokens;
         private long totalCompletionTokens;
+        private long totalRetrieval;
         private final List<Long> latencies = new ArrayList<>();
+        private final List<Long> retrievalLatencies = new ArrayList<>();
         private final List<Map<String, Object>> failureSamples = new ArrayList<>();
 
         private ModeReport(String mode) {
             this.mode = mode;
+        }
+
+        /** 记录单条样本的检索耗时（仅 RAG 链路） */
+        private void addRetrieval(long retrievalMs) {
+            retrievalLatencies.add(retrievalMs);
+            totalRetrieval += retrievalMs;
         }
 
         private void add(EvalItem item, ParseResultDTO dto, long latency, int promptTokens, int completionTokens) {
@@ -257,6 +267,7 @@ public class EvalRunner implements ApplicationRunner {
 
         private void finish() {
             latencies.sort(Long::compareTo);
+            retrievalLatencies.sort(Long::compareTo);
         }
 
         @SuppressWarnings("unused")
@@ -296,11 +307,32 @@ public class EvalRunner implements ApplicationRunner {
 
         @SuppressWarnings("unused")
         public long getP95LatencyMs() {
-            if (latencies.isEmpty()) {
+            return p95(latencies);
+        }
+
+        /** 检索阶段平均耗时（不含模型调用） */
+        @SuppressWarnings("unused")
+        public double getRetrievalAvgMs() {
+            return retrievalLatencies.isEmpty() ? 0 : round((double) totalRetrieval / retrievalLatencies.size());
+        }
+
+        @SuppressWarnings("unused")
+        public long getRetrievalP95Ms() {
+            return p95(retrievalLatencies);
+        }
+
+        /** 平均 prompt token：用于对比 few-shot 条数变化带来的 Prompt 体积 */
+        @SuppressWarnings("unused")
+        public double getAvgPromptTokens() {
+            return total == 0 ? 0 : round((double) totalPromptTokens / total);
+        }
+
+        private long p95(List<Long> values) {
+            if (values.isEmpty()) {
                 return 0;
             }
-            int index = (int) Math.ceil(latencies.size() * 0.95) - 1;
-            return latencies.get(Math.max(0, Math.min(index, latencies.size() - 1)));
+            int index = (int) Math.ceil(values.size() * 0.95) - 1;
+            return values.get(Math.max(0, Math.min(index, values.size() - 1)));
         }
 
         @SuppressWarnings("unused")
