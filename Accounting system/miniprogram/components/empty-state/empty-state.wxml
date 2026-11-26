@@ -1,5 +1,5 @@
 <view class="empty">
-  <mascot state="{{mascotState}}" size="{{160}}" />
+  <mascot state="{{mascotState}}" size="{{220}}" />
   <text class="empty__text">{{text}}</text>
   <view
     wx:if="{{actionText}}"

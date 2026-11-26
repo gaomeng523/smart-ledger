@@ -38,6 +38,8 @@ import java.util.Map;
 public class ImportServiceImpl implements ImportService {
 
     private static final long MAX_FILE_SIZE = 5L * 1024 * 1024;
+    /** 单次导入行数上限，避免一个文件触发上万次 insert 拖垮数据库 */
+    private static final int MAX_ROWS = 5000;
     private static final String REQUEST_ID_PREFIX = "imp-";
     private static final int MAX_REMARK_LEN = 255;
     private static final String UNCATEGORIZED_EXPENSE = "EXPENSE_OTHER";
@@ -112,6 +114,9 @@ public class ImportServiceImpl implements ImportService {
         String channelCode = resolveChannel(sourceType);
 
         List<String[]> rows = parseCsv(readContent(file));
+        if (rows.size() > MAX_ROWS) {
+            throw new BizException(ErrorCode.PARAM_ERROR, "单次最多导入 " + MAX_ROWS + " 行，请拆分文件");
+        }
         if (rows.isEmpty()) {
             throw new BizException(ErrorCode.IMPORT_FORMAT_ERROR);
         }

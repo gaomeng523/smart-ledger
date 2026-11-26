@@ -51,7 +51,7 @@
   <view class="sheet__panel">
     <view class="sheet__header">
       <text class="sheet__title">{{editing ? '编辑别名' : '新增别名'}}</text>
-      <text class="sheet__close" bindtap="onPanelClose">关闭</text>
+      <view class="sheet__close" hover-class="sheet__close--hover" bindtap="onPanelClose">关闭</view>
     </view>
 
     <scroll-view class="sheet__body" scroll-y>
@@ -69,14 +69,14 @@
 
       <view class="sheet__field">
         <text class="sheet__label">映射目标类型</text>
-        <view class="seg">
+        <view class="seg sheet__seg">
           <view
-            class="seg__item {{formTargetType === 1 ? 'is-active' : ''}}"
+            class="seg__item {{formTargetType === 1 ? 'is-on' : ''}}"
             data-type="1"
             bindtap="onTypeChange"
           >分类</view>
           <view
-            class="seg__item {{formTargetType === 2 ? 'is-active' : ''}}"
+            class="seg__item {{formTargetType === 2 ? 'is-on' : ''}}"
             data-type="2"
             bindtap="onTypeChange"
           >渠道</view>
@@ -87,6 +87,7 @@
         <text class="sheet__label">映射目标</text>
         <view class="sheet__picker">
           <dict-picker
+            class="sheet__pk"
             type="{{formTargetType === 1 ? 'category' : 'channel'}}"
             billType="{{0}}"
             value="{{formTargetCode}}"
@@ -99,10 +100,9 @@
     </scroll-view>
 
     <view class="sheet__footer">
-      <view class="btn btn-ghost sheet__btn" hover-class="sheet__btn--hover" bindtap="onPanelClose">取消</view>
       <view
-        class="btn btn-primary sheet__btn {{saving ? 'btn--disabled' : ''}}"
-        hover-class="{{saving ? '' : 'btn--active'}}"
+        class="btn btn-primary sheet__save {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--hover'}}"
         bindtap="onSave"
       >{{saving ? '保存中…' : '保存'}}</view>
     </view>

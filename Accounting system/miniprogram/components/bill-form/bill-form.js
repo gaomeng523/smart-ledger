@@ -55,6 +55,11 @@ Component({
     showTags: {
       type: Boolean,
       value: true
+    },
+    /** 为 true 时把「分类」排在「渠道」之前（新建模板用） */
+    categoryFirst: {
+      type: Boolean,
+      value: false
     }
   },
 

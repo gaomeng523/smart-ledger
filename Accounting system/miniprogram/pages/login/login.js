@@ -8,9 +8,9 @@ const storage = require('../../utils/storage');
 const request = require('../../utils/request');
 
 const FEATURES = [
-  { icon: 'spark', color: '#A78BFF', text: '一句话 / 拍照，AI 自动记账' },
+  { icon: 'spark', color: '#A78BFF', text: '说一句，金额和分类自动填好' },
   { icon: 'chart', color: '#3D8BFF', text: '自动分类，按月出报表' },
-  { icon: 'wallet', color: '#57D9A3', text: '资产体检，余额只存本机' }
+  { icon: 'wallet', color: '#57D9A3', text: '我的账户，余额只存本机' }
 ];
 
 Page({
@@ -18,6 +18,7 @@ Page({
     statusBarHeight: 20,
     step: 'login',
     loading: false,
+    agreed: false,
     features: FEATURES,
     nickname: '',
     avatarPath: '',
@@ -49,6 +50,10 @@ Page({
 
   onLogin() {
     if (this.data.loading) {
+      return;
+    }
+    if (!this.data.agreed) {
+      request.toast('请先勾选同意《用户服务协议》和《隐私政策》');
       return;
     }
     this.setData({ loading: true });
@@ -106,16 +111,38 @@ Page({
     }
   },
 
-  onPrivacy() {
+  onToggleAgree() {
+    this.setData({ agreed: !this.data.agreed });
+  },
+
+  onTerms() {
     wx.showModal({
-      title: '隐私与数据说明',
-      content: '1. 记账文本与图片会上传到服务器用于解析和保存账单；\n2. 资产账户余额、昵称、头像、使用天数只保存在本机，不会上传；\n3. 不采集通讯录、位置等无关信息。',
+      title: '用户服务协议',
+      content: '1. 本小程序提供个人记账工具，账单数据仅用于你自己的记账与统计；\n2. 请勿录入他人隐私或违法违规内容；\n3. 你可以随时在设置中退出登录或删除账单；\n4. 因设备丢失、卸载小程序导致本机数据丢失的，需自行备份。',
       showCancel: false,
       confirmText: '我知道了'
     });
   },
 
+  onPrivacy() {
+    wx.showModal({
+      title: '隐私政策',
+      content: '1. 记账文本与图片会上传到服务器，用于解析和保存你的账单；\n2. 资产账户余额、昵称、头像、使用天数只保存在本机，不会上传；\n3. 不采集通讯录、位置等无关信息，也不向第三方出售你的数据；\n4. 你可以随时删除账单或退出登录。',
+      showCancel: false,
+      confirmText: '我知道了'
+    });
+  },
+
+  onGuest() {
+    wx.switchTab({ url: '/pages/index/index' });
+  },
+
   goHome() {
+    // 从「我的」等页面进来的，登录后原路返回；否则回记账首页
+    if (getCurrentPages().length > 1) {
+      wx.navigateBack();
+      return;
+    }
     wx.switchTab({ url: '/pages/index/index' });
   }
 });

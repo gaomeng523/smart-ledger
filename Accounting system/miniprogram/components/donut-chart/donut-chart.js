@@ -1,6 +1,6 @@
 /**
  * 支出构成环形图（§5、§4.4）
- * 自绘 canvas：环宽 32rpx、扇区间留 2rpx 白色间隙、中心显示总额。
+ * 自绘 canvas：环宽 12px、扇区间留 2px 间隙、圆端；中心显示总额。
  *
  * 属性：items（[{ name, amount, color }]）、centerText
  * 事件：tapItem → { item }
@@ -102,8 +102,9 @@ Component({
       const cx = w / 2;
       const cy = h / 2;
       const unit = rpxToPx();
-      const ringWidth = 32 * unit;
+      const ringWidth = 24 * unit;
       const radius = Math.min(w, h) / 2 - ringWidth / 2 - 2;
+      ctx.lineCap = 'round';
 
       const items = (this.data.items || []).filter((it) => Number(it.amount) > 0);
       const total = items.reduce((sum, it) => sum + Number(it.amount), 0);
@@ -125,7 +126,7 @@ Component({
         const to = start + angle - gapAngle / 2;
         if (to > from) {
           ctx.beginPath();
-          ctx.strokeStyle = it.color || '#D9D2CB';
+          ctx.strokeStyle = it.color || '#9AA0A9';
           ctx.lineWidth = ringWidth;
           ctx.arc(cx, cy, radius, from, to);
           ctx.stroke();
@@ -146,7 +147,7 @@ Component({
       }
 
       const unit = rpxToPx();
-      const ringWidth = 32 * unit;
+      const ringWidth = 24 * unit;
       const cx = this.cssWidth / 2;
       const cy = this.cssHeight / 2;
       const radius = Math.min(this.cssWidth, this.cssHeight) / 2 - ringWidth / 2 - 2;

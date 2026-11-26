@@ -1,10 +1,14 @@
 /**
  * 账单相关接口
  */
-const { request } = require('../utils/request');
+const requestLib = require('../utils/request');
+const { BASE_URL } = require('../config/env');
+const storage = require('../utils/storage');
+
+const { request } = requestLib;
 
 /**
- * AI 解析自然语言 → 结构化草稿（不落库）
+ * 解析自然语言 → 结构化草稿（不落库）
  * @param {string} text 1~200 字
  * @param {Object} [options] { silent }
  * @returns {Promise<ParseResultDTO>}
@@ -16,6 +20,48 @@ function parse(text, options) {
     data: { text },
     silent: !!(options && options.silent)
   });
+}
+
+/**
+ * 拍照识别：上传小票图片 → 视觉模型解析成结构化草稿（不落库）
+ * 走 wx.uploadFile（multipart），需手动携带 Authorization。
+ * @param {string} filePath 本地临时文件路径（wx.chooseMedia 返回）
+ * @returns {Promise<ParseResultDTO>} 额外带 imageUrl（已保存的小票地址）
+ */
+function parseImage(filePath) {
+  const ready = storage.getToken()
+    ? Promise.resolve()
+    : requestLib.ensureLogin();
+
+  return ready.then(() => new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: BASE_URL + '/api/bill/parse-image',
+      filePath,
+      name: 'file',
+      header: { Authorization: 'Bearer ' + storage.getToken() },
+      success(res) {
+        let body = {};
+        try {
+          body = JSON.parse(res.data || '{}');
+        } catch (e) {
+          reject({ code: -1, message: '识别失败，请重试' });
+          return;
+        }
+        if (body.code === 0) {
+          resolve(body.data || {});
+        } else {
+          reject({
+            code: body.code,
+            message: body.message || '识别失败，请重试',
+            data: body.data || null
+          });
+        }
+      },
+      fail(err) {
+        reject({ code: -1, message: '网络异常，请检查网络后重试', raw: err });
+      }
+    });
+  }));
 }
 
 /**
@@ -96,6 +142,7 @@ function remove(billId) {
 
 module.exports = {
   parse,
+  parseImage,
   save,
   list,
   tagSuggest,

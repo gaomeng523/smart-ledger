@@ -9,13 +9,17 @@
     <view slot="left" class="brand" bindtap="onAvatarTap">
       <view class="brand__avatar">
         <image wx:if="{{avatarPath}}" class="brand__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
-        <text wx:else>记</text>
+        <text wx:else class="brand__avatar-txt">记</text>
       </view>
       <view class="brand__meta">
-        <view class="brand__name">Lumen<text class="brand__ai">AI</text></view>
-        <view class="brand__sub">AI 记账 · 在线</view>
+        <view class="brand__name">萌萌记账</view>
+        <view class="brand__sub">
+          <view class="brand__dot"></view>
+          <text>在线</text>
+        </view>
       </view>
     </view>
+    <view wx:if="{{guest}}" slot="right" class="nav-login" hover-class="nav-login--hover" bindtap="onLoginTap">登录</view>
   </nav-bar>
 
   <scroll-view
@@ -32,9 +36,9 @@
         <view class="bubble">
           <text class="bubble__text">{{greeting}}</text>
           <view wx:if="{{renewText}}" class="renew" bindtap="goRenew">
-            <ui-icon name="repeat" size="24" color="#FFB020" />
+            <ui-icon name="repeat" size="32" color="#F5B544" />
             <text class="renew__text">续费提醒 · {{renewText}}</text>
-            <ui-icon name="right" size="22" color="#7B7C82" />
+            <ui-icon name="right" size="28" color="#8A8F98" />
           </view>
         </view>
         <text class="msg__time">{{greetingTime}}</text>
@@ -66,20 +70,74 @@
         </view>
       </view>
 
-      <!-- 解析结果卡 -->
-      <view wx:if="{{draftView}}" class="card parse">
+      <!-- 多笔汇总卡：一句话识别出多笔时展示 -->
+      <view wx:if="{{draftViews.length}}" class="card card--hero multi">
         <view class="parse__head">
-          <ui-icon name="spark" size="24" color="#B49CFF" />
-          <text class="parse__title">已识别 · {{draftView.isIncome ? '一笔收入' : '一笔支出'}}</text>
-          <text class="parse__conf {{draftView.confidenceLow ? 'is-low' : ''}}">置信度 {{draftView.confidenceText}}</text>
+          <ui-icon name="spark" size="28" color="#A78BFA" />
+          <text class="parse__title">已识别 · {{draftViews.length}} 笔</text>
+          <text class="parse__warn">可逐笔修改</text>
+        </view>
+
+        <view class="multi__list">
+          <view
+            wx:for="{{draftViews}}"
+            wx:key="key"
+            class="multi__row"
+            hover-class="multi__row--hover"
+            data-index="{{index}}"
+            bindtap="onEditMulti"
+          >
+            <view class="multi__dot" style="background-color:{{item.catColor}};"></view>
+            <view class="multi__main">
+              <view class="multi__name">
+                <text wx:if="{{item.missingCategory}}" class="parse__miss">分类待确认</text>
+                <text wx:else>{{item.categoryLabel}}</text>
+                <text wx:if="{{item.warn}}" class="multi__flag">需确认</text>
+              </view>
+              <text class="multi__sub">{{item.subText}}</text>
+            </view>
+            <view class="multi__right">
+              <text class="multi__amt {{item.isIncome ? 'is-income' : ''}}">{{item.sign}}¥{{item.amountText}}</text>
+            </view>
+            <view
+              class="multi__del"
+              hover-class="multi__del--hover"
+              data-index="{{index}}"
+              catchtap="onRemoveMulti"
+            >
+              <ui-icon name="close" size="24" color="#8A8F98" />
+            </view>
+          </view>
+        </view>
+
+        <view class="multi__total">
+          <text>共 {{draftViews.length}} 笔</text>
+          <text class="multi__total-val">{{multiTotalText}}</text>
+        </view>
+
+        <view class="parse__actions">
+          <view class="btn btn-ghost parse__btn" hover-class="btn--hover" bindtap="onRetryParse">换个说法</view>
+          <view
+            class="btn btn-primary parse__btn {{saving ? 'btn--disabled' : ''}}"
+            hover-class="btn--hover"
+            bindtap="onSaveAll"
+          >{{saving ? '保存中…' : '全部存入'}}</view>
+        </view>
+      </view>
+
+      <!-- 解析结果卡（本页唯一主角卡片） -->
+      <view wx:if="{{draftView}}" class="card card--hero parse">
+        <view class="parse__head">
+          <ui-icon name="spark" size="28" color="#A78BFA" />
+          <text class="parse__title">{{draftView.isIncome ? '已识别 · 收入' : '已识别 · 支出'}}</text>
+          <text wx:if="{{draftView.needConfirm}}" class="parse__warn">请确认</text>
         </view>
 
         <view class="parse__amount" bindtap="onEditDraft">
           <text class="parse__cur">¥</text>
           <text class="parse__val num {{draftView.isIncome ? 'is-income' : ''}}">{{draftView.intPart}}<text class="parse__dec">.{{draftView.decPart}}</text></text>
           <view class="parse__edit">
-            <ui-icon name="edit" size="22" color="#5E5F66" />
-            <text>改</text>
+            <ui-icon name="edit" size="28" color="#8A8F98" />
           </view>
         </view>
 
@@ -88,14 +146,19 @@
             <text class="parse__k">分类</text>
             <view class="parse__v">
               <text wx:if="{{draftView.missingCategory}}" class="parse__miss">待确认</text>
-              <text wx:else class="chip">{{draftView.categoryLabel}}</text>
+              <text
+                wx:else
+                class="parse__cat"
+                style="color:{{draftView.catColor}};background-color:{{draftView.catBg}};"
+              >{{draftView.categoryLabel}}</text>
             </view>
           </view>
           <view class="parse__row" bindtap="onEditDraft">
             <text class="parse__k">账户</text>
             <view class="parse__v">
-              <text wx:if="{{draftView.missingChannel}}" class="parse__miss">待确认</text>
+              <text wx:if="{{draftView.missingChannel}}" class="parse__pick">未指定</text>
               <text wx:else>{{draftView.channelName}}</text>
+              <ui-icon name="right" size="26" color="#8A8F98" />
             </view>
           </view>
           <view class="parse__row" bindtap="onEditDraft">
@@ -117,10 +180,10 @@
         </view>
 
         <view class="parse__actions">
-          <view class="btn parse__btn" hover-class="parse__btn--hover" bindtap="onRetryParse">换个说法</view>
+          <view class="btn btn-ghost parse__btn" hover-class="btn--hover" bindtap="onRetryParse">换个说法</view>
           <view
             class="btn btn-primary parse__btn {{saving ? 'btn--disabled' : ''}}"
-            hover-class="parse__btn--hover"
+            hover-class="btn--hover"
             bindtap="onSaveDraft"
           >{{saving ? '保存中…' : '存入账本'}}</view>
         </view>
@@ -131,26 +194,26 @@
         <view class="chips__inner">
           <view
             wx:for="{{quickChips}}"
-            wx:key="*this"
+            wx:key="text"
             class="chips__item"
             hover-class="chips__item--hover"
-            data-text="{{item}}"
+            data-text="{{item.text}}"
             bindtap="onChipTap"
-          >{{item}}</view>
+          >
+            <view class="chips__dot" style="background-color:{{item.color}};"></view>
+            <text>{{item.text}}</text>
+          </view>
         </view>
       </scroll-view>
 
-      <view class="chat__tip">
-        <ui-icon name="spark" size="20" color="#46474E" />
-        <text>Lumen 会记住你的习惯，越记越准</text>
-      </view>
+      <view class="chat__tip">记账越久，分类越准</view>
 
       <view id="chat-end" class="chat__end"></view>
     </view>
   </scroll-view>
 
   <!-- 输入条 -->
-  <view class="inputbar safe-bottom">
+  <view wx:if="{{!singlePage}}" class="inputbar">
     <view wx:if="{{pendingImagePath}}" class="photo">
       <image class="photo__img" src="{{pendingImagePath}}" mode="aspectFill" />
       <text class="photo__text">小票已上传</text>
@@ -159,8 +222,8 @@
 
     <view class="ib">
       <view class="ib__field">
-        <view class="ib__icon" bindtap="onVoice">
-          <ui-icon name="mic" size="30" color="#8A8B92" />
+        <view class="ib__icon" bindtap="onVoice" hover-class="ib__icon--hover">
+          <ui-icon name="mic" size="40" color="#A8ADB5" />
         </view>
         <input
           class="ib__input"
@@ -172,15 +235,39 @@
           bindinput="onInput"
           bindconfirm="onSend"
         />
-        <view class="ib__icon" bindtap="onPhoto">
-          <ui-icon name="camera" size="30" color="#8A8B92" />
+        <view class="ib__icon" bindtap="onPhoto" hover-class="ib__icon--hover">
+          <ui-icon name="camera" size="40" color="#A8ADB5" />
         </view>
       </view>
 
       <view class="ib__send {{canSend ? 'is-on' : ''}}" hover-class="ib__send--hover" bindtap="onSend">
-        <ui-icon name="spark" size="38" color="{{canSend ? '#FFFFFF' : '#6E6F76'}}" />
+        <ui-icon name="spark" size="40" color="{{canSend ? '#FFFFFF' : '#8A8F98'}}" />
       </view>
     </view>
+  </view>
+
+  <!-- 朋友圈单页模式：未登录访问时展示介绍，引导前往完整小程序 -->
+  <view wx:if="{{singlePage}}" class="single">
+    <view class="single__logo">记</view>
+    <view class="single__title">萌萌记账</view>
+    <view class="single__sub">一句话、一张小票，就记好一笔账</view>
+
+    <view class="single__list">
+      <view class="single__item">
+        <text class="single__k">一句话</text>
+        <text class="single__v">「早餐 12，打车 32」一次记两笔</text>
+      </view>
+      <view class="single__item">
+        <text class="single__k">拍小票</text>
+        <text class="single__v">自动识别金额、商户和分类</text>
+      </view>
+      <view class="single__item">
+        <text class="single__k">看统计</text>
+        <text class="single__v">月度收支与分类占比一目了然</text>
+      </view>
+    </view>
+
+    <view class="single__hint">点击底部「前往小程序」开始记账</view>
   </view>
 
   <!-- 抽屉 -->
@@ -193,7 +280,7 @@
     class="drawer {{dragging ? 'is-drag' : ''}}"
     style="transform:translateX({{drawerX}}px);{{drawerOpen || dragging ? '' : 'pointer-events:none;'}}"
   >
-    <drawer-menu id="menu" mode="drawer" bind:navigate="onDrawerNavigate" />
+    <drawer-menu id="menu" mode="drawer" bind:navigate="onDrawerNavigate" bind:profile="onDrawerProfile" />
   </view>
 </view>
 

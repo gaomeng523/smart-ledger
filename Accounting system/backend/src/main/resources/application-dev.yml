@@ -5,7 +5,7 @@ smartledger:
   wx:
     mock-enabled: true
   ai:
-    enabled: true
+    enabled: ${AI_ENABLED:false}
 
 mybatis-plus:
   configuration:

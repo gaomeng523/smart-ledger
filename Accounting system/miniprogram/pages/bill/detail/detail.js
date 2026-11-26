@@ -5,6 +5,7 @@
 const billApi = require('../../../api/bill');
 const store = require('../../../store/index');
 const request = require('../../../utils/request');
+const storage = require('../../../utils/storage');
 const format = require('../../../utils/format');
 const { BASE_URL } = require('../../../config/env');
 const { CODE, BILL_TYPE, SOURCE } = require('../../../config/const');
@@ -106,7 +107,28 @@ Page({
         : Math.round(Number(bill.confidence) * 100) + '%',
       sourceText: SOURCE_TEXT[bill.source] || '手动',
       createTimeText: bill.createTime || '',
-      imageUrl: bill.imageUrl ? BASE_URL + bill.imageUrl : ''
+      imageUrl: ''
+    });
+    this.loadImage(bill.imageUrl);
+  },
+
+  /**
+   * 小票图片需要登录态，<image> 不能自带 Authorization，
+   * 先下载到临时文件再展示。
+   */
+  loadImage(path) {
+    if (!path) {
+      return;
+    }
+    const token = storage.getToken();
+    wx.downloadFile({
+      url: BASE_URL + '/api/upload/image?path=' + encodeURIComponent(path),
+      header: token ? { Authorization: 'Bearer ' + token } : {},
+      success: (res) => {
+        if (res.statusCode === 200) {
+          this.setData({ imageUrl: res.tempFilePath });
+        }
+      }
     });
   },
 
@@ -212,7 +234,7 @@ Page({
       title: '删除账单',
       content: '删除后不可恢复，确定删除？',
       confirmText: '删除',
-      confirmColor: '#E8454F',
+      confirmColor: '#FF6B6B',
       success: (res) => {
         if (!res.confirm) {
           return;

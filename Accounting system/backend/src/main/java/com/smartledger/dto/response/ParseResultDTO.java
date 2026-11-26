@@ -37,4 +37,7 @@ public class ParseResultDTO {
 
     /** 缺失且必须由用户补全的字段列表 */
     private List<String> missingFields = new ArrayList<>();
+
+    /** 拍照识别时已保存的小票图片地址（文本解析为空） */
+    private String imageUrl;
 }

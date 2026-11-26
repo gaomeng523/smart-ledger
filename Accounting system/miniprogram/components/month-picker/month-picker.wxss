@@ -43,7 +43,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--sheet-bottom, 0px);
   z-index: 301;
   background-color: var(--color-bg-card);
   border-top-left-radius: 32rpx;
@@ -79,6 +79,7 @@
 
 .mp__list {
   flex: 1;
+  min-height: 0;
   max-height: 46vh;
   padding: 0 32rpx;
 }
@@ -108,5 +109,5 @@
 
 .mp__safe {
   flex: none;
-  height: env(safe-area-inset-bottom);
+  height: var(--sheet-safe, env(safe-area-inset-bottom));
 }

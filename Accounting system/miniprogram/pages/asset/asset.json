@@ -1,5 +1,6 @@
 {
   "navigationStyle": "custom",
+  "navigationBarTitleText": "我的账户",
   "usingComponents": {
     "nav-bar": "../../components/nav-bar/nav-bar",
     "ui-icon": "../../components/ui-icon/ui-icon"

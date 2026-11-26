@@ -1,0 +1,108 @@
+{"text": "超市买菜 45.5", "amount": 45.5, "categoryCode": "FOOD_GROCERY", "billType": 0}
+{"text": "叮咚买菜，38.9元，微信付的", "amount": 38.9, "categoryCode": "FOOD_GROCERY", "billType": 0}
+{"text": "点外卖 28", "amount": 28, "categoryCode": "FOOD_TAKEOUT", "billType": 0}
+{"text": "饿了么点餐，42元，银行卡付的", "amount": 42, "categoryCode": "FOOD_TAKEOUT", "billType": 0}
+{"text": "下馆子吃火锅 180", "amount": 180, "categoryCode": "FOOD_DINING", "billType": 0}
+{"text": "餐厅聚餐，240元，微信付的", "amount": 240, "categoryCode": "FOOD_DINING", "billType": 0}
+{"text": "瑞幸生椰拿铁 19", "amount": 19, "categoryCode": "FOOD_COFFEE", "billType": 0}
+{"text": "蜜雪冰城奶茶，12元，支付宝付的", "amount": 12, "categoryCode": "FOOD_COFFEE", "billType": 0}
+{"text": "便利店买零食 15.5", "amount": 15.5, "categoryCode": "FOOD_SNACK", "billType": 0}
+{"text": "买水果，28元，微信付的", "amount": 28, "categoryCode": "FOOD_SNACK", "billType": 0}
+{"text": "坐地铁 4", "amount": 4, "categoryCode": "TRAFFIC_TRANSIT", "billType": 0}
+{"text": "地铁通勤，6元，现金付的", "amount": 6, "categoryCode": "TRAFFIC_TRANSIT", "billType": 0}
+{"text": "打车 32", "amount": 32, "categoryCode": "TRAFFIC_TAXI", "billType": 0}
+{"text": "出租车，28元，现金付的", "amount": 28, "categoryCode": "TRAFFIC_TAXI", "billType": 0}
+{"text": "加油 300", "amount": 300, "categoryCode": "TRAFFIC_CHARGE", "billType": 0}
+{"text": "汽车加油，420元，支付宝付的", "amount": 420, "categoryCode": "TRAFFIC_CHARGE", "billType": 0}
+{"text": "停车费 10", "amount": 10, "categoryCode": "TRAFFIC_PARKING", "billType": 0}
+{"text": "商场停车，15元，银行卡付的", "amount": 15, "categoryCode": "TRAFFIC_PARKING", "billType": 0}
+{"text": "高铁票 398", "amount": 398, "categoryCode": "TRAFFIC_TICKET", "billType": 0}
+{"text": "机票，1280元，现金付的", "amount": 1280, "categoryCode": "TRAFFIC_TICKET", "billType": 0}
+{"text": "超市买日用品 68", "amount": 68, "categoryCode": "SHOPPING_DAILY", "billType": 0}
+{"text": "便利店买牙膏，22元，支付宝付的", "amount": 22, "categoryCode": "SHOPPING_DAILY", "billType": 0}
+{"text": "买衣服 3100", "amount": 3100, "categoryCode": "SHOPPING_CLOTHES", "billType": 0}
+{"text": "优衣库买T恤，199元，银行卡付的", "amount": 199, "categoryCode": "SHOPPING_CLOTHES", "billType": 0}
+{"text": "买手机 4999", "amount": 4999, "categoryCode": "SHOPPING_DIGITAL", "billType": 0}
+{"text": "京东买显示器，1299元，支付宝付的", "amount": 1299, "categoryCode": "SHOPPING_DIGITAL", "billType": 0}
+{"text": "买护肤品 320", "amount": 320, "categoryCode": "SHOPPING_BEAUTY", "billType": 0}
+{"text": "买洗面奶，89元，微信付的", "amount": 89, "categoryCode": "SHOPPING_BEAUTY", "billType": 0}
+{"text": "买床单 199", "amount": 199, "categoryCode": "SHOPPING_HOME", "billType": 0}
+{"text": "宜家买收纳，356元，现金付的", "amount": 356, "categoryCode": "SHOPPING_HOME", "billType": 0}
+{"text": "交房租 3200", "amount": 3200, "categoryCode": "HOUSING_RENT", "billType": 0}
+{"text": "月租房租，1800元，微信付的", "amount": 1800, "categoryCode": "HOUSING_RENT", "billType": 0}
+{"text": "交电费 120", "amount": 120, "categoryCode": "HOUSING_UTILITY", "billType": 0}
+{"text": "燃气费，80元，银行卡付的", "amount": 80, "categoryCode": "HOUSING_UTILITY", "billType": 0}
+{"text": "物业费 280", "amount": 280, "categoryCode": "HOUSING_PROPERTY", "billType": 0}
+{"text": "小区物业费，260元，现金付的", "amount": 260, "categoryCode": "HOUSING_PROPERTY", "billType": 0}
+{"text": "宽带费 600", "amount": 600, "categoryCode": "HOUSING_TELECOM", "billType": 0}
+{"text": "交网费，120元，微信付的", "amount": 120, "categoryCode": "HOUSING_TELECOM", "billType": 0}
+{"text": "视频会员 25", "amount": 25, "categoryCode": "ENT_SUB", "billType": 0}
+{"text": "爱奇艺年费，218元，微信付的", "amount": 218, "categoryCode": "ENT_SUB", "billType": 0}
+{"text": "游戏充值 68", "amount": 68, "categoryCode": "ENT_GAME", "billType": 0}
+{"text": "Steam买游戏，199元，支付宝付的", "amount": 199, "categoryCode": "ENT_GAME", "billType": 0}
+{"text": "健身房年卡 2400", "amount": 2400, "categoryCode": "ENT_FITNESS", "billType": 0}
+{"text": "羽毛球场地费，60元，现金付的", "amount": 60, "categoryCode": "ENT_FITNESS", "billType": 0}
+{"text": "旅游门票 120", "amount": 120, "categoryCode": "ENT_TRAVEL", "billType": 0}
+{"text": "景区门票，180元，现金付的", "amount": 180, "categoryCode": "ENT_TRAVEL", "billType": 0}
+{"text": "看电影 45", "amount": 45, "categoryCode": "ENT_LEISURE", "billType": 0}
+{"text": "密室逃脱，88元，支付宝付的", "amount": 88, "categoryCode": "ENT_LEISURE", "billType": 0}
+{"text": "门诊挂号 50", "amount": 50, "categoryCode": "MED_CLINIC", "billType": 0}
+{"text": "挂号费，30元，支付宝付的", "amount": 30, "categoryCode": "MED_CLINIC", "billType": 0}
+{"text": "药店买药 35", "amount": 35, "categoryCode": "MED_MEDICINE", "billType": 0}
+{"text": "买药，46元，支付宝付的", "amount": 46, "categoryCode": "MED_MEDICINE", "billType": 0}
+{"text": "体检 680", "amount": 680, "categoryCode": "MED_CHECKUP", "billType": 0}
+{"text": "全身体检，1200元，现金付的", "amount": 1200, "categoryCode": "MED_CHECKUP", "billType": 0}
+{"text": "医疗保险 380", "amount": 380, "categoryCode": "MED_INSURANCE", "billType": 0}
+{"text": "医保缴费，420元，现金付的", "amount": 420, "categoryCode": "MED_INSURANCE", "billType": 0}
+{"text": "买书 59", "amount": 59, "categoryCode": "STUDY_BOOK", "billType": 0}
+{"text": "当当买书，88元，支付宝付的", "amount": 88, "categoryCode": "STUDY_BOOK", "billType": 0}
+{"text": "报培训班 2980", "amount": 2980, "categoryCode": "STUDY_COURSE", "billType": 0}
+{"text": "买课程，599元，支付宝付的", "amount": 599, "categoryCode": "STUDY_COURSE", "billType": 0}
+{"text": "考试报名费 50", "amount": 50, "categoryCode": "STUDY_EXAM", "billType": 0}
+{"text": "考证报名，260元，微信付的", "amount": 260, "categoryCode": "STUDY_EXAM", "billType": 0}
+{"text": "买文具 35", "amount": 35, "categoryCode": "STUDY_TOOL", "billType": 0}
+{"text": "买打印机，899元，支付宝付的", "amount": 899, "categoryCode": "STUDY_TOOL", "billType": 0}
+{"text": "随份子 600", "amount": 600, "categoryCode": "SOCIAL_GIFT", "billType": 0}
+{"text": "结婚礼金，1000元，银行卡付的", "amount": 1000, "categoryCode": "SOCIAL_GIFT", "billType": 0}
+{"text": "请客吃饭 560", "amount": 560, "categoryCode": "SOCIAL_TREAT", "billType": 0}
+{"text": "请客，380元，微信付的", "amount": 380, "categoryCode": "SOCIAL_TREAT", "billType": 0}
+{"text": "给父母生活费 2000", "amount": 2000, "categoryCode": "SOCIAL_FAMILY", "billType": 0}
+{"text": "给家里打钱，3000元，微信付的", "amount": 3000, "categoryCode": "SOCIAL_FAMILY", "billType": 0}
+{"text": "捐款 100", "amount": 100, "categoryCode": "SOCIAL_DONATE", "billType": 0}
+{"text": "水滴筹捐款，50元，现金付的", "amount": 50, "categoryCode": "SOCIAL_DONATE", "billType": 0}
+{"text": "手续费 5", "amount": 5, "categoryCode": "OTHER_FEE", "billType": 0}
+{"text": "提现手续费，3元，银行卡付的", "amount": 3, "categoryCode": "OTHER_FEE", "billType": 0}
+{"text": "罚款 200", "amount": 200, "categoryCode": "OTHER_FINE", "billType": 0}
+{"text": "违章罚款，300元，微信付的", "amount": 300, "categoryCode": "OTHER_FINE", "billType": 0}
+{"text": "其他杂项 66", "amount": 66, "categoryCode": "OTHER_MISC", "billType": 0}
+{"text": "其他开销，88元，支付宝付的", "amount": 88, "categoryCode": "OTHER_MISC", "billType": 0}
+{"text": "工资 8000", "amount": 8000, "categoryCode": "SALARY_BASE", "billType": 1}
+{"text": "前天发工资9500元", "amount": 9500, "categoryCode": "SALARY_BASE", "billType": 1}
+{"text": "加班费 500", "amount": 500, "categoryCode": "SALARY_OVERTIME", "billType": 1}
+{"text": "11月10日加班工资800元", "amount": 800, "categoryCode": "SALARY_OVERTIME", "billType": 1}
+{"text": "年终奖 20000", "amount": 20000, "categoryCode": "SALARY_ANNUAL", "billType": 1}
+{"text": "11月10日年底双薪15000元", "amount": 15000, "categoryCode": "SALARY_ANNUAL", "billType": 1}
+{"text": "绩效奖金 3000", "amount": 3000, "categoryCode": "BONUS_PERF", "billType": 1}
+{"text": "今天绩效工资4000元", "amount": 4000, "categoryCode": "BONUS_PERF", "billType": 1}
+{"text": "交通补贴 300", "amount": 300, "categoryCode": "BONUS_ALLOWANCE", "billType": 1}
+{"text": "前天住房补贴1200元", "amount": 1200, "categoryCode": "BONUS_ALLOWANCE", "billType": 1}
+{"text": "提成 2000", "amount": 2000, "categoryCode": "BONUS_COMMISSION", "billType": 1}
+{"text": "11月10日项目提成3500元", "amount": 3500, "categoryCode": "BONUS_COMMISSION", "billType": 1}
+{"text": "利息 12", "amount": 12, "categoryCode": "INVEST_INTEREST", "billType": 1}
+{"text": "今天银行利息88元", "amount": 88, "categoryCode": "INVEST_INTEREST", "billType": 1}
+{"text": "基金收益 260", "amount": 260, "categoryCode": "INVEST_FUND", "billType": 1}
+{"text": "昨天基金赎回收益450元", "amount": 450, "categoryCode": "INVEST_FUND", "billType": 1}
+{"text": "分红 600", "amount": 600, "categoryCode": "INVEST_DIVIDEND", "billType": 1}
+{"text": "11月10日基金分红380元", "amount": 380, "categoryCode": "INVEST_DIVIDEND", "billType": 1}
+{"text": "公司报销 480", "amount": 480, "categoryCode": "REIMBURSE_COMPANY", "billType": 1}
+{"text": "11月10日差旅报销1200元", "amount": 1200, "categoryCode": "REIMBURSE_COMPANY", "billType": 1}
+{"text": "退款 99", "amount": 99, "categoryCode": "REIMBURSE_REFUND", "billType": 1}
+{"text": "今天订单退款260元", "amount": 260, "categoryCode": "REIMBURSE_REFUND", "billType": 1}
+{"text": "借款收回 1000", "amount": 1000, "categoryCode": "REIMBURSE_LOAN", "billType": 1}
+{"text": "昨天收回借款2000元", "amount": 2000, "categoryCode": "REIMBURSE_LOAN", "billType": 1}
+{"text": "兼职收入 800", "amount": 800, "categoryCode": "INCOME_PARTTIME", "billType": 1}
+{"text": "11月10日副业收入1500元", "amount": 1500, "categoryCode": "INCOME_PARTTIME", "billType": 1}
+{"text": "收红包 66", "amount": 66, "categoryCode": "INCOME_REDPACKET", "billType": 1}
+{"text": "11月10日微信收红包200元", "amount": 200, "categoryCode": "INCOME_REDPACKET", "billType": 1}
+{"text": "其他收入 120", "amount": 120, "categoryCode": "INCOME_MISC", "billType": 1}
+{"text": "11月10日闲鱼卖二手260元", "amount": 260, "categoryCode": "INCOME_MISC", "billType": 1}

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 账单接口：解析、保存、查询、统计。
@@ -44,6 +45,12 @@ public class BillController {
     @PostMapping("/parse")
     public R<ParseResultDTO> parse(@Valid @RequestBody BillParseRequest request) {
         return R.ok(aiParseService.parse(UserContext.requireOpenid(), request.getText()));
+    }
+
+    /** 拍照识别：上传小票图片 → 视觉模型解析（不落库，图片随结果地址返回） */
+    @PostMapping("/parse-image")
+    public R<ParseResultDTO> parseImage(@RequestParam("file") MultipartFile file) {
+        return R.ok(aiParseService.parseImage(UserContext.requireOpenid(), file));
     }
 
     /** 保存账单 */

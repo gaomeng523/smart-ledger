@@ -18,42 +18,35 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "backgroundColor": "#0B0B0C",
-    "navigationBarBackgroundColor": "#0B0B0C",
-    "navigationBarTitleText": "AI 记账",
+    "backgroundColor": "#0B0C0E",
+    "navigationBarBackgroundColor": "#0B0C0E",
+    "navigationBarTitleText": "萌萌记账",
     "navigationBarTextStyle": "white",
     "navigationStyle": "custom",
     "pageOrientation": "portrait"
   },
   "tabBar": {
-    "color": "#54555B",
-    "selectedColor": "#3D8BFF",
-    "backgroundColor": "#0B0B0C",
+    "custom": true,
+    "color": "#8A8F98",
+    "selectedColor": "#4C8DFF",
+    "backgroundColor": "#0B0C0E",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "AI 记账",
-        "iconPath": "assets/tabbar/tab-ai.png",
-        "selectedIconPath": "assets/tabbar/tab-ai-active.png"
+        "text": "记账"
       },
       {
         "pagePath": "pages/bill/list/list",
-        "text": "日历",
-        "iconPath": "assets/tabbar/tab-cal.png",
-        "selectedIconPath": "assets/tabbar/tab-cal-active.png"
+        "text": "日历"
       },
       {
         "pagePath": "pages/stat/stat/stat",
-        "text": "统计",
-        "iconPath": "assets/tabbar/tab-chart.png",
-        "selectedIconPath": "assets/tabbar/tab-chart-active.png"
+        "text": "统计"
       },
       {
         "pagePath": "pages/mine/mine/mine",
-        "text": "我的",
-        "iconPath": "assets/tabbar/tab-mine.png",
-        "selectedIconPath": "assets/tabbar/tab-mine-active.png"
+        "text": "我的"
       }
     ]
   },

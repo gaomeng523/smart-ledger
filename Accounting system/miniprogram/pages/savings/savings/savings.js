@@ -8,8 +8,25 @@ const request = require('../../../utils/request');
 const format = require('../../../utils/format');
 const { CODE } = require('../../../config/const');
 
-/** 可选心愿图标（与 H5 一致） */
-const ICONS = ['🎯', '✈️', '📷', '💻', '🏠', '🚗', '💍', '🎓', '🎁', '🐱'];
+/** 心愿图标：emoji 仅作为存储值，界面一律用线性图标 */
+const ICONS = [
+  { emoji: '🎯', icon: 'target' },
+  { emoji: '✈️', icon: 'plane' },
+  { emoji: '📷', icon: 'camera' },
+  { emoji: '💻', icon: 'card' },
+  { emoji: '🏠', icon: 'home' },
+  { emoji: '🚗', icon: 'car' },
+  { emoji: '💍', icon: 'heart' },
+  { emoji: '🎓', icon: 'book' },
+  { emoji: '🎁', icon: 'gift' },
+  { emoji: '🐱', icon: 'paw' }
+];
+
+/** emoji → 线性图标名 */
+const ICON_MAP = ICONS.reduce((map, item) => {
+  map[item.emoji] = item.icon;
+  return map;
+}, {});
 
 /** 存入 / 取出快捷金额 */
 const QUICK_ADD = [100, 500, 1000, 2000];
@@ -36,7 +53,7 @@ Page({
       targetAmount: '',
       dueDate: ''
     },
-    selectedIcon: ICONS[0],
+    selectedIcon: ICONS[0].emoji,
     saving: false,
 
     // 存 / 取金额弹层
@@ -99,9 +116,10 @@ Page({
         achieved += 1;
       }
       const pct = Math.max(0, Math.min(100, Number(g.progressPercent) || 0));
+      const days = this.daysText(g, done);
       return {
         id: g.id,
-        icon: g.icon || '🎯',
+        icon: ICON_MAP[g.icon] || 'target',
         title: g.title,
         done,
         abandoned: Number(g.status) === 2,
@@ -109,7 +127,8 @@ Page({
         targetText: format.formatMoney(target),
         savedText: format.formatMoney(saved),
         percent: pct,
-        subText: this.subText(g, done),
+        remainText: done ? '已达成' : '还差 ¥' + format.formatMoney(g.remainAmount),
+        daysText: days,
         canWithdraw: saved > 0
       };
     });
@@ -123,24 +142,21 @@ Page({
     };
   },
 
-  subText(g, done) {
-    const parts = ['目标 ¥' + format.formatMoney(g.targetAmount)];
+  daysText(g, done) {
     if (done) {
-      parts.push('已达成 🎉');
-    } else {
-      parts.push('还差 ¥' + format.formatMoney(g.remainAmount));
-      if (g.dueDate && g.daysLeft !== null && g.daysLeft !== undefined) {
-        const d = Number(g.daysLeft);
-        if (d < 0) {
-          parts.push('已逾期 ' + (-d) + ' 天');
-        } else if (d === 0) {
-          parts.push('今天到期');
-        } else {
-          parts.push('剩 ' + d + ' 天');
-        }
-      }
+      return '已完成';
     }
-    return parts.join(' · ');
+    if (!g.dueDate || g.daysLeft === null || g.daysLeft === undefined) {
+      return '未设期限';
+    }
+    const d = Number(g.daysLeft);
+    if (d < 0) {
+      return '已逾期 ' + (-d) + ' 天';
+    }
+    if (d === 0) {
+      return '今天到期';
+    }
+    return '剩 ' + d + ' 天';
   },
 
   /* ---------- 新建 / 编辑弹层 ---------- */
@@ -150,7 +166,7 @@ Page({
     this.setData({
       sheetVisible: true,
       sheetMode: 'new',
-      selectedIcon: ICONS[0],
+      selectedIcon: ICONS[0].emoji,
       form: { title: '', targetAmount: '', dueDate: '' }
     });
   },
@@ -327,25 +343,29 @@ Page({
 
   /* ---------- 删除 ---------- */
 
-  onDelete(e) {
-    const goal = this.find(e.currentTarget.dataset.id);
-    const self = this;
+  /** 编辑弹层底部的删除入口（危险操作，二次确认） */
+  onDeleteFromSheet() {
+    const goal = this.editing;
+    if (!goal) {
+      return;
+    }
     wx.showModal({
       title: '删除心愿',
-      content: goal ? '「' + goal.title + '」将被删除，已存金额仅作记录、不影响账单' : '删除后不可恢复',
+      content: '「' + goal.title + '」将被删除，已存金额仅作记录、不影响账单。删除后不可恢复。',
       confirmText: '删除',
-      confirmColor: '#E8454F',
+      confirmColor: '#FF6B6B',
       success: (res) => {
         if (!res.confirm) {
           return;
         }
         savingsApi.remove(goal.id)
           .then(() => {
+            this.setData({ sheetVisible: false });
             wx.showToast({ title: '已删除', icon: 'success' });
-            self.load();
+            this.load();
           })
           .catch((err) => {
-            if (self.shouldToast(err)) {
+            if (this.shouldToast(err)) {
               request.toast((err && err.message) || '删除失败，请稍后再试');
             }
           });

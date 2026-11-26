@@ -1,73 +1,104 @@
-<view class="page">
+<view class="page page--sub">
   <nav-bar back title="分类管理" />
 
   <view class="body">
+    <!-- 顶部统计 -->
     <view class="summary">
       <view class="summary__row">
-        <text class="summary__v">{{usedCount}}<text class="summary__unit">个分类在用</text></text>
-        <text class="summary__v">{{billCount}}<text class="summary__unit">笔账单</text></text>
+        <view class="summary__item">
+          <text class="summary__n num">{{usedCount}}</text>
+          <text class="summary__k">在用分类</text>
+        </view>
+        <view class="summary__item">
+          <text class="summary__n num">{{billCount}}</text>
+          <text class="summary__k">笔账单</text>
+        </view>
       </view>
       <view class="summary__foot">
-        <text>{{monthText}} · 支出合计 ¥{{totalText}}</text>
-        <text class="summary__link" bindtap="goAI">去记账 ›</text>
+        <text class="summary__meta">{{monthText}} · 支出合计 ¥{{totalText}}</text>
+        <view class="summary__link" hover-class="summary__link--hover" bindtap="goAI">去记账 ›</view>
       </view>
     </view>
 
-    <view class="card list">
+    <!-- 支出分类（主角卡片） -->
+    <view class="card card--hero cat-card">
       <view class="card__head">
         <text class="card__title">支出分类</text>
-        <text class="card__aside">点击展开二级</text>
+        <text class="card__aside">点开看二级分类</text>
       </view>
 
       <block wx:for="{{parents}}" wx:key="code">
         <view
-          class="row"
-          hover-class="row--hover"
+          class="crow"
+          hover-class="crow--hover"
           data-code="{{item.code}}"
           bindtap="onParentTap"
         >
-          <view class="row__ico" style="background-color:{{item.color}}1F;">
-            <category-icon icon="{{item.icon}}" size="34" color="{{item.color}}" />
+          <view class="crow__ico" style="background-color:{{item.bg}};">
+            <category-icon icon="{{item.icon}}" size="38" color="{{item.color}}" />
           </view>
-          <view class="row__main">
-            <view class="row__line">
-              <text class="row__name">{{item.name}}</text>
-              <text class="row__amt num">¥{{item.amountText}}</text>
+
+          <view class="crow__main">
+            <view class="crow__line">
+              <text class="crow__name">{{item.name}}</text>
+              <text class="crow__amt num">¥{{item.amountText}}</text>
             </view>
-            <view class="row__bar">
-              <view class="row__bar-fill" style="width:{{item.ratio}}%;background-color:{{item.color}};"></view>
+            <view class="crow__bar">
+              <view class="crow__bar-fill" style="width:{{item.ratio}}%;background-color:{{item.color}};"></view>
             </view>
-            <text class="row__meta">{{item.ratio}}% · {{item.children.length}} 个二级</text>
+            <text class="crow__meta">{{item.ratioText}} · {{item.children.length}} 个二级</text>
           </view>
-          <ui-icon
-            name="{{expanded === item.code ? 'down' : 'right'}}"
-            size="26"
-            color="#5E5F66"
-          />
+
+          <ui-icon name="{{expanded === item.code ? 'down' : 'right'}}" size="26" color="#8A8F98" />
         </view>
 
         <view wx:if="{{expanded === item.code}}" class="sub">
           <view wx:if="{{!children.length}}" class="sub__loading">正在加载明细…</view>
           <view wx:for="{{children}}" wx:for-item="child" wx:key="code" class="sub__row">
-            <category-icon icon="{{child.icon}}" size="26" color="#7B7C82" />
+            <category-icon icon="{{child.icon}}" size="26" color="{{child.zero ? '#8A8F98' : child.color}}" />
             <text class="sub__name {{child.zero ? 'is-zero' : ''}}">{{child.name}}</text>
             <text class="sub__amt num {{child.zero ? 'is-zero' : ''}}">¥{{child.amountText}}</text>
           </view>
         </view>
       </block>
+
+
+      <!-- 未使用分类：默认收起 -->
+      <view wx:if="{{unusedCount > 0}}" class="unused">
+        <view class="unused__head" hover-class="unused__head--hover" bindtap="onToggleUnused">
+          <text class="unused__title">未使用 {{unusedCount}} 个分类</text>
+          <ui-icon
+            name="down"
+            size="26"
+            color="#8A8F98"
+            class="unused__arrow {{showUnused ? 'is-open' : ''}}"
+          />
+        </view>
+        <block wx:if="{{showUnused}}">
+          <view wx:for="{{unusedParents}}" wx:key="code" class="urow">
+            <view class="urow__ico" style="background-color:{{item.bg}};">
+              <category-icon icon="{{item.icon}}" size="32" color="{{item.color}}" />
+            </view>
+            <text class="urow__name">{{item.name}}</text>
+            <text class="urow__amt num">¥0.00</text>
+          </view>
+        </block>
+      </view>
+
+      <view wx:if="{{!parents.length && !loading}}" class="cat-empty">本月还没有支出分类数据</view>
     </view>
 
-    <view class="rules" bindtap="goRules">
+    <view class="rules" hover-class="rules--hover" bindtap="goRules">
       <view class="rules__ico">
-        <ui-icon name="book" size="28" color="#B49CFF" />
+        <ui-icon name="search" size="32" color="#A8ADB5" />
       </view>
       <view class="rules__main">
-        <text class="rules__title">AI 学习规则</text>
-        <text class="rules__sub">已学会 {{ruleCount}} 条 · 点此管理关键词映射</text>
+        <text class="rules__title">别名词典</text>
+        <text class="rules__sub">已学会 {{ruleCount}} 条关键词映射</text>
       </view>
-      <ui-icon name="right" size="26" color="#5E5F66" />
+      <ui-icon name="right" size="28" color="#8A8F98" />
     </view>
 
-    <view class="tip">分类由 AI 根据备注自动匹配，记账时随时可改；改过的说法会自动记住。</view>
+    <view class="tip">分类会根据备注里的说法自动匹配，记账时随时可改；改过的说法会自动记住。</view>
   </view>
 </view>

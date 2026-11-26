@@ -5,80 +5,63 @@ import com.smartledger.common.exception.BizException;
 import com.smartledger.common.result.R;
 import com.smartledger.common.util.UserContext;
 import com.smartledger.dto.response.UploadResultDTO;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import com.smartledger.service.ImageStorageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.UUID;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
 
 /**
- * 图片上传接口（V3 阶段二，拍照记账）。
+ * 图片上传接口。
  *
- * <p>图片保存到本地目录，返回可直接访问的相对地址。</p>
+ * <p>图片保存到本地目录，返回可直接访问的相对地址。拍照识别见 /api/bill/parse-image。</p>
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/upload")
+@RequiredArgsConstructor
 public class UploadController {
 
-    private static final Set<String> ALLOWED_EXT = Set.of("jpg", "jpeg", "png", "webp", "gif");
-    private static final long MAX_SIZE = 5 * 1024 * 1024L;
-
-    @Value("${smartledger.upload.dir:./uploads}")
-    private String uploadDir;
+    private final ImageStorageService imageStorageService;
 
     /**
-     * 上传账单图片。
+     * 上传账单图片（仅存图，不做识别）。
      */
     @PostMapping("/image")
     public R<UploadResultDTO> uploadImage(@RequestParam("file") MultipartFile file) {
         // 登录校验（未登录会抛 401）
         UserContext.requireOpenid();
-
-        if (file == null || file.isEmpty()) {
-            throw new BizException(ErrorCode.PARAM_ERROR, "请选择要上传的图片");
-        }
-        if (file.getSize() > MAX_SIZE) {
-            throw new BizException(ErrorCode.PARAM_ERROR, "图片不能超过 5MB");
-        }
-        String ext = resolveExt(file.getOriginalFilename());
-        if (!ALLOWED_EXT.contains(ext)) {
-            throw new BizException(ErrorCode.PARAM_ERROR, "仅支持 jpg/png/webp/gif 格式图片");
-        }
-
-        LocalDate now = LocalDate.now();
-        String subPath = now.getYear() + "/" + String.format("%02d", now.getMonthValue());
-        String fileName = UUID.randomUUID().toString().replace("-", "") + "." + ext;
-
-        try {
-            File dir = new File(uploadDir, subPath);
-            if (!dir.exists() && !dir.mkdirs()) {
-                throw new BizException(ErrorCode.SYSTEM_ERROR, "图片目录创建失败");
-            }
-            file.transferTo(new File(dir, fileName).getAbsoluteFile());
-        } catch (BizException e) {
-            throw e;
-        } catch (Exception e) {
-            log.warn("图片上传失败: {}", e.getMessage());
-            throw new BizException(ErrorCode.SYSTEM_ERROR, "图片上传失败，请重试");
-        }
-
-        String url = "/uploads/" + subPath + "/" + fileName;
-        return R.ok(new UploadResultDTO(url));
+        return R.ok(new UploadResultDTO(imageStorageService.store(file).url()));
     }
 
-    private String resolveExt(String name) {
-        if (name == null) {
-            return "";
+    /**
+     * 鉴权读取小票图片：不走 nginx 静态目录，避免链接被转发后任何人都能看。
+     *
+     * @param path 形如 /uploads/2026/11/xxx.jpg
+     */
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> viewImage(@RequestParam("path") String path) {
+        UserContext.requireOpenid();
+        Path file = imageStorageService.resolvePath(path);
+        byte[] bytes;
+        try {
+            bytes = Files.readAllBytes(file);
+        } catch (IOException e) {
+            throw new BizException(ErrorCode.SYSTEM_ERROR, "图片读取失败");
         }
-        int dot = name.lastIndexOf('.');
-        return dot < 0 ? "" : name.substring(dot + 1).toLowerCase();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(imageStorageService.mimeType(path)))
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(7)))
+                .body(bytes);
     }
 }

@@ -1,46 +1,38 @@
-/**
- * 日历账本（设计稿 02 屏）
- */
-.page {
-  min-height: 100vh;
-  padding-bottom: 220rpx;
-  background: radial-gradient(120% 55% at 50% 0%, #131417 0%, #0B0B0C 44%, #08090A 100%);
+/* 日历页：月份标题 + 紧凑月历 + 当日明细（主角卡片） */
+
+/* filter-panel 挂在页面根下（不在 .page--tab 内），
+   变量必须声明在 page 上才能继承，否则筛选弹层的按钮会被 tab 栏盖住 */
+page {
+  --sheet-bottom: calc(var(--tab-h) + var(--safe-b));
+  --sheet-safe: 0px;
 }
 
 .body {
-  padding: 8rpx 32rpx 0;
+  padding: 8rpx var(--page-x) 0;
 }
 
-/* ---- 顶部月份 ---- */
-
+/* ---------- 月份 ---------- */
 .mhead {
   display: flex;
   align-items: baseline;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
 .mhead__m {
-  font-family: var(--font-brush);
-  font-size: 44rpx;
-  color: #F0F0EE;
-  letter-spacing: .06em;
-}
-
-.mhead__y {
-  font-size: 20rpx;
-  color: #62636A;
-  letter-spacing: .1em;
+  font-size: var(--t-h1);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
 }
 
 .macts {
   display: flex;
   align-items: center;
-  gap: 8rpx;
 }
 
 .mact {
-  width: 60rpx;
-  height: 60rpx;
+  width: 88rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,181 +40,229 @@
 }
 
 .mact--hover {
-  background-color: rgba(255, 255, 255, .06);
+  background-color: rgba(255, 255, 255, .05);
 }
 
-/* ---- 月历 ---- */
+/* ---------- 搜索 ---------- */
+.search {
+  margin-bottom: 24rpx;
+}
+
+.search__field {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: var(--r-btn);
+  background-color: var(--card);
+  border: 2rpx solid var(--card-line);
+}
+
+.search__input {
+  flex: 1;
+  height: 88rpx;
+  font-size: 30rpx;
+  color: var(--text);
+}
+
+.search__ph {
+  color: var(--text-3);
+}
+
+.search__cancel {
+  min-width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 28rpx;
+  color: var(--text-2);
+}
+
+.search__tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16rpx;
+}
+
+.search__filter {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: var(--r-pill);
+  background-color: var(--card);
+  border: 2rpx solid var(--card-line);
+  font-size: 26rpx;
+  color: var(--text-2);
+}
+
+.search__filter--hover {
+  opacity: .8;
+}
+
+.search__hint {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.search__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  padding: 96rpx 0;
+  font-size: 28rpx;
+  color: var(--text-3);
+}
+
+.sgroup {
+  margin-bottom: 24rpx;
+  padding: 8rpx 24rpx;
+}
+
+.sgroup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72rpx;
+}
+
+.sgroup__date {
+  font-size: var(--t-aux);
+  color: var(--text-2);
+}
+
+.sgroup__count {
+  font-size: var(--t-min);
+  color: var(--text-3);
+}
+
+/* ---------- 月历 ---------- */
+.cal__seg {
+  margin: 8rpx 0 24rpx;
+}
 
 .cal {
-  margin-top: 16rpx;
-  padding: 24rpx 10rpx 16rpx;
-  background-color: #101113;
-  border: 1rpx solid rgba(255, 255, 255, .04);
-  border-radius: 40rpx;
+  padding: 24rpx 20rpx 12rpx;
 }
 
 .cal__head {
-  display: flex;
-  padding: 0 6rpx 12rpx;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding-bottom: 12rpx;
 }
 
 .cal__wh {
-  flex: 1;
   text-align: center;
-  font-size: 19rpx;
-  color: #5A5B62;
-  letter-spacing: .1em;
+  font-size: 24rpx;
+  color: var(--text-2);
 }
 
 .cal__grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx 0;
 }
 
 .cell {
-  width: 14.285%;
-  height: 108rpx;
+  height: 104rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4rpx;
-  border-radius: 22rpx;
-  padding: 6rpx 0;
+  border-radius: 16rpx;
+  border: 2rpx solid transparent;
 }
 
 .cell.is-blank {
-  pointer-events: none;
+  border-color: transparent;
 }
 
-.cell__day {
-  font-family: var(--font-sans);
-  font-size: 26rpx;
-  color: #C9CAC6;
-  line-height: 1.2;
-}
-
-.cell.is-today .cell__day {
-  color: #6FA6FF;
-}
-
-.cell__amt {
-  font-size: 17rpx;
-  color: #5E5F66;
-  letter-spacing: -.02em;
-  line-height: 1.2;
-}
-
-.cell__dot {
-  width: 6rpx;
-  height: 6rpx;
-  border-radius: 50%;
-  background-color: #3A3B42;
+.cell.is-today {
+  border-color: var(--blue);
 }
 
 .cell.is-on {
-  background-color: #182539;
-  box-shadow: inset 0 0 0 1rpx rgba(61, 139, 255, .35);
+  background-color: var(--blue-weak);
+  border-color: var(--blue);
 }
 
-.cell.is-on .cell__day {
-  color: #EDF3FF;
+.cell__day {
+  font-size: 32rpx;
+  line-height: 1.2;
+  color: var(--text);
 }
 
-.cell.is-on .cell__amt {
-  color: #8AB6FF;
+.cell__day.is-on {
+  color: var(--blue);
+  font-weight: 600;
 }
 
-/* ---- 分段 ---- */
-
-.seg {
-  margin-top: 20rpx;
+.cell__amt {
+  margin-top: 2rpx;
+  font-size: var(--t-cal);
+  line-height: 1.2;
+  color: var(--text-2);
 }
 
-/* ---- 当日概览 ---- */
-
-.nowline {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  margin: 24rpx 4rpx 14rpx;
-}
-
-.nowline__dot {
-  width: 10rpx;
-  height: 10rpx;
+.cell__dot {
+  width: 8rpx;
+  height: 8rpx;
+  margin-top: 6rpx;
   border-radius: 50%;
-  background-color: #3D8BFF;
-  box-shadow: 0 0 12rpx rgba(61, 139, 255, .8);
+  background-color: var(--text-3);
 }
 
-.nowline__text {
-  font-size: 21rpx;
-  color: #7B7C82;
-  letter-spacing: .06em;
-}
-
-.nowline__out {
-  margin-left: auto;
-  font-size: 21rpx;
-  color: #8A8B92;
-}
-
-/* ---- 当日流水 ---- */
-
+/* ---------- 当日明细 ---------- */
 .daycard {
-  padding: 24rpx 28rpx 12rpx;
-  background: linear-gradient(165deg, #191A1D, #141518 70%);
-  border: 1rpx solid rgba(255, 255, 255, .06);
-  border-radius: 40rpx;
+  margin-top: 24rpx;
+  padding: 24rpx;
 }
 
 .daycard__head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  padding-bottom: 16rpx;
-  border-bottom: 1rpx dashed rgba(255, 255, 255, .07);
+  padding-bottom: 8rpx;
 }
 
 .daycard__title {
-  font-size: 30rpx;
-  color: #E4E5E1;
-  letter-spacing: .1em;
+  font-size: var(--t-h2);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .daycard__sub {
-  font-size: 20rpx;
-  color: #5E5F66;
+  font-size: var(--t-min);
+  color: var(--text-3);
 }
 
+/* ---------- 明细行 ---------- */
 .tx {
   display: flex;
   align-items: center;
   gap: 20rpx;
   min-height: 104rpx;
   padding: 12rpx 0;
-  border-bottom: 1rpx solid rgba(255, 255, 255, .04);
-}
-
-.tx:last-child {
-  border-bottom: none;
+  border-radius: 16rpx;
 }
 
 .tx--hover {
-  opacity: .72;
+  background-color: rgba(255, 255, 255, .03);
 }
 
 .tx__ico {
-  width: 68rpx;
-  height: 68rpx;
+  width: 72rpx;
+  height: 72rpx;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 22rpx;
-  background-color: #1C1D20;
-  border: 1rpx solid rgba(255, 255, 255, .04);
+  border-radius: 20rpx;
 }
 
 .tx__main {
@@ -230,22 +270,20 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
 }
 
 .tx__name {
-  font-size: 26rpx;
-  color: #DCDDD9;
-  letter-spacing: .02em;
+  font-size: var(--t-body);
+  color: var(--text);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .tx__meta {
-  font-size: 19rpx;
-  color: #5E5F66;
-  letter-spacing: .04em;
+  margin-top: 4rpx;
+  font-size: var(--t-min);
+  color: var(--text-2);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -253,160 +291,57 @@
 
 .tx__amt {
   flex: none;
-  font-size: 27rpx;
-  color: #D3D4D0;
-  letter-spacing: .01em;
+  font-size: var(--t-body);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .tx__amt.is-in {
-  color: #8FE0BE;
+  color: var(--income);
 }
 
 .tx-empty {
-  padding: 44rpx 0;
+  padding: 48rpx 0;
   text-align: center;
-  font-size: 22rpx;
-  color: #4E4F56;
-  letter-spacing: .08em;
+  font-size: var(--t-aux);
+  color: var(--text-3);
 }
 
-/* ---- AI 洞察 ---- */
-
+/* ---------- 洞察 ---------- */
 .insight {
   display: flex;
-  gap: 16rpx;
-  margin-top: 22rpx;
-  padding: 24rpx 26rpx;
-  border-radius: 28rpx;
-  background-color: rgba(139, 108, 255, .06);
-  border: 1rpx solid rgba(139, 108, 255, .14);
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: var(--r-card);
+  background-color: var(--ai-weak);
+  border: 2rpx solid rgba(167, 139, 250, .16);
 }
 
 .insight__ico {
+  width: 36rpx;
+  height: 36rpx;
   flex: none;
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(139, 108, 255, .16);
 }
 
 .insight__text {
-  font-size: 23rpx;
+  flex: 1;
+  font-size: var(--t-aux);
   line-height: 1.6;
-  color: #A9A0C8;
-  letter-spacing: .02em;
+  color: var(--text-2);
 }
 
 .insight__hl {
-  color: #C9B8FF;
-  padding: 0 4rpx;
+  color: var(--ai);
 }
 
 .mfoot {
-  padding: 28rpx 0 48rpx;
+  padding: 32rpx 0 8rpx;
   text-align: center;
-  font-size: 19rpx;
-  color: #46474E;
-  letter-spacing: .08em;
-}
-
-/* ---- 搜索 ---- */
-
-.search {
-  padding-top: 8rpx;
-}
-
-.search__field {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  height: 88rpx;
-  padding: 0 12rpx 0 26rpx;
-  border-radius: 44rpx;
-  background-color: #161719;
-  border: 1rpx solid rgba(255, 255, 255, .06);
-}
-
-.search__input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  font-size: 26rpx;
-  color: #EDEDEC;
-}
-
-.search__ph {
-  color: #54555B;
-}
-
-.search__cancel {
-  font-size: 24rpx;
-  color: #9A9BA1;
-  padding: 10rpx 14rpx;
-}
-
-.search__tools {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 8rpx 8rpx;
-}
-
-.search__filter {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: 22rpx;
-  color: #9A9BA1;
-  padding: 8rpx 20rpx;
-  border-radius: 999rpx;
-  background-color: rgba(255, 255, 255, .04);
-  border: 1rpx solid rgba(255, 255, 255, .06);
-}
-
-.search__filter--hover {
-  background-color: rgba(61, 139, 255, .12);
-}
-
-.search__hint {
-  font-size: 19rpx;
-  color: #5E5F66;
-  letter-spacing: .06em;
-}
-
-.search__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18rpx;
-  padding: 120rpx 0;
-  font-size: 22rpx;
-  color: #4E4F56;
-  letter-spacing: .06em;
-}
-
-.sgroup {
-  margin-top: 20rpx;
-  padding: 20rpx 28rpx 8rpx;
-}
-
-.sgroup__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12rpx;
-}
-
-.sgroup__date {
-  font-size: 24rpx;
-  color: #B9BABF;
-  letter-spacing: .06em;
-}
-
-.sgroup__count {
-  font-size: 19rpx;
-  color: #5E5F66;
+  font-size: var(--t-min);
+  color: var(--text-3);
 }

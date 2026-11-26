@@ -5,7 +5,7 @@
     <view class="lg__logo">
       <text class="lg__logo-text">记</text>
     </view>
-    <view class="lg__brand">AI 记账</view>
+    <view class="lg__brand">萌萌记账</view>
     <view class="lg__slogan">一句话或一张小票，把账记下来</view>
   </view>
 
@@ -22,7 +22,16 @@
       <view class="lg__btn {{loading ? 'is-loading' : ''}}" hover-class="lg__btn--hover" bindtap="onLogin">
         {{loading ? '正在登录…' : '微信一键登录'}}
       </view>
-      <text class="lg__agree" bindtap="onPrivacy">登录即表示同意《隐私与数据说明》</text>
+      <view class="lg__agree-row" bindtap="onToggleAgree">
+        <view class="lg__box {{agreed ? 'is-on' : ''}}">
+          <text wx:if="{{agreed}}" class="lg__tick">✓</text>
+        </view>
+        <text class="lg__agree-text">我已阅读并同意</text>
+        <text class="lg__link" catchtap="onTerms">《用户服务协议》</text>
+        <text class="lg__agree-text">与</text>
+        <text class="lg__link" catchtap="onPrivacy">《隐私政策》</text>
+      </view>
+      <text class="lg__skip" bindtap="onGuest">先随便看看</text>
     </view>
   </block>
 

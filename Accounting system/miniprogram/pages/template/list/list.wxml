@@ -1,38 +1,38 @@
-<view class="page">
-  <view class="nav-fix"><nav-bar back title="模板管理" /></view>
+<view class="page page--sub">
+  <nav-bar back title="模板管理" />
 
-  <!-- 顶部操作 -->
-  <view class="toolbar">
-    <view class="btn btn-primary toolbar__new" hover-class="btn--active" bindtap="onNew">+ 新建模板</view>
-  </view>
+  <view class="body">
+    <skeleton wx:if="{{firstLoading}}" rows="3" />
 
-  <!-- 首屏骨架 -->
-  <skeleton wx:if="{{firstLoading}}" rows="3" />
-
-  <!-- 模板列表 -->
-  <block wx:elif="{{!empty}}">
-    <view class="tpl-list">
-      <view wx:for="{{templates}}" wx:key="templateId" class="tpl-list__item">
-        <template-item
-          template="{{item}}"
-          tintIndex="{{index}}"
-          bind:tap="noop"
-          bind:use="onUse"
-          bind:edit="onEdit"
-          bind:delete="onDelete"
-        />
+    <block wx:elif="{{!empty}}">
+      <view class="section-head">
+        <text class="section-head__title">我的模板</text>
+        <view class="section-head__action" hover-class="section-head__action--hover" bindtap="onNew">+ 新建</view>
       </view>
-    </view>
-  </block>
+      <view class="hint">左滑卡片可编辑或删除</view>
 
-  <!-- 空态 -->
-  <empty-state
-    wx:else
-    mascotState="empty"
-    text="还没有模板，把常记的账存成模板吧"
-    actionText="新建模板"
-    bind:action="onNew"
-  />
+      <view class="tpl-list">
+        <view wx:for="{{templates}}" wx:key="templateId" class="tpl-list__item">
+          <template-item
+            template="{{item}}"
+            tintIndex="{{index}}"
+            bind:tap="noop"
+            bind:use="onUse"
+            bind:edit="onEdit"
+            bind:delete="onDelete"
+          />
+        </view>
+      </view>
+    </block>
+
+    <empty-state
+      wx:else
+      mascotState="empty"
+      text="还没有模板，把常记的账存成模板吧"
+      actionText="新建模板"
+      bind:action="onNew"
+    />
+  </view>
 </view>
 
 <!-- 一键记账撤销条 -->
@@ -47,7 +47,7 @@
   <view class="sheet__panel">
     <view class="sheet__header">
       <text class="sheet__title">{{editing ? '编辑模板' : '新建模板'}}</text>
-      <text class="sheet__close" bindtap="onPanelClose">关闭</text>
+      <view class="sheet__close" hover-class="sheet__close--hover" bindtap="onPanelClose">关闭</view>
     </view>
 
     <scroll-view class="sheet__body" scroll-y>
@@ -69,15 +69,15 @@
         mode="create"
         marks="{{formMarks}}"
         showTags="{{false}}"
+        categoryFirst="{{true}}"
         bind:change="onFormChange"
       />
     </scroll-view>
 
     <view class="sheet__footer">
-      <view class="btn btn-ghost sheet__btn" hover-class="sheet__btn--hover" bindtap="onPanelClose">取消</view>
       <view
-        class="btn btn-primary sheet__btn {{saving ? 'btn--disabled' : ''}}"
-        hover-class="{{saving ? '' : 'btn--active'}}"
+        class="btn btn-primary sheet__save {{saving ? 'btn--disabled' : ''}}"
+        hover-class="{{saving ? '' : 'btn--hover'}}"
         bindtap="onSave"
       >{{saving ? '保存中…' : '保存'}}</view>
     </view>

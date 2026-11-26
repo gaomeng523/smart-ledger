@@ -50,6 +50,10 @@ public class BillServiceImpl implements BillService {
     private static final int DUPLICATE_CANDIDATE_LIMIT = 5;
     private static final int TAG_SUGGEST_LIMIT = 20;
 
+    /** 小票图片地址白名单：只接受本站上传目录生成的路径，避免写入外链 */
+    private static final java.util.regex.Pattern IMAGE_URL_PATTERN = java.util.regex.Pattern.compile(
+            "^/uploads/\\d{4}/\\d{2}/[0-9a-f]{32}\\.(?:jpg|jpeg|png|webp|gif)$");
+
     private final BillMapper billMapper;
     private final DictService dictService;
     private final BillConverter billConverter;
@@ -61,7 +65,9 @@ public class BillServiceImpl implements BillService {
         // 1. 幂等：requestId 命中即返回既有账单
         if (StringUtils.hasText(request.getRequestId())) {
             Bill existed = billMapper.selectOne(new LambdaQueryWrapper<Bill>()
-                    .eq(Bill::getRequestId, request.getRequestId()));
+                    .eq(Bill::getOpenid, openid)
+                    .eq(Bill::getRequestId, request.getRequestId())
+                    .eq(Bill::getDeleted, 0));
             if (existed != null) {
                 return new SaveResultDTO(existed.getId(), true, List.of());
             }
@@ -111,6 +117,7 @@ public class BillServiceImpl implements BillService {
         bill.setSource(request.getSource() == null ? 1 : request.getSource());
         bill.setConfidence(request.getConfidence());
         bill.setTags(tags);
+        validateImageUrl(request.getImageUrl());
         bill.setImageUrl(request.getImageUrl());
         bill.setRequestId(request.getRequestId());
         bill.setDeleted(0);
@@ -124,6 +131,12 @@ public class BillServiceImpl implements BillService {
             log.warn("记账后洞察计算失败 billId={}: {}", bill.getId(), e.getMessage());
         }
         return new SaveResultDTO(bill.getId(), false, insights);
+    }
+
+    private void validateImageUrl(String imageUrl) {
+        if (StringUtils.hasText(imageUrl) && !IMAGE_URL_PATTERN.matcher(imageUrl).matches()) {
+            throw new BizException(ErrorCode.PARAM_ERROR, "图片地址不合法");
+        }
     }
 
     @Override
@@ -243,7 +256,9 @@ public class BillServiceImpl implements BillService {
             bill.setTags(TagUtils.normalizeToStorage(request.getTags()));
         }
         if (request.getImageUrl() != null) {
-            bill.setImageUrl(request.getImageUrl().isBlank() ? null : request.getImageUrl().trim());
+            String imageUrl = request.getImageUrl().isBlank() ? null : request.getImageUrl().trim();
+            validateImageUrl(imageUrl);
+            bill.setImageUrl(imageUrl);
         }
         billMapper.updateById(bill);
     }

@@ -56,6 +56,10 @@ function setNickname(nickname) {
   set(STORAGE_KEY.NICKNAME, nickname);
 }
 
+function clearNickname() {
+  remove(STORAGE_KEY.NICKNAME);
+}
+
 module.exports = {
   get,
   set,
@@ -64,5 +68,6 @@ module.exports = {
   setToken,
   clearToken,
   getNickname,
-  setNickname
+  setNickname,
+  clearNickname
 };

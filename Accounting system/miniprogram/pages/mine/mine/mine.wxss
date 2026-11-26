@@ -1,11 +1,5 @@
-/**
- * 我的（tab）：深色抽屉式布局
- */
+/* 我的（tab）：内容由 drawer-menu 组件承载 */
 .page {
   min-height: 100vh;
-  background: radial-gradient(120% 55% at 50% 0%, #121316 0%, #0B0B0C 46%, #08090A 100%);
-}
-
-.status {
-  flex: none;
+  background-color: var(--bg);
 }

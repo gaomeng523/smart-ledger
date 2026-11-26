@@ -1,10 +1,10 @@
 /**
- * 数据报告相关接口（V3 · F-44 AI 月报）
+ * 数据报告相关接口（V3 · F-44 月度报告）
  */
 const { request } = require('../utils/request');
 
 /**
- * AI 月度消费报告
+ * 月度消费报告
  * @param {string} month yyyy-MM，不传由后端取当前月
  * @returns {Promise<{month, aiEnabled, aiGenerated, summary, highlights, suggestions, stats}>}
  */

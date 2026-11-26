@@ -1,5 +1,5 @@
 /**
- * 首页 · AI 对话式记账
+ * 首页 · 对话式记账
  * 打开即对话：一句话 / 一张小票 → 解析卡片 → 存入账本。
  * 左缘右滑唤出「我的」抽屉。
  */
@@ -7,16 +7,62 @@ const billApi = require('../../api/bill');
 const statApi = require('../../api/stat');
 const templateApi = require('../../api/template');
 const subscriptionApi = require('../../api/subscription');
-const uploadApi = require('../../api/upload');
 const store = require('../../store/index');
 const request = require('../../utils/request');
 const format = require('../../utils/format');
+const palette = require('../../utils/palette');
 const auth = require('../../utils/auth');
 const avatar = require('../../utils/avatar');
 const { CODE, BILL_TYPE, SOURCE } = require('../../config/const');
 
 /** 无模板时的默认快捷短语 */
 const QUICK_DEFAULT = ['早餐 12', '打车 32', '咖啡 18', '房租 3200'];
+
+/** 快捷短语 → 带分类色圆点的展示结构 */
+function toChips(list) {
+  return (list || []).map((text) => ({
+    text,
+    color: palette.colorFor(String(text).split(' ')[0])
+  }));
+}
+
+/** 一句话里多笔消费的切分符：中英文逗号、顿号、分号、换行 */
+const SPLIT_RE = /[，,、;；\n]+/;
+/** 片段内是否含金额 */
+const AMOUNT_RE = /\d+(?:\.\d+)?/;
+/** 整段只有一个金额：「3100」「¥3100」「3100元」 */
+const ONLY_AMOUNT_RE = /^[¥￥]?\s*\d+(?:\.\d+)?\s*(?:元|块钱|块)?$/;
+/** 一次最多识别的笔数（后端每分钟解析上限 20 次，留出余量） */
+const MAX_MULTI = 8;
+
+/**
+ * 「买衣服花 3100，车票花 398」→ ['买衣服花 3100', '车票花 398']
+ * 只有带金额的片段才算一笔；「买衣服，3100」这种金额单独成段的并回前一段。
+ */
+function splitBillText(text) {
+  const raw = String(text || '')
+    .split(SPLIT_RE)
+    .map((s) => s.trim())
+    .filter((s) => !!s);
+
+  const merged = [];
+  raw.forEach((segment) => {
+    const prev = merged[merged.length - 1];
+    if (prev && ONLY_AMOUNT_RE.test(segment)) {
+      merged[merged.length - 1] = prev + ' ' + segment;
+    } else {
+      merged.push(segment);
+    }
+  });
+
+  return merged.filter((s) => AMOUNT_RE.test(s));
+}
+
+/** 兜底取片段里最后一个金额（口语里金额通常在句尾） */
+function pickAmount(text) {
+  const list = String(text || '').match(/\d+(?:\.\d+)?/g);
+  return list && list.length ? Number(list[list.length - 1]) : null;
+}
 
 /** 抽屉宽度（px，与设计稿一致） */
 const DRAWER_W = 312;
@@ -35,12 +81,16 @@ Page({
     canSend: false,
     parsing: false,
     saving: false,
-    quickChips: QUICK_DEFAULT,
+    quickChips: toChips(QUICK_DEFAULT),
 
     // 解析结果卡
     draft: null,
     draftView: null,
     splitCount: 1,
+
+    // 多笔汇总卡
+    draftViews: [],
+    multiTotalText: '',
 
     // 当月概览（卡片底部）
     monthBalanceText: '0.00',
@@ -55,6 +105,9 @@ Page({
     // 顶部品牌位：已设置头像时显示头像，否则显示「记」
     avatarPath: '',
 
+    // 游客态（未登录）：可以浏览，写入数据时再登录
+    guest: false,
+
     // 续费提醒
     renewText: '',
 
@@ -66,7 +119,10 @@ Page({
     previewDraft: null,
 
     // 拍照
-    pendingImagePath: ''
+    pendingImagePath: '',
+
+    // 朋友圈「单页模式」打开（未登录，仅展示介绍）
+    singlePage: false
   },
 
   /** 幂等 requestId（同一草稿重试复用） */
@@ -89,12 +145,69 @@ Page({
     }
     this.drawerW = drawerW;
     this.setData({ greetingTime: this.nowTime(), drawerX: -drawerW });
+
+    // 朋友圈分享打开时是「单页模式」（scene=1154）：无登录能力，展示介绍页
+    let scene = 0;
+    try {
+      scene = (wx.getLaunchOptionsSync() || {}).scene || 0;
+    } catch (e) {
+      scene = 0;
+    }
+    this.setData({ singlePage: scene === 1154 });
+
+    // 同时开启「转发给朋友」和「分享到朋友圈」
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        withShareTicket: false,
+        menus: ['shareAppMessage', 'shareTimeline']
+      });
+    }
+  },
+
+  /** 转发给朋友 */
+  onShareAppMessage() {
+    return {
+      title: '萌萌记账｜说一句话就记好账',
+      path: '/pages/index/index'
+    };
+  },
+
+  /** 分享到朋友圈（打开后为单页模式，不依赖登录） */
+  onShareTimeline() {
+    return {
+      title: '萌萌记账｜说一句话、拍张小票，就能记好账'
+    };
   },
 
   onShow() {
-    if (!auth.guard()) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setSelected(0);
+    }
+
+    // 设置页重置数据后回到首页：清空本会话的对话与待存草稿
+    const app = getApp();
+    if (app && app.globalData && app.globalData.resetAt) {
+      app.globalData.resetAt = 0;
+      this.clearDraftState();
+      this.setData({ messages: [], text: '', canSend: false });
+    }
+
+    // 朋友圈单页模式：不请求任何需要登录的数据
+    if (this.data.singlePage) {
+      this.setData({ guest: true, avatarPath: '' });
       return;
     }
+
+    // 游客态：正常展示对话界面，保存/拍照等动作时再引导登录
+    if (!auth.guard()) {
+      this.setData({ guest: true, avatarPath: '' });
+      const menu = this.selectComponent('#menu');
+      if (menu) {
+        menu.refreshProfile();
+      }
+      return;
+    }
+    this.setData({ guest: false });
     this.loadDict();
     this.loadStat();
     this.loadGreeting();
@@ -188,9 +301,9 @@ Page({
             const amount = Number(item.amount);
             return item.title + (amount > 0 ? ' ' + format.formatMoney(amount) : '');
           });
-        this.setData({ quickChips: chips.length ? chips : QUICK_DEFAULT });
+        this.setData({ quickChips: chips.length ? toChips(chips) : toChips(QUICK_DEFAULT) });
       })
-      .catch(() => this.setData({ quickChips: QUICK_DEFAULT }));
+      .catch(() => this.setData({ quickChips: toChips(QUICK_DEFAULT) }));
   },
 
   loadRenewReminders() {
@@ -245,10 +358,34 @@ Page({
     if (this.data.parsing) {
       return;
     }
+    if (auth.requireLogin()) {
+      return;
+    }
     this.sourceText = text;
     this.appendMessage(text);
-    this.setData({ text: '', canSend: false, parsing: true, draft: null, draftView: null, splitCount: 1 });
+    this.multiDrafts = null;
+    this.editIndex = -1;
+    this.setData({
+      text: '',
+      canSend: false,
+      parsing: true,
+      draft: null,
+      draftView: null,
+      draftViews: [],
+      multiTotalText: '',
+      splitCount: 1
+    });
     this.scrollToEnd();
+
+    // 一句话里有多笔消费（逗号/顿号/分号/换行分隔，且每段都带金额）→ 汇总卡
+    const segments = splitBillText(text);
+    if (segments.length >= 2) {
+      if (segments.length > MAX_MULTI) {
+        request.toast('一次最多记 ' + MAX_MULTI + ' 笔，先处理前 ' + MAX_MULTI + ' 笔');
+      }
+      this.parseMulti(segments.slice(0, MAX_MULTI));
+      return;
+    }
 
     billApi.parse(text, { silent: true })
       .then((draft) => {
@@ -261,12 +398,90 @@ Page({
       });
   },
 
+  /** 多笔：逐段并行解析，聚合成汇总卡 */
+  parseMulti(segments) {
+    const tasks = segments.map((segment) => billApi.parse(segment, { silent: true })
+      .catch((err) => {
+        const data = (err && err.data) || {};
+        if (data.amount !== null && data.amount !== undefined) {
+          return data;
+        }
+        // 单段解析失败也不丢：用本地金额兜底，让用户补分类/账户
+        const amount = pickAmount(segment);
+        return amount === null ? null : {
+          amount,
+          billType: BILL_TYPE.EXPENSE,
+          recordDate: format.todayStr(),
+          missingFields: ['categoryCode', 'payChannelCode']
+        };
+      }));
+
+    Promise.all(tasks).then((list) => {
+      const drafts = [];
+      list.forEach((draft, i) => {
+        if (draft) {
+          drafts.push(Object.assign({}, draft, { segmentText: segments[i] }));
+        }
+      });
+
+      if (!drafts.length) {
+        this.setData({ parsing: false });
+        this.handleParseError({ code: CODE.AMOUNT_UNRECOGNIZED });
+        return;
+      }
+      if (drafts.length === 1) {
+        this.applyDraft(drafts[0]);
+        return;
+      }
+      this.applyMulti(drafts);
+    });
+  },
+
+  applyMulti(drafts) {
+    this.multiDrafts = drafts;
+    this.editIndex = -1;
+    this.setData({
+      parsing: false,
+      draft: null,
+      draftView: null,
+      splitCount: 1,
+      draftViews: this.buildMultiViews(drafts),
+      multiTotalText: this.multiTotalTextOf(drafts)
+    });
+    this.scrollToEnd();
+  },
+
+  /** 多笔列表 → 卡片行数据 */
+  buildMultiViews(drafts) {
+    return (drafts || []).map((draft, index) => {
+      const view = this.buildDraftView(draft);
+      view.key = 'mv' + index;
+      view.sign = view.isIncome ? '+' : '-';
+      view.subText = (view.missingChannel ? '账户待确认' : view.channelName) + ' · ' + view.dateText;
+      view.warn = view.missingCategory || view.missingAmount || view.missingChannel;
+      return view;
+    });
+  },
+
+  /** 多笔合计（支出记负、收入记正） */
+  multiTotalTextOf(drafts) {
+    let net = 0;
+    (drafts || []).forEach((draft) => {
+      const amount = Number(draft.amount) || 0;
+      net += Number(draft.billType) === BILL_TYPE.INCOME ? amount : -amount;
+    });
+    return (net >= 0 ? '+' : '-') + '¥' + format.formatMoney(Math.abs(net));
+  },
+
   applyDraft(draft) {
     const view = this.buildDraftView(draft);
+    this.multiDrafts = null;
     this.setData({
       parsing: false,
       draft,
       draftView: view,
+      draftViews: [],
+      multiTotalText: '',
       splitCount: 1
     });
     this.scrollToEnd();
@@ -281,6 +496,7 @@ Page({
     const confidence = d.confidence === null || d.confidence === undefined
       ? null
       : Number(d.confidence);
+    const categoryLabel = this.categoryLabel(d.categoryCode, d.categoryName);
 
     return {
       amountText,
@@ -288,12 +504,15 @@ Page({
       decPart: parts[1] || '00',
       isIncome: Number(d.billType) === BILL_TYPE.INCOME,
       confidenceText: confidence === null ? '—' : Math.round(confidence * 100) + '%',
-      confidenceLow: confidence !== null && confidence < 0.5,
-      categoryLabel: this.categoryLabel(d.categoryCode, d.categoryName),
+      confidenceLow: confidence !== null && confidence < 0.9,
+      needConfirm: confidence !== null && confidence < 0.9,
+      categoryLabel,
+      catColor: palette.colorFor((d.categoryName || categoryLabel || '').split(' · ').pop()),
+      catBg: palette.rgba(palette.colorFor((d.categoryName || categoryLabel || '').split(' · ').pop()), 0.15),
       missingCategory: missing.indexOf('categoryCode') >= 0 || !d.categoryCode,
       missingAmount: missing.indexOf('amount') >= 0 || d.amount === null || d.amount === undefined,
       missingChannel: missing.indexOf('payChannelCode') >= 0 || !d.payChannelCode,
-      channelName: d.payChannelName || '未识别',
+      channelName: d.payChannelName || '未指定',
       dateText: this.dateText(d.recordDate),
       remarkText: d.remark || '',
       splitText: ''
@@ -393,6 +612,38 @@ Page({
     this.openPreview(this.data.draft);
   },
 
+  /** 点汇总卡里的某一笔：打开编辑弹层，确认后回写到列表 */
+  onEditMulti(e) {
+    if (this.data.saving) {
+      return;
+    }
+    const index = Number(e.currentTarget.dataset.index);
+    const drafts = this.multiDrafts || [];
+    if (!drafts[index]) {
+      return;
+    }
+    this.openPreview(drafts[index], index);
+  },
+
+  /** 移除误识别的某一笔 */
+  onRemoveMulti(e) {
+    if (this.data.saving) {
+      return;
+    }
+    const index = Number(e.currentTarget.dataset.index);
+    const drafts = (this.multiDrafts || []).slice();
+    if (!drafts[index]) {
+      return;
+    }
+    drafts.splice(index, 1);
+    if (!drafts.length) {
+      this.clearDraftState();
+      this.appendAi('这次识别已清空，重新说一句试试？');
+      return;
+    }
+    this.applyMulti(drafts);
+  },
+
   onSplitTap() {
     if (!this.data.draft) {
       return;
@@ -429,9 +680,128 @@ Page({
   },
 
   onRetryParse() {
+    if (this.data.saving) {
+      return;
+    }
     const text = this.sourceText || '';
-    this.setData({ draft: null, draftView: null, splitCount: 1, text, canSend: !!text });
+    this.clearDraftState();
+    this.setData({ text, canSend: !!text });
     request.toast('改一下说法，再发一次');
+  },
+
+  /** 多笔：校验后逐笔顺序存入 */
+  onSaveAll() {
+    if (this.data.saving) {
+      return;
+    }
+    const drafts = this.multiDrafts || [];
+    if (!drafts.length) {
+      return;
+    }
+
+    for (let i = 0; i < drafts.length; i++) {
+      const error = this.validate(drafts[i]);
+      if (error) {
+        request.toast('第 ' + (i + 1) + ' 笔：' + error);
+        this.openPreview(drafts[i], i);
+        return;
+      }
+    }
+
+    this.setData({ saving: true });
+    const done = [];
+    const skipped = [];
+    const failed = [];
+
+    const saveAt = (i) => {
+      if (i >= drafts.length) {
+        return Promise.resolve();
+      }
+      const draft = drafts[i];
+      const payload = this.buildPayload(draft, {
+        requestId: format.uuid(),
+        source: SOURCE.TEXT,
+        confidence: draft.confidence,
+        recordText: draft.segmentText || this.sourceText
+      });
+      return billApi.save(payload, { silent: true })
+        .then((res) => {
+          done.push({ draft, payload, res });
+        })
+        .catch((err) => {
+          if (err && err.code === CODE.DUPLICATE_BILL) {
+            skipped.push({ draft, payload });
+          } else {
+            failed.push({ draft, payload, err });
+          }
+        })
+        .then(() => saveAt(i + 1));
+    };
+
+    saveAt(0).then(() => this.finishSaveAll(done, skipped, failed));
+  },
+
+  finishSaveAll(done, skipped, failed) {
+    this.setData({ saving: false });
+
+    if (done.length) {
+      const parts = done.map((it) => '¥' + format.formatMoney(it.payload.amount));
+      this.appendAi('已存入 ' + done.length + ' 笔：' + parts.join('、'));
+      const insights = [];
+      done.forEach((it) => {
+        ((it.res && it.res.insights) || []).forEach((item) => insights.push(item));
+      });
+      insights.slice(0, 2).forEach((item) => {
+        if (item && item.title) {
+          this.appendAi(item.title + '：' + (item.body || ''));
+        }
+      });
+    }
+    if (skipped.length) {
+      this.appendAi('另有 ' + skipped.length + ' 笔和已有记录重复，已跳过。');
+    }
+    if (failed.length) {
+      const first = failed[0].err;
+      this.appendAi((first && first.message) || ('有 ' + failed.length + ' 笔没存上，点开确认后再试。'));
+    }
+
+    if (!failed.length) {
+      this.clearDraftState();
+      this.loadStat();
+      this.loadGreeting();
+      this.loadTemplates();
+      return;
+    }
+
+    // 失败的留在卡里，改完可以再点「全部存入」
+    this.multiDrafts = failed.map((it) => it.draft);
+    this.setData({
+      draftViews: this.buildMultiViews(this.multiDrafts),
+      multiTotalText: this.multiTotalTextOf(this.multiDrafts)
+    });
+    if (done.length || skipped.length) {
+      this.loadStat();
+      this.loadGreeting();
+    }
+  },
+
+  /** 清空解析卡 / 汇总卡与相关临时状态 */
+  clearDraftState() {
+    this.multiDrafts = null;
+    this.editIndex = -1;
+    this.requestId = '';
+    this.sourceText = '';
+    this.pendingImageUrl = '';
+    this.setData({
+      draft: null,
+      draftView: null,
+      draftViews: [],
+      multiTotalText: '',
+      splitCount: 1,
+      showPreview: false,
+      previewDraft: null,
+      pendingImagePath: ''
+    });
   },
 
   onSaveDraft() {
@@ -453,8 +823,9 @@ Page({
 
   /* ---------- 半屏编辑 / 手动录入 ---------- */
 
-  openPreview(draft) {
+  openPreview(draft, index) {
     const d = draft || {};
+    this.editIndex = typeof index === 'number' ? index : -1;
     this.setData({
       showPreview: true,
       previewDraft: {
@@ -474,11 +845,28 @@ Page({
   },
 
   onPreviewCancel() {
+    this.editIndex = -1;
     this.setData({ showPreview: false, previewDraft: null });
   },
 
   onPreviewConfirm(e) {
     const form = (e.detail && e.detail.draft) || {};
+
+    // 多笔汇总卡里的单笔编辑：只回写列表，不立即入库
+    if (this.editIndex >= 0 && this.multiDrafts && this.multiDrafts[this.editIndex]) {
+      // 表单里字段已补齐，清掉旧的 missingFields，避免「待确认」标记残留
+      const patch = Object.assign({}, form, { missingFields: [] });
+      this.multiDrafts[this.editIndex] = Object.assign({}, this.multiDrafts[this.editIndex], patch);
+      this.editIndex = -1;
+      this.setData({
+        showPreview: false,
+        previewDraft: null,
+        draftViews: this.buildMultiViews(this.multiDrafts),
+        multiTotalText: this.multiTotalTextOf(this.multiDrafts)
+      });
+      return;
+    }
+
     const source = this.data.draft ? SOURCE.TEXT : SOURCE.MANUAL;
     this.doSave(this.buildPayload(form, {
       requestId: this.requestId || format.uuid(),
@@ -500,7 +888,7 @@ Page({
       recordDate: form.recordDate,
       remark,
       tags: (form.tags || []).slice(),
-      recordText: this.sourceText || '',
+      recordText: options.recordText === undefined ? (this.sourceText || '') : options.recordText,
       source: this.pendingImageUrl ? SOURCE.OCR : options.source,
       confidence: options.confidence === undefined ? null : options.confidence,
       imageUrl: this.pendingImageUrl || '',
@@ -576,17 +964,7 @@ Page({
       }
     });
 
-    this.requestId = '';
-    this.sourceText = '';
-    this.pendingImageUrl = '';
-    this.setData({
-      draft: null,
-      draftView: null,
-      splitCount: 1,
-      showPreview: false,
-      previewDraft: null,
-      pendingImagePath: ''
-    });
+    this.clearDraftState();
 
     this.loadStat();
     this.loadGreeting();
@@ -613,6 +991,9 @@ Page({
     if (this.data.parsing || this.data.saving) {
       return;
     }
+    if (auth.requireLogin()) {
+      return;
+    }
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
@@ -627,23 +1008,39 @@ Page({
           request.toast('图片不能超过 5MB');
           return;
         }
-        this.uploadPhoto(file.tempFilePath);
+        this.recognizePhoto(file.tempFilePath);
       }
     });
   },
 
-  uploadPhoto(filePath) {
+  /** 小票识别：上传 + 视觉模型解析，成功后直接弹出确认卡片 */
+  recognizePhoto(filePath) {
+    this.sourceText = '';
+    this.appendMessage('[小票]');
+    this.multiDrafts = null;
+    this.editIndex = -1;
+    this.setData({ parsing: true, draft: null, draftView: null, draftViews: [], multiTotalText: '', splitCount: 1 });
+    this.scrollToEnd();
     wx.showLoading({ title: '上传中…', mask: true });
-    uploadApi.uploadImage(filePath)
-      .then((res) => {
+
+    billApi.parseImage(filePath)
+      .then((draft) => {
         wx.hideLoading();
-        this.pendingImageUrl = (res && res.url) || '';
+        this.requestId = format.uuid();
+        this.pendingImageUrl = (draft && draft.imageUrl) || '';
         this.setData({ pendingImagePath: filePath });
-        this.appendAi('小票收到，补充一句「买了什么、多少钱」，我就帮你记好。');
+        this.applyDraft(draft);
       })
       .catch((err) => {
         wx.hideLoading();
-        request.toast((err && err.message) || '上传失败，请重试');
+        const draft = (err && err.data) || {};
+        // 图片已存下但没认全：保留小票，打开手动确认让用户补字段
+        if (draft.imageUrl) {
+          this.pendingImageUrl = draft.imageUrl;
+          this.setData({ pendingImagePath: filePath });
+        }
+        this.setData({ parsing: false });
+        this.handleParseError(err);
       });
   },
 
@@ -653,6 +1050,9 @@ Page({
   },
 
   onVoice() {
+    if (auth.requireLogin()) {
+      return;
+    }
     request.toast('语音记账即将上线');
   },
 
@@ -660,6 +1060,19 @@ Page({
 
   onAvatarTap() {
     this.openDrawer();
+  },
+
+  /** 游客态顶部「登录」入口：由用户主动触发授权 */
+  onLoginTap() {
+    auth.requireLogin();
+  },
+
+  /** 游客在抽屉里点头像 / 登录按钮：关掉抽屉并引导登录 */
+  onDrawerProfile() {
+    if (!auth.guard()) {
+      this.closeDrawer();
+      auth.requireLogin();
+    }
   },
 
   openDrawer() {

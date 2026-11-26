@@ -1,6 +1,6 @@
 /**
  * 自定义导航（navigationStyle: custom）
- * 与右上角胶囊对齐：导航内容右侧预留胶囊宽度，标题可居中。
+ * 高 44px，标题左对齐 18/600；右侧为胶囊预留宽度（≥100px），按钮不得紧贴胶囊。
  */
 Component({
   options: {
@@ -16,18 +16,13 @@ Component({
     back: {
       type: Boolean,
       value: false
-    },
-    /** 标题居中（日历 / 统计这类标题） */
-    center: {
-      type: Boolean,
-      value: false
     }
   },
 
   data: {
     statusBarHeight: 20,
     barHeight: 44,
-    rightSpace: 96
+    rightSpace: 100
   },
 
   lifetimes: {
@@ -35,14 +30,13 @@ Component({
       const sys = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
       const statusBarHeight = sys.statusBarHeight || 20;
       let barHeight = 44;
-      let rightSpace = 96;
+      let rightSpace = 100;
 
       try {
         const rect = wx.getMenuButtonBoundingClientRect();
         if (rect && rect.height) {
-          // 上下留白对称 → 导航条高度
           barHeight = (rect.top - statusBarHeight) * 2 + rect.height;
-          rightSpace = (sys.windowWidth || 375) - rect.left + 8;
+          rightSpace = (sys.windowWidth || 375) - rect.left + 12;
         }
       } catch (e) {
         // 取不到胶囊信息时用默认值，不影响展示

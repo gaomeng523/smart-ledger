@@ -39,7 +39,7 @@ function remove(templateId) {
   });
 }
 
-/** 一键模板记账（跳过 AI），后端为 @RequestParam */
+/** 一键模板记账，后端为 @RequestParam */
 function use(templateId) {
   return request({
     url: '/api/template/use?templateId=' + templateId,

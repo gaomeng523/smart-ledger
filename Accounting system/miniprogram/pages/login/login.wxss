@@ -97,12 +97,45 @@
   opacity: .7;
 }
 
-.lg__agree {
-  display: block;
-  margin-top: 26rpx;
-  text-align: center;
+.lg__agree-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 24rpx;
   font-size: 21rpx;
   color: var(--dim);
+}
+
+.lg__box {
+  width: 26rpx;
+  height: 26rpx;
+  border: 1rpx solid #5E5F66;
+  border-radius: 6rpx;
+  margin-right: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.lg__box.is-on {
+  background-color: var(--accent, #3D8BFF);
+  border-color: var(--accent, #3D8BFF);
+}
+
+.lg__tick {
+  font-size: 18rpx;
+  line-height: 1;
+  color: #FFFFFF;
+}
+
+.lg__agree-text {
+  color: var(--dim);
+}
+
+.lg__link {
+  color: #3D8BFF;
 }
 
 .lg__skip {

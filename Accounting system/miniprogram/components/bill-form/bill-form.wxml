@@ -42,21 +42,23 @@
     </view>
   </view>
 
-  <!-- 支付渠道 -->
-  <view class="bf__row">
-    <text class="bf__label">渠道</text>
-    <view class="bf__field bf__field--picker">
-      <dict-picker
-        type="channel"
-        value="{{value.payChannelCode}}"
-        dict="{{dict}}"
-        placeholder="请选择支付渠道"
-        invalid="{{!!marks.payChannelCode}}"
-        bind:change="onChannelChange"
-      />
+  <!-- 支付渠道（categoryFirst 时移到最后） -->
+  <block wx:if="{{!categoryFirst}}">
+    <view class="bf__row">
+      <text class="bf__label">渠道</text>
+      <view class="bf__field bf__field--picker">
+        <dict-picker
+          type="channel"
+          value="{{value.payChannelCode}}"
+          dict="{{dict}}"
+          placeholder="请选择支付渠道"
+          invalid="{{!!marks.payChannelCode}}"
+          bind:change="onChannelChange"
+        />
+      </view>
+      <text wx:if="{{marks.payChannelCode === 'missing'}}" class="bf__warn">待补充</text>
     </view>
-    <text wx:if="{{marks.payChannelCode === 'missing'}}" class="bf__warn">待补充</text>
-  </view>
+  </block>
 
   <!-- 分类 -->
   <view class="bf__row">
@@ -75,10 +77,28 @@
     <text wx:if="{{marks.categoryCode === 'missing'}}" class="bf__warn">待补充</text>
   </view>
 
+  <!-- 支付渠道（categoryFirst 时排在分类之后） -->
+  <block wx:if="{{categoryFirst}}">
+    <view class="bf__row">
+      <text class="bf__label">渠道</text>
+      <view class="bf__field bf__field--picker">
+        <dict-picker
+          type="channel"
+          value="{{value.payChannelCode}}"
+          dict="{{dict}}"
+          placeholder="请选择支付渠道"
+          invalid="{{!!marks.payChannelCode}}"
+          bind:change="onChannelChange"
+        />
+      </view>
+      <text wx:if="{{marks.payChannelCode === 'missing'}}" class="bf__warn">待补充</text>
+    </view>
+  </block>
+
   <!-- 日期 -->
   <view class="bf__row">
     <text class="bf__label">日期</text>
-    <view class="bf__field bf__field--plain {{marks.recordDate ? 'is-invalid' : ''}}">
+    <view class="bf__field bf__field--date {{marks.recordDate ? 'is-invalid' : ''}}">
       <picker class="bf__picker" mode="date" value="{{value.recordDate}}" end="{{maxDate}}" bindchange="onDateChange">
         <view class="bf__picker-inner">
           <text class="bf__picker-text {{value.recordDate ? '' : 'bf__ph'}}">

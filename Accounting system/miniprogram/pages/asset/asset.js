@@ -1,32 +1,33 @@
 /**
  * 资产体检（设计稿 04 屏）
- * 账户余额手动维护（仅存本机），AI 体检结论由本地规则生成。
+ * 账户余额手动维护（仅存本机），体检结论由本地规则生成。
  */
 const statApi = require('../../api/stat');
-const storage = require('../../utils/storage');
+const assetAccounts = require('../../utils/asset-accounts');
 const request = require('../../utils/request');
 const format = require('../../utils/format');
 
-const STORE_KEY = 'assetAccounts';
-
-/** 默认账户（首次进入的预置账户，余额由用户手工填写） */
-const DEFAULT_ACCOUNTS = [
-  { id: 'a_cmb', name: '招商银行储蓄卡', kind: 'asset', liquid: false, amount: 0, icon: 'card', color: '#3D8BFF' },
-  { id: 'a_wechat', name: '微信零钱', kind: 'asset', liquid: true, amount: 0, icon: 'wallet', color: '#57D9A3' },
-  { id: 'a_alipay', name: '支付宝余额', kind: 'asset', liquid: true, amount: 0, icon: 'wallet', color: '#6C8CFF' },
-  { id: 'a_credit', name: '信用卡待还', kind: 'debt', liquid: false, amount: 0, icon: 'card', color: '#FF6B6B' }
-];
+/** 金额拆分为整数 / 小数（整数带千分位，小数两位） */
+function moneyParts(value) {
+  const text = format.formatMoney(Math.abs(Number(value) || 0));
+  const seg = text.split('.');
+  return { int: seg[0], dec: seg[1] || '00' };
+}
 
 Page({
   data: {
     accounts: [],
     assetText: '0.00',
     debtText: '0.00',
-    netText: '0.00',
+    netInt: '0',
+    netDec: '00',
+    netNegative: false,
+    debtDanger: false,
     accountCount: 0,
+    hasData: false,
     score: 0,
     scoreText: '',
-    scoreColor: '#3D8BFF',
+    scoreColor: '#34D399',
     findings: []
   },
 
@@ -38,12 +39,7 @@ Page({
   },
 
   loadAccounts() {
-    const saved = storage.get(STORE_KEY, null);
-    const accounts = Array.isArray(saved) && saved.length
-      ? saved
-      : DEFAULT_ACCOUNTS.slice();
-
-    this.render(accounts);
+    this.render(assetAccounts.load());
   },
 
   render(accounts) {
@@ -51,32 +47,42 @@ Page({
     let debt = 0;
     const rows = accounts.map((acc) => {
       const amount = Number(acc.amount) || 0;
-      if (acc.kind === 'debt') {
+      const isDebt = acc.kind === 'debt';
+      if (isDebt) {
         debt += Math.abs(amount);
       } else {
         asset += amount;
       }
+      const showDebt = isDebt && amount > 0;
       return Object.assign({}, acc, {
-        amountText: format.formatMoney(Math.abs(amount)),
-        isDebt: acc.kind === 'debt'
+        isDebt,
+        showDebt,
+        amountText: (showDebt ? '-' : '') + '¥' + format.formatMoney(amount)
       });
     });
 
+    const net = asset - debt;
+    const netParts = moneyParts(net);
+
     this.accounts = accounts;
+    this.assetTotal = asset;
+    this.debtTotal = debt;
     this.setData({
       accounts: rows,
       accountCount: rows.length,
       assetText: format.formatMoney(asset),
       debtText: format.formatMoney(debt),
-      netText: format.formatMoney(asset - debt)
+      debtDanger: debt > 0,
+      netInt: netParts.int,
+      netDec: netParts.dec,
+      netNegative: net < 0,
+      hasData: asset > 0 || debt > 0
     });
-    this.assetTotal = asset;
-    this.debtTotal = debt;
     this.buildCheckup(rows, asset, debt);
   },
 
   save(accounts) {
-    storage.set(STORE_KEY, accounts);
+    assetAccounts.save(accounts);
     this.render(accounts);
   },
 
@@ -84,7 +90,9 @@ Page({
     statApi.month(format.currentMonthStr(), { silent: true })
       .then((stat) => {
         this.monthExpense = Number(stat.expense) || 0;
-        this.buildCheckup(this.data.accounts, this.assetTotal, this.debtTotal);
+        if (this.data.hasData) {
+          this.buildCheckup(this.data.accounts, this.assetTotal, this.debtTotal);
+        }
       })
       .catch(() => {});
   },
@@ -136,8 +144,7 @@ Page({
           kind: 'asset',
           liquid: true,
           amount: 0,
-          icon: 'wallet',
-          color: '#7B7C82'
+          icon: 'wallet'
         });
         this.save(accounts);
         request.toast('已添加，点它填写余额');
@@ -153,7 +160,7 @@ Page({
     }
     wx.showModal({
       title: '删除账户',
-      content: '确定删除「' + account.name + '」吗？',
+      content: '删除后「' + account.name + '」的余额记录会一并清空，且无法恢复。',
       confirmText: '删除',
       confirmColor: '#FF6B6B',
       success: (res) => {
@@ -168,26 +175,43 @@ Page({
   /* ---------- 体检 ---------- */
 
   buildCheckup(rows, asset, debt) {
+    // 无数据（全部账户余额为 0）时不出评分与结论
+    if (!(asset > 0 || debt > 0)) {
+      this.setData({ hasData: false, score: 0, scoreText: '', findings: [] });
+      return;
+    }
+
     const liquid = rows
       .filter((r) => r.liquid && r.isDebt !== true)
       .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
     const runway = this.monthExpense > 0 ? liquid / this.monthExpense : 0;
     const debtRatio = asset > 0 ? debt / asset : (debt > 0 ? 1 : 0);
+    const net = asset - debt;
 
     let score = 55;
-    if (asset > debt) score += 15;
+    if (net > 0) score += 15;
     if (debtRatio < 0.2) score += 10;
     if (runway >= 3) score += 10;
     if (rows.length >= 3) score += 5;
     score = Math.min(96, score);
 
     const findings = [];
-    findings.push({
-      key: 'net',
-      text: asset - debt >= 0
-        ? '净资产为 ¥' + format.formatMoney(asset - debt) + '，整体为正。'
-        : '净资产为负 ¥' + format.formatMoney(debt - asset) + '，建议先还清高息负债。'
-    });
+    if (net > 0) {
+      findings.push({
+        key: 'net',
+        text: '净资产为 ¥' + format.formatMoney(net) + '，整体为正。'
+      });
+    } else if (net === 0) {
+      findings.push({
+        key: 'net',
+        text: '净资产为 ¥0.00，资产与负债持平。'
+      });
+    } else {
+      findings.push({
+        key: 'net',
+        text: '净资产为负 ¥' + format.formatMoney(-net) + '，建议先还清高息负债。'
+      });
+    }
 
     if (debt > 0) {
       findings.push({
@@ -209,10 +233,12 @@ Page({
       });
     }
 
-    const color = score >= 85 ? '#57D9A3' : (score >= 70 ? '#3D8BFF' : '#FFB020');
+    // 高 = 绿，中 = 黄，低 = 红
+    const color = score >= 85 ? '#34D399' : (score >= 70 ? '#F5B544' : '#FF6B6B');
     const text = score >= 85 ? '状态稳健' : (score >= 70 ? '整体健康' : '需要关注');
 
     this.setData({
+      hasData: true,
       score,
       scoreText: text,
       scoreColor: color,

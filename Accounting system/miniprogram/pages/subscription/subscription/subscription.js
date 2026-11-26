@@ -7,6 +7,8 @@ const subscriptionApi = require('../../../api/subscription');
 const store = require('../../../store/index');
 const request = require('../../../utils/request');
 const format = require('../../../utils/format');
+const palette = require('../../../utils/palette');
+const categoryIcon = require('../../../utils/category-icon');
 const { CODE } = require('../../../config/const');
 
 /** 忽略候选的本地存储 Key */
@@ -106,32 +108,54 @@ Page({
     const items = (this.rawList || []).map((s) => {
       const due = this.dueText(s);
       const paused = Number(s.status) === 0;
+      const catColor = palette.colorFor(s.categoryName);
       return {
         id: s.id,
         title: s.title,
         amountText: format.formatMoney(s.avgAmount),
         cycleText: s.cycleText || '',
+        cycleShort: this.cycleShort(s.cycleDays),
         categoryName: s.categoryName || '未分类',
         payChannelName: s.payChannelName || '未选渠道',
         dueText: due.text,
         dueCls: due.cls,
-        paused
+        paused,
+        icon: categoryIcon.iconOf({ code: s.categoryCode, icon: s.categoryIcon }),
+        catColor,
+        catBg: palette.rgba(catColor, 0.15)
       };
     });
     return { items };
   },
 
   buildCandidates() {
-    const candidates = (this.rawCandidates || []).map((c, i) => ({
-      index: i,
-      title: c.title,
-      amountText: format.formatMoney(c.avgAmount),
-      cycleText: c.cycleText || '',
-      categoryName: c.categoryName || '未分类',
-      payChannelName: c.payChannelName || '未选渠道',
-      occurrences: c.occurrences || 0
-    }));
+    const candidates = (this.rawCandidates || []).map((c, i) => {
+      const catColor = palette.colorFor(c.categoryName);
+      return {
+        index: i,
+        title: c.title,
+        amountText: format.formatMoney(c.avgAmount),
+        cycleText: c.cycleText || '',
+        categoryName: c.categoryName || '未分类',
+        payChannelName: c.payChannelName || '未选渠道',
+        occurrences: c.occurrences || 0,
+        icon: categoryIcon.iconOf({ code: c.categoryCode, icon: c.categoryIcon }),
+        catColor,
+        catBg: palette.rgba(catColor, 0.15)
+      };
+    });
     return { candidates };
+  },
+
+  cycleShort(days) {
+    const n = Number(days);
+    if (n === 90) {
+      return '季付';
+    }
+    if (n === 365) {
+      return '年付';
+    }
+    return '月付';
   },
 
   /** 距下次扣费文案（0=今天，负数=逾期） */
@@ -395,25 +419,29 @@ Page({
 
   /* ---------- 删除 ---------- */
 
-  onDelete(e) {
-    const s = this.find(e.currentTarget.dataset.id);
-    const self = this;
+  /** 编辑弹层底部的删除入口（危险操作，二次确认） */
+  onDeleteFromSheet() {
+    const s = this.current;
+    if (!s) {
+      return;
+    }
     wx.showModal({
       title: '删除订阅',
-      content: s ? '「' + s.title + '」的续费提醒将被删除，历史账单不受影响' : '删除后不可恢复',
+      content: '「' + s.title + '」的续费提醒将被删除，历史账单不受影响，删除后不可恢复。',
       confirmText: '删除',
-      confirmColor: '#E8454F',
+      confirmColor: '#FF6B6B',
       success: (res) => {
         if (!res.confirm) {
           return;
         }
         subscriptionApi.remove(s.id)
           .then(() => {
+            this.setData({ sheetVisible: false });
             wx.showToast({ title: '已删除', icon: 'success' });
-            self.load();
+            this.load();
           })
           .catch((err) => {
-            if (self.shouldToast(err)) {
+            if (this.shouldToast(err)) {
               request.toast((err && err.message) || '删除失败，请稍后再试');
             }
           });

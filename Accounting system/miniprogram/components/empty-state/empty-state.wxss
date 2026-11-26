@@ -1,32 +1,36 @@
+/* 空状态：插画 96–120px，文案 14px 次要色，主按钮高 44、蓝色实底、无发光 */
 .empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48rpx 32rpx;
+  padding: 120rpx 48rpx 96rpx;
 }
 
 .empty__text {
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: var(--color-text-hint);
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
   text-align: center;
+  color: var(--text-2, #A8ADB5);
 }
 
 .empty__btn {
   margin-top: 32rpx;
+  min-width: 280rpx;
+  height: 88rpx;
+  padding: 0 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 88rpx;
-  padding: 0 48rpx;
-  border-radius: 999rpx;
-  background-color: var(--color-brand-strong);
-  color: #FFFFFF;
+  border-radius: var(--r-btn, 28rpx);
+  background-color: var(--blue, #4C8DFF);
+  color: var(--white, #FFFFFF);
   font-size: 30rpx;
   font-weight: 600;
-  box-shadow: var(--shadow-btn);
+  transition: transform .1s ease;
 }
 
 .empty__btn--hover {
-  background-color: var(--color-brand-active);
+  transform: scale(.98);
+  opacity: .92;
 }

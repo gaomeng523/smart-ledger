@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.LinkedHashMap;
@@ -25,7 +26,8 @@ import java.util.Map;
 @Component
 public class DeepSeekClient {
 
-    private static final int MAX_TOKENS = 256;
+    /** 解析结果通常不到 150 token；留足余量避免 JSON 被截断 */
+    private static final int MAX_TOKENS = 1024;
 
     private final RestClient restClient;
     private final AiProperties aiProperties;
@@ -46,11 +48,26 @@ public class DeepSeekClient {
         DeepSeekResult result = chatContent(systemPrompt, userText, MAX_TOKENS);
         try {
             result.setRaw(objectMapper.readValue(result.getContent(), AiRawResponse.class));
-        } catch (Exception e) {
-            log.warn("AI 输出非合法 JSON: {}", result.getContent());
-            throw new BizException(ErrorCode.AI_OUTPUT_INVALID, "AI 输出格式非法");
+            return result;
+        } catch (Exception first) {
+            // 偶发截断/非 JSON：放宽输出上限重试一次，仍失败才降级
+            log.warn("AI 输出非合法 JSON（重试一次）: {}", abbreviate(result.getContent()));
+            DeepSeekResult retry = chatContent(systemPrompt, userText, MAX_TOKENS * 2);
+            try {
+                retry.setRaw(objectMapper.readValue(retry.getContent(), AiRawResponse.class));
+                return retry;
+            } catch (Exception second) {
+                log.warn("AI 输出非合法 JSON: {}", abbreviate(retry.getContent()));
+                throw new BizException(ErrorCode.AI_OUTPUT_INVALID, "AI 输出格式非法");
+            }
         }
-        return result;
+    }
+
+    private String abbreviate(String content) {
+        if (content == null) {
+            return "";
+        }
+        return content.length() <= 200 ? content : content.substring(0, 200) + "...";
     }
 
     /**
@@ -90,6 +107,10 @@ public class DeepSeekClient {
             } catch (BizException e) {
                 // 输出格式非法等业务异常不重试
                 throw e;
+            } catch (HttpClientErrorException e) {
+                // 4xx（密钥错误、模型名错误、参数非法）重试没有意义，直接失败
+                log.warn("DeepSeek 请求被拒绝: {} {}", e.getStatusCode(), e.getMessage());
+                throw new BizException(ErrorCode.AI_PARSE_FAILED, "AI 服务拒绝请求（请检查密钥与模型配置）");
             } catch (Exception e) {
                 lastError = e;
                 log.warn("DeepSeek 调用失败（第 {} 次）: {}", i + 1, e.getMessage());

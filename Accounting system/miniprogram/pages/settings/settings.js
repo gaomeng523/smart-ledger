@@ -3,14 +3,18 @@
  * 说明：账单与字典在服务器，资产余额、使用天数只在本机。
  */
 const storage = require('../../utils/storage');
+const assetAccounts = require('../../utils/asset-accounts');
 const billExport = require('../../utils/bill-export');
 const auth = require('../../utils/auth');
+const usage = require('../../utils/usage');
+const userApi = require('../../api/user');
+const store = require('../../store/index');
 const { STORAGE_KEY } = require('../../config/const');
 
-const VERSION = '2.6.0';
-const MODEL = 'Lumen 2';
-const ASSET_KEY = 'assetAccounts';
-const FIRST_USE_KEY = 'firstUseDate';
+const VERSION = '1.0.3';
+const MODEL = '本地规则';
+const ASSET_KEY = assetAccounts.STORE_KEY;
+const FIRST_USE_KEY = usage.FIRST_USE_KEY;
 
 Page({
   data: {
@@ -18,7 +22,8 @@ Page({
     accountCount: 0,
     usedDays: 1,
     version: VERSION,
-    model: MODEL
+    model: MODEL,
+    guest: false
   },
 
   onShow() {
@@ -26,22 +31,15 @@ Page({
   },
 
   refresh() {
-    const accounts = storage.get(ASSET_KEY, []);
+    // 与资产体检页同源：未保存过时使用同一份预置账户
+    const accounts = assetAccounts.load();
+    const guest = !auth.isLoggedIn();
     this.setData({
-      nickname: storage.getNickname(),
-      accountCount: Array.isArray(accounts) ? accounts.length : 0,
-      usedDays: this.calcUsedDays()
+      nickname: guest ? '' : storage.getNickname(),
+      accountCount: accounts.length,
+      usedDays: usage.usedDays(),
+      guest
     });
-  },
-
-  calcUsedDays() {
-    const first = storage.get(FIRST_USE_KEY, '');
-    if (!first) {
-      return 1;
-    }
-    const start = new Date(String(first).replace(/-/g, '/'));
-    const days = Math.max(1, Math.round((Date.now() - start.getTime()) / 86400000) + 1);
-    return isFinite(days) ? days : 1;
   },
 
   /* ---------- 账户 ---------- */
@@ -68,6 +66,11 @@ Page({
     });
   },
 
+  /** 游客态：由用户主动点击进入登录页 */
+  onLogin() {
+    auth.requireLogin();
+  },
+
   onLogout() {
     wx.showModal({
       title: '退出登录',
@@ -79,7 +82,8 @@ Page({
           return;
         }
         auth.logout();
-        wx.reLaunch({ url: '/pages/login/login' });
+        // 退出后回到首页游客态，不强制停在登录页
+        wx.switchTab({ url: '/pages/index/index' });
       }
     });
   },
@@ -111,12 +115,72 @@ Page({
     });
   },
 
+  /** 重置所有数据：两次确认，避免误触 */
+  onResetAll() {
+    if (this.resetting) {
+      return;
+    }
+    if (!auth.isLoggedIn()) {
+      auth.requireLogin();
+      return;
+    }
+    wx.showModal({
+      title: '重置所有数据',
+      content: '将清空云端的全部账单、预算、订阅、快捷模板、心愿储蓄、分类别名与导入记录。昵称、头像、分类字典和本机资产账户会保留。',
+      confirmText: '继续',
+      confirmColor: '#FF6B6B',
+      success: (res) => {
+        if (!res.confirm) {
+          return;
+        }
+        wx.showModal({
+          title: '确认重置？',
+          content: '重置后数据无法恢复，建议先「导出账单」备份。',
+          confirmText: '确认重置',
+          confirmColor: '#FF6B6B',
+          success: (res2) => {
+            if (res2.confirm) {
+              this.doResetAll();
+            }
+          }
+        });
+      }
+    });
+  },
+
+  doResetAll() {
+    this.resetting = true;
+    wx.showLoading({ title: '正在重置…', mask: true });
+    userApi.resetData()
+      .then(() => {
+        // 月度统计快照是内存缓存，清掉避免首页闪旧数字
+        store.setMonthStat(null);
+        // 通知首页清空本会话的对话与待存草稿
+        const app = getApp();
+        if (app && app.globalData) {
+          app.globalData.resetAt = Date.now();
+        }
+        wx.hideLoading();
+        this.resetting = false;
+        this.refresh();
+        wx.showToast({ title: '已重置', icon: 'success' });
+      })
+      .catch((err) => {
+        wx.hideLoading();
+        this.resetting = false;
+        wx.showToast({
+          title: (err && err.message) || '重置失败，请稍后重试',
+          icon: 'none'
+        });
+      });
+  },
+
   /* ---------- 关于 ---------- */
 
   onAbout() {
     wx.showModal({
-      title: 'AI 记账 v' + VERSION,
-      content: '一句话或一张小票完成入账，账单按月汇总，支持两级分类与 AI 月报。',
+      title: '萌萌记账 v' + VERSION,
+      content: '说一句或手动填写即可入账，账单按月汇总，支持两级分类与月度报告。',
       showCancel: false,
       confirmText: '知道了'
     });

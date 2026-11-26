@@ -1,10 +1,13 @@
 # 萌萌记账 · smart-ledger
 
-一个面向个人的智能记账系统：微信小程序前端 + Spring Boot 后端。支持用一句自然语言快速记账，AI 自动识别金额、分类与支付渠道，并提供日历账单、分类统计、预算提醒、周期订阅、心愿储蓄等完整闭环。
+一个面向个人的智能记账系统：微信小程序前端 + Spring Boot 后端。支持一句话记多笔、拍照识别小票，AI 自动提取金额、分类与支付渠道，并提供日历账单、分类统计、预算提醒、周期订阅、心愿储蓄等完整闭环。
 
 ## 功能
 
 - **AI 快速记账**：输入「午饭 30 微信」即可自动解析金额、收支类型、分类、支付渠道与日期，解析结果可二次编辑；解析失败自动降级为手动表单
+- **一句话多笔**：输入「买衣服 3100，车票 398」自动拆成两笔，汇总确认后一次入库
+- **拍照识小票**：上传小票或支付截图，视觉模型提取金额、商户、日期与分类，字段可修改后保存
+- **检索增强分类**：解析前用向量检索召回相似历史记账作为 few-shot，统一分类口径（见下方评测）
 - **日历账单**：按日聚合收支，支持按类型、分类筛选与本月汇总
 - **分类统计**：9 个支出一级分类 + 5 个收入一级分类，共 54 个二级分类，支持按一级汇总并下钻查看二级明细
 - **预算管理**：月度预算与分类预算，超支预警
@@ -20,7 +23,7 @@
 |---|---|
 | 后端 | Java 17、Spring Boot 3.2.5、MyBatis-Plus 3.5.7、JJWT 0.12.5、Caffeine、Bean Validation |
 | 数据库 | MySQL 8（utf8mb4） |
-| AI | DeepSeek Chat API（自然语言账单解析） |
+| AI | DeepSeek Chat（文本解析）、Qwen-VL（拍照识别）、text-embedding-v4（检索增强） |
 | 前端 | 微信小程序原生（WXML / WXSS / JavaScript），自定义组件化、深色设计令牌 |
 | 部署 | Nginx（HTTPS 反向代理）+ systemd + 腾讯云轻量服务器 |
 
@@ -32,19 +35,23 @@
 └── Accounting system/
     ├── backend/                   Spring Boot 后端
     │   ├── src/main/java/com/smartledger/
-    │   │   ├── controller/        14 个 REST 控制器
+    │   │   ├── controller/        15 个 REST 控制器
     │   │   ├── service/           业务逻辑
-    │   │   ├── ai/                DeepSeek 调用、提示词构建、解析结果校验
+    │   │   ├── ai/                文本/视觉解析、Prompt 构建、结果校验
+    │   │   ├── ai/rag/            向量检索：示例库加载、余弦召回、失败降级
+    │   │   ├── ai/eval/           离线评测器（规则 / 模型 / RAG 三组对照）
     │   │   ├── mapper/            MyBatis-Plus 数据访问
     │   │   ├── entity/ dto/       实体与传输对象
     │   │   ├── config/            拦截器、缓存、静态资源映射
     │   │   └── common/            统一响应、异常处理、工具类
+    │   ├── tools/eval/            评测集生成脚本与历史报告
     │   └── src/main/resources/
+    │       ├── ai/                检索示例库与评测集（JSONL）
     │       ├── db/schema.sql      建表脚本（可重复执行）
     │       ├── db/data.sql        字典数据（分类、支付渠道）
     │       └── application*.yml   多环境配置
     ├── miniprogram/               微信小程序
-    │   ├── pages/                 15 个页面（首页、日历、统计、我的、登录等）
+    │   ├── pages/                 14 个页面（首页、日历、统计、我的、登录等）
     │   ├── components/            自定义组件（账单表单、分类选择器、空态、抽屉等）
     │   ├── utils/                 请求封装、登录鉴权、存储、格式化
     │   └── config/env.js          环境与接口地址配置
@@ -54,6 +61,41 @@
         ├── env/                   环境变量模板
         └── server-setup.sh        服务器初始化脚本
 ```
+
+## AI 解析与评测
+
+文本解析支持三种链路，通过环境变量切换：
+
+| 模式 | 说明 | 估算成本 |
+|---|---|---|
+| 本地规则 | 关键词 + 正则，零网络调用，AI 关闭时的默认链路 | 0 |
+| 大模型 | DeepSeek 结构化输出 + JSON 校验 + 失败重试 | 约 ¥0.002 / 次 |
+| 大模型 + RAG | 解析前用 `text-embedding-v4` 召回 Top-5 相似历史记账作为 few-shot | 约 ¥0.003 / 次 |
+
+在自建评测集上的实测结果（216 条：108 条检索示例 + 108 条测试集，覆盖 54 个二级分类，两组句式刻意不重叠）：
+
+| 链路 | 金额准确率 | 分类 Top-1 | 全字段通过率 | 平均延迟 | P95 |
+|---|---|---|---|---|---|
+| 本地规则 | 100% | 58.33% | 58.33% | 3 ms | 1 ms |
+| 大模型 | 100% | 82.41% | 82.41% | 1232 ms | 2001 ms |
+| 大模型 + RAG | 100% | **90.74%** | **90.74%** | 1904 ms | 6351 ms |
+
+复现方式：
+
+```bash
+# 1. 重新生成评测集（固定随机种子）
+python backend/tools/eval/gen_eval_dataset.py
+
+# 2. 跑三组对照（需数据库与模型 Key）
+java -jar target/smart-ledger-backend-1.0.0.jar \
+  --spring.profiles.active=prod \
+  --spring.main.web-application-type=none \
+  --smartledger.eval.enabled=true \
+  --smartledger.ai.enabled=true \
+  --smartledger.ai.rag.enabled=true
+```
+
+完整结果见 `backend/tools/eval/reports/eval-2026-11-26.json`。
 
 ## 快速开始
 
@@ -80,6 +122,10 @@ smartledger:
     mock-enabled: true      # 本地开发走 mock 登录，无需真实微信凭证
   ai:
     api-key: ""             # 留空则 AI 解析不可用，手动记账不受影响
+    rag:
+      enabled: false        # 检索增强，需同时配置 DASHSCOPE_API_KEY
+  vision:
+    api-key: ""             # 拍照识别，留空则只保存图片
 ```
 
 ```bash
@@ -104,7 +150,11 @@ cd "Accounting system/backend"
 |---|---|
 | `JWT_SECRET` | JWT 签名密钥，建议 `openssl rand -base64 48` 生成 |
 | `WX_APP_ID` / `WX_APP_SECRET` | 微信小程序 AppID / AppSecret（18 位 / 32 位） |
-| `DEEPSEEK_API_KEY` | DeepSeek 密钥，留空则 AI 解析不可用，其余功能正常 |
+| `DEEPSEEK_API_KEY` | DeepSeek 密钥，留空则 AI 文字解析不可用，其余功能正常 |
+| `DASHSCOPE_API_KEY` | 通义千问视觉模型密钥，留空则拍照识别回落为手动填写 |
+| `AI_ENABLED` | 文本解析开关，`false` 时走本地规则（生产默认关闭） |
+| `VISION_ENABLED` | 拍照识别开关（生产需显式设为 `true`） |
+| `AI_RAG_ENABLED` | 检索增强开关，需配置 `DASHSCOPE_API_KEY` |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | 数据库连接信息 |
 | `DB_USERNAME` / `DB_PASSWORD` | 数据库账号密码 |
 | `UPLOAD_DIR` | 账单图片存放目录 |

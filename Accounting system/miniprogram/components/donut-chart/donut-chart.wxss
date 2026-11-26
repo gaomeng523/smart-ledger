@@ -1,7 +1,7 @@
 .donut {
   position: relative;
   width: 100%;
-  height: 360rpx;
+  height: 100%;
 }
 
 .donut__canvas {
@@ -23,14 +23,14 @@
 }
 
 .donut__center-label {
-  font-size: 24rpx;
-  color: var(--color-text-hint);
+  font-size: var(--t-min, 24rpx);
+  color: var(--text-3, #8A8F98);
 }
 
 .donut__center-value {
   margin-top: 4rpx;
-  font-size: 40rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--text, #F2F3F5);
   font-variant-numeric: tabular-nums;
 }

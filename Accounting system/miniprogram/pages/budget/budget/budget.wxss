@@ -1,10 +1,10 @@
 .budget {
-  padding: 24rpx 32rpx 48rpx;
+  padding: 32rpx 32rpx 48rpx;
 }
 
-/* 自定义导航通栏：抵消根容器左右内边距 */
+/* 自定义导航通栏：抵消根容器左右内边距；导航下留 32rpx */
 .nav-fix {
-  margin: 0 -32rpx;
+  margin: 0 -32rpx 32rpx;
 }
 
 .budget__head {
@@ -241,6 +241,7 @@
 /* 用 scroll-view scroll-y 承载，键盘弹起时可内部滚动 */
 .panel__body {
   flex: 1;
+  min-height: 0;
   max-height: 58vh;
   padding: 0 var(--gap-lg) var(--gap-md);
 }

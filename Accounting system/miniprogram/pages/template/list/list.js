@@ -1,6 +1,6 @@
 /**
  * P-06 模板管理页（V2，§4.6）
- * 列表一键记账（不经过 AI）+ 撤销、新建 / 编辑半屏弹窗（复用 bill-form）、删除二次确认。
+ * 列表一键记账 + 撤销、新建 / 编辑半屏弹窗（复用 bill-form）、删除二次确认。
  */
 const templateApi = require('../../../api/template');
 const billApi = require('../../../api/bill');
@@ -175,6 +175,7 @@ Page({
       title: '删除模板',
       content: '删除后不可恢复，确定删除「' + (template.title || '') + '」？',
       confirmText: '删除',
+      confirmColor: '#FF6B6B',
       cancelText: '取消',
       success: (res) => {
         if (res.confirm) {

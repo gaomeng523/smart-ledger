@@ -24,9 +24,9 @@
     <image class="photo__img" src="{{imageUrl}}" mode="widthFix" bindtap="onPreviewImage" />
   </view>
 
-  <!-- AI 原始输入 -->
+  <!-- 原始输入 -->
   <view class="raw">
-    <text class="raw__title">AI 原始输入</text>
+    <text class="raw__title">原始输入</text>
     <text class="raw__text">{{bill.recordText || '（无原始输入）'}}</text>
     <text class="raw__meta">解析置信度 {{confidenceText}} · 来源 {{sourceText}}</text>
     <text class="raw__meta">创建于 {{createTimeText || '—'}}</text>

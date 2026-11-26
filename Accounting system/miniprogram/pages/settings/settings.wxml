@@ -1,79 +1,95 @@
-<view class="page">
+<view class="page page--sub settings">
   <nav-bar back title="设置" />
 
   <view class="body">
+    <!-- 账户 -->
     <view class="group">
-      <text class="group__title">账户</text>
-      <view class="card">
-        <view class="st__row" hover-class="st__row--hover" bindtap="onChangeNickname">
-          <ui-icon name="edit" size="32" color="#8B6CFF" />
-          <text class="st__label">昵称</text>
-          <text class="st__value">{{nickname || '未设置'}}</text>
-          <ui-icon name="right" size="24" color="#54555B" />
-        </view>
-        <view class="st__row" hover-class="st__row--hover" bindtap="onLogout">
-          <ui-icon name="out" size="32" color="#FF6B6B" />
-          <text class="st__label st__label--danger">退出登录</text>
-          <ui-icon name="right" size="24" color="#54555B" />
+      <view class="group__title">账户</view>
+      <view class="card group__card">
+        <view class="crow" hover-class="crow--hover" bindtap="onChangeNickname">
+          <ui-icon name="user" size="40" color="#A8ADB5" />
+          <text class="crow__label">昵称</text>
+          <text class="crow__value">{{nickname || '未设置'}}</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
         </view>
       </view>
     </view>
 
+    <!-- 数据 -->
     <view class="group">
-      <text class="group__title">数据</text>
-      <view class="card">
-        <view class="st__row" hover-class="st__row--hover" bindtap="onAsset">
-          <ui-icon name="wallet" size="32" color="#3D8BFF" />
-          <text class="st__label">我的账本</text>
-          <text class="st__value">{{accountCount}} 个账户</text>
-          <ui-icon name="right" size="24" color="#54555B" />
+      <view class="group__title">数据</view>
+      <view class="card group__card">
+        <view class="crow" hover-class="crow--hover" bindtap="onAsset">
+          <ui-icon name="wallet" size="40" color="#A8ADB5" />
+          <text class="crow__label">我的账户</text>
+          <text class="crow__value">{{accountCount}} 个账户</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
         </view>
-        <view class="st__row" hover-class="st__row--hover" bindtap="onExport">
-          <ui-icon name="out" size="32" color="#57D9A3" />
-          <text class="st__label">导出账单</text>
-          <text class="st__value">CSV</text>
-          <ui-icon name="right" size="24" color="#54555B" />
-        </view>
-        <view class="st__row" hover-class="st__row--hover" bindtap="onClearCache">
-          <ui-icon name="repeat" size="32" color="#FF6B6B" />
-          <text class="st__label st__label--danger">清空本机缓存</text>
-          <ui-icon name="right" size="24" color="#54555B" />
-        </view>
-      </view>
-      <text class="group__hint">资产余额与使用天数只存在本机，云端账单不受影响</text>
-    </view>
-
-    <view class="group">
-      <text class="group__title">关于</text>
-      <view class="card">
-        <view class="st__row" hover-class="st__row--hover" bindtap="onAbout">
-          <ui-icon name="spark" size="32" color="#8B6CFF" />
-          <text class="st__label">版本</text>
-          <text class="st__value num">v{{version}}</text>
-          <ui-icon name="right" size="24" color="#54555B" />
-        </view>
-        <view class="st__row">
-          <ui-icon name="target" size="32" color="#FFB020" />
-          <text class="st__label">AI 模型</text>
-          <text class="st__value">{{model}}</text>
-        </view>
-        <view class="st__row">
-          <ui-icon name="calendar" size="32" color="#7B7C82" />
-          <text class="st__label">使用天数</text>
-          <text class="st__value num">{{usedDays}} 天</text>
-        </view>
-        <view class="st__row" hover-class="st__row--hover" bindtap="onPrivacy">
-          <ui-icon name="eye" size="32" color="#7B7C82" />
-          <text class="st__label">隐私与数据说明</text>
-          <ui-icon name="right" size="24" color="#54555B" />
+        <view class="crow" hover-class="crow--hover" bindtap="onExport">
+          <ui-icon name="out" size="40" color="#A8ADB5" />
+          <text class="crow__label">导出账单</text>
+          <text class="crow__value">CSV</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
         </view>
       </view>
     </view>
 
-    <view class="st__foot">
-      <text class="st__foot-text">一句话或一张小票，把账记下来</text>
+    <!-- 关于 -->
+    <view class="group">
+      <view class="group__title">关于</view>
+      <view class="card group__card">
+        <view class="crow" hover-class="crow--hover" bindtap="onAbout">
+          <ui-icon name="info" size="40" color="#A8ADB5" />
+          <text class="crow__label">版本</text>
+          <text class="crow__value num">v{{version}}</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
+        </view>
+        <view class="crow">
+          <ui-icon name="target" size="40" color="#A8ADB5" />
+          <text class="crow__label">解析方式</text>
+          <text class="crow__value">{{model}}</text>
+        </view>
+        <view class="crow">
+          <ui-icon name="calendar" size="40" color="#A8ADB5" />
+          <text class="crow__label">使用天数</text>
+          <text class="crow__value num">{{usedDays}} 天</text>
+        </view>
+        <view class="crow" hover-class="crow--hover" bindtap="onPrivacy">
+          <ui-icon name="eye" size="40" color="#A8ADB5" />
+          <text class="crow__label">隐私与数据说明</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
+        </view>
+      </view>
     </view>
 
-    <view class="safe-bottom"></view>
+    <!-- 危险操作（单独成组） -->
+    <view class="group">
+      <view class="group__title">危险操作</view>
+      <view class="card group__card">
+        <view class="crow" hover-class="crow--hover" bindtap="onClearCache">
+          <ui-icon name="trash" size="40" color="#A8ADB5" />
+          <text class="crow__label is-danger">清空本机缓存</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
+        </view>
+        <view class="crow__note">资产余额与使用天数只存在本机，云端账单不受影响。</view>
+        <view class="crow" hover-class="crow--hover" bindtap="onResetAll">
+          <ui-icon name="trash" size="40" color="#FF6B6B" />
+          <text class="crow__label is-danger">重置所有数据</text>
+          <ui-icon name="right" size="28" color="#8A8F98" />
+        </view>
+        <view class="crow__note">清空云端账单、预算、订阅、模板、心愿、别名与导入记录；昵称、头像和本机数据保留，操作不可恢复。</view>
+      </view>
+    </view>
+
+    <view wx:if="{{guest}}" class="logout" hover-class="logout--hover" bindtap="onLogin">
+      <ui-icon name="logout" size="40" color="#A8ADB5" />
+      <text class="logout__txt">登录 / 注册</text>
+    </view>
+    <view wx:else class="logout" hover-class="logout--hover" bindtap="onLogout">
+      <ui-icon name="logout" size="40" color="#A8ADB5" />
+      <text class="logout__txt">退出登录</text>
+    </view>
+
+    <view class="foot">一句话或一张小票，把账记下来</view>
   </view>
 </view>

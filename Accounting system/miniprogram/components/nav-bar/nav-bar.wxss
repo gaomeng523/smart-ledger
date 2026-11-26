@@ -1,30 +1,21 @@
+/* 自定义导航：高 44px，标题 18/600 左对齐，右侧为胶囊预留 ≥100px */
 .nav {
-  flex: none;
-  width: 100%;
+  position: relative;
+  z-index: 20;
   background-color: transparent;
 }
 
 .nav__bar {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 16rpx;
   padding-left: 32rpx;
   box-sizing: border-box;
 }
 
-.nav__left {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  min-width: 0;
-  flex: none;
-}
-
 .nav__back {
-  width: 64rpx;
-  height: 64rpx;
-  margin-left: -16rpx;
+  width: 88rpx;
+  height: 88rpx;
+  margin-left: -20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,23 +23,14 @@
 }
 
 .nav__back--hover {
-  background-color: rgba(255, 255, 255, .05);
+  background-color: rgba(255, 255, 255, .06);
 }
 
 .nav__title {
-  font-size: 38rpx;
-  letter-spacing: .08em;
-  color: #F0F0EE;
-  white-space: nowrap;
-}
-
-.nav__title.is-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-brush);
-  font-size: 42rpx;
-  letter-spacing: .06em;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text, #F2F3F5);
+  line-height: 1.2;
 }
 
 .nav__spacer {

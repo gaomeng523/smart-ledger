@@ -12,7 +12,8 @@ const ENV = 'prod';
 
 const BASE_URL_MAP = {
   // 当前临时指向本机后端做 UI 联调；测完改回服务器地址 http://101.42.2.204:8080
-  dev: 'http://127.0.0.1:8080',
+  // 真机预览必须用电脑局域网 IP（127.0.0.1 在手机上指手机自己）
+  dev: 'http://10.62.36.59:8080',
   // 正式环境：已备案域名 + HTTPS（Nginx 443 反代到本机 8080）
   prod: 'https://api.gmenggmeng.cn'
 };

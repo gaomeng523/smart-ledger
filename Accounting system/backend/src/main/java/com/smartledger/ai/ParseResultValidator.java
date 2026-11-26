@@ -44,10 +44,10 @@ public class ParseResultValidator {
         int billType = Integer.valueOf(1).equals(raw.getBillType()) ? 1 : 0;
         dto.setBillType(billType);
 
-        // 金额：非数字或 <= 0 归 0 并标记缺失
+        // 金额：取绝对值后校验；支付截图常把支出写成「-460.31」，不能当成缺失
         BigDecimal amount = raw.getAmount() == null
                 ? BigDecimal.ZERO
-                : raw.getAmount().setScale(2, RoundingMode.HALF_UP);
+                : raw.getAmount().abs().setScale(2, RoundingMode.HALF_UP);
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             amount = BigDecimal.ZERO;
             dto.getMissingFields().add(FIELD_AMOUNT);

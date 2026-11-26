@@ -1,6 +1,6 @@
 /**
  * 分类管理（设计稿 06 屏）
- * 一级分类 + 二级明细（按需下钻）+ AI 学习规则入口。
+ * 一级分类 + 二级明细（按需下钻）+ 学习规则入口。
  */
 const statApi = require('../../api/stat');
 const aliasApi = require('../../api/alias');
@@ -8,9 +8,9 @@ const store = require('../../store/index');
 const request = require('../../utils/request');
 const format = require('../../utils/format');
 const categoryIcon = require('../../utils/category-icon');
+const palette = require('../../utils/palette');
+const { splitPercent } = require('../../utils/percent');
 const { BILL_TYPE } = require('../../config/const');
-
-const PALETTE = ['#3D8BFF', '#FF6B6B', '#57D9A3', '#8B6CFF', '#FFB020', '#6C8CFF', '#FF8FA3', '#7FD1C7'];
 
 Page({
   data: {
@@ -20,6 +20,9 @@ Page({
     billCount: 0,
     usedCount: 0,
     parents: [],
+    unusedParents: [],
+    unusedCount: 0,
+    showUnused: false,
     expanded: '',
     children: [],
     ruleCount: 0,
@@ -57,6 +60,8 @@ Page({
       .then((res) => {
         const items = (res && res.items) || [];
         this.lastItems = items;
+        // 合计直接用接口返回值，和统计页同源，避免只汇总树内分类导致少算
+        this.apiTotal = res && res.total !== undefined ? Number(res.total) || 0 : null;
         this.renderParents(items);
       })
       .catch(() => {
@@ -80,32 +85,51 @@ Page({
     (items || []).forEach((it) => {
       map[it.categoryCode] = it;
     });
-    let total = 0;
+
+    let sum = 0;
     let used = 0;
-    const parents = this.tree.map((p, index) => {
+    const base = this.tree.map((p) => {
       const hit = map[p.code];
       const amount = hit ? Number(hit.amount) || 0 : 0;
-      total += amount;
+      sum += amount;
       if (amount > 0) {
         used += 1;
       }
+      const color = palette.colorFor(p.name);
       return {
         code: p.code,
         name: p.name,
         icon: categoryIcon.iconOf({ code: p.code, icon: p.icon }),
-        color: PALETTE[index % PALETTE.length],
+        color,
+        bg: palette.rgba(color, 0.15),
+        amount,
         amountText: format.formatMoney(amount),
-        ratio: hit ? Math.round((Number(hit.ratio) || 0) * 100) : 0,
-        children: p.children || []
+        children: p.children || [],
+        unused: amount <= 0
       };
     });
 
+    // 与统计页共用最大余数法，保证分类占比合计正好 100%
+    const percents = splitPercent(base.map((it) => it.amount));
+    const all = base.map((it, index) => Object.assign({}, it, {
+      ratio: percents[index],
+      ratioText: percents[index] + '%'
+    }));
+
+    const total = this.apiTotal === null || this.apiTotal === undefined ? sum : this.apiTotal;
+
     this.setData({
-      parents,
+      parents: all.filter((p) => !p.unused),
+      unusedParents: all.filter((p) => p.unused),
+      unusedCount: all.filter((p) => p.unused).length,
       totalText: format.formatMoney(total),
       usedCount: used,
       loading: false
     });
+  },
+
+  onToggleUnused() {
+    this.setData({ showUnused: !this.data.showUnused });
   },
 
   onParentTap(e) {
@@ -125,11 +149,13 @@ Page({
         const children = ((parent && parent.children) || []).map((child) => {
           const hit = map[child.code];
           const amount = hit ? Number(hit.amount) || 0 : 0;
+          const color = palette.colorFor(child.name);
           return {
             code: child.code,
             name: child.name,
             icon: categoryIcon.iconOf({ code: child.code, icon: child.icon }),
-            amountText: amount > 0 ? format.formatMoney(amount) : '—',
+            color,
+            amountText: amount > 0 ? format.formatMoney(amount) : '0.00',
             zero: amount <= 0
           };
         });

@@ -1,0 +1,42 @@
+/* 自定义 tab 栏：高 56px + 安全区，背景同页面，顶部 1px 描边 */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  height: calc(112rpx + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: var(--bg, #0B0C0E);
+  border-top: 2rpx solid var(--card-line, rgba(255, 255, 255, .06));
+}
+
+.tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  min-height: 88rpx;
+}
+
+.tabbar__icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabbar__text {
+  font-size: 24rpx;
+  line-height: 1.2;
+  color: var(--text-3, #8A8F98);
+}
+
+.tabbar__text.is-on {
+  color: var(--blue, #4C8DFF);
+  font-weight: 600;
+}

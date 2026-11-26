@@ -6,9 +6,10 @@
  * 事件：tap → { template } / use → { template } / edit → { template } / delete → { template }
  */
 const format = require('../../utils/format');
+const palette = require('../../utils/palette');
+const categoryIcon = require('../../utils/category-icon');
 const { BILL_TYPE } = require('../../config/const');
 
-const BADGE_COLORS = ['#FFC46B', '#FF9EAB', '#8ED9C0', '#6BB6FF', '#A88BEB', '#7ED9A6'];
 /** 操作区宽度（px）：两个按钮 */
 const ACTION_WIDTH = 150;
 
@@ -29,26 +30,31 @@ Component({
     opened: false,
     amountText: '',
     isIncome: false,
-    badgeText: '记',
-    badgeColor: BADGE_COLORS[0],
-    metaText: ''
+    metaText: '',
+    catColor: '#F5B544',
+    catBg: 'rgba(245,181,68,0.15)',
+    icon: 'tag'
   },
 
   observers: {
-    'template, tintIndex': function (template, tintIndex) {
+    'template, tintIndex': function (template) {
       if (!template) {
         return;
       }
-      const index = Math.abs(Number(tintIndex) || 0) % BADGE_COLORS.length;
-      const meta = [template.payChannelName, template.categoryName]
-        .filter((text) => !!text)
-        .join(' · ');
+      const meta = [
+        template.categoryName,
+        template.payChannelName,
+        template.useCount ? '已用 ' + template.useCount + ' 次' : ''
+      ].filter((text) => !!text).join(' · ');
+      const catColor = palette.colorFor(template.categoryName);
+
       this.setData({
         amountText: format.signedAmount(template.amount, template.billType),
         isIncome: Number(template.billType) === BILL_TYPE.INCOME,
-        badgeText: format.firstChar(template.title || template.categoryName),
-        badgeColor: BADGE_COLORS[index],
-        metaText: meta
+        metaText: meta,
+        catColor,
+        catBg: palette.rgba(catColor, 0.15),
+        icon: categoryIcon.iconOf({ code: template.categoryCode, icon: template.categoryIcon })
       });
     }
   },

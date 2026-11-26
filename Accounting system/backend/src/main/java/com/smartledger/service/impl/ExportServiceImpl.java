@@ -104,9 +104,14 @@ public class ExportServiceImpl implements ExportService {
     private String[] escape(String[] columns) {
         for (int i = 0; i < columns.length; i++) {
             String value = columns[i];
-            if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {
-                columns[i] = "\"" + value.replace("\"", "\"\"") + "\"";
+            // 防 CSV 公式注入：Excel 会把 = + - @ 开头的单元格当公式执行
+            if (!value.isEmpty() && "=+-@".indexOf(value.charAt(0)) >= 0) {
+                value = "'" + value;
             }
+            if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {
+                value = "\"" + value.replace("\"", "\"\"") + "\"";
+            }
+            columns[i] = value;
         }
         return columns;
     }

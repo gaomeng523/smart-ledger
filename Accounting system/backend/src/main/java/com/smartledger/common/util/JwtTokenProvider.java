@@ -32,6 +32,9 @@ public class JwtTokenProvider {
         if (bytes.length < 32) {
             throw new IllegalStateException("smartledger.jwt.secret 长度不足 32 字节，HS256 无法使用");
         }
+        if (jwtProperties.getExpireDays() <= 0) {
+            throw new IllegalStateException("smartledger.jwt.expire-days 必须大于 0");
+        }
         this.secretKey = Keys.hmacShaKeyFor(bytes);
     }
 

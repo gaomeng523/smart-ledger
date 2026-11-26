@@ -6,9 +6,9 @@
  */
 const { iconFor, iconOf } = require('../../utils/category-icon');
 
-/** 图标颜色：常规 / 选中（与 --color-text-sub / --color-brand 对应） */
-const ICON_COLOR = '#C9CAC6';
-const ICON_COLOR_ACTIVE = '#3D8BFF';
+/** 图标颜色：常规 / 选中（与 --text-2 / --blue 对应） */
+const ICON_COLOR = '#A8ADB5';
+const ICON_COLOR_ACTIVE = '#4C8DFF';
 
 Component({
   properties: {

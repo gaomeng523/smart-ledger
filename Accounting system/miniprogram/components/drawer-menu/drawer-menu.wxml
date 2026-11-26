@@ -1,55 +1,77 @@
 <view class="dm {{mode === 'page' ? 'dm--page' : ''}}">
-  <view class="dm__profile" bindtap="onProfileTap">
-    <view class="dm__avatar">
-      <image wx:if="{{avatarPath}}" class="dm__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
-      <text wx:else class="dm__avatar-text">{{avatarText}}</text>
+  <!-- 头部：头像 64px + 昵称 + 两项数据 -->
+  <view class="prof">
+    <view class="prof__avatar" bindtap="onProfileTap">
+      <image wx:if="{{avatarPath}}" class="prof__avatar-img" src="{{avatarPath}}" mode="aspectFill" />
+      <text wx:else class="prof__avatar-txt">{{avatarText}}</text>
       <button
-        class="dm__avatar-btn"
+        wx:if="{{!guest}}"
+        class="prof__avatar-btn"
         open-type="chooseAvatar"
         hover-class="none"
         catchtap="noop"
         bindchooseavatar="onChooseAvatar"
       ></button>
     </view>
-    <text wx:if="{{!avatarPath}}" class="dm__avatar-tip">点头像，选「用微信头像」</text>
-    <view class="dm__name">
-      <text class="dm__name-text">{{nickname || '微信用户'}}</text>
-    </view>
-    <view class="dm__sub">已使用 {{usedDays}} 天 · 已学习 {{billCount}} 笔</view>
-  </view>
 
-  <view class="dm__menu">
-    <view
-      wx:for="{{menus}}"
-      wx:key="key"
-      class="dm__item {{item.ai ? 'is-ai' : ''}}"
-      hover-class="dm__item--hover"
-      data-url="{{item.url}}"
-      data-tab="{{item.tab}}"
-      data-action="{{item.action}}"
-      bindtap="onMenuTap"
-    >
-      <ui-icon name="{{item.icon}}" size="38" color="{{item.ai ? '#A78BFF' : '#90919A'}}" />
-      <text class="dm__item-label">{{item.label}}</text>
-      <text wx:if="{{item.tip}}" class="dm__item-tip">{{item.tip}}</text>
-      <text wx:if="{{item.badge}}" class="dm__item-badge">{{item.badge}}</text>
+    <view class="prof__main" bindtap="onProfileTap">
+      <text class="prof__name">{{nickname || (guest ? '未登录' : '微信用户')}}</text>
+      <view wx:if="{{guest}}" class="prof__login" hover-class="prof__login--hover" catchtap="onProfileTap">
+        <text class="prof__login-txt">登录 / 注册</text>
+        <ui-icon name="right" size="24" color="#4C8DFF" />
+      </view>
+      <text wx:elif="{{!avatarPath}}" class="prof__tip">点头像，选「用微信头像」</text>
+    </view>
+
+    <view class="prof__stats">
+      <view class="pstat">
+        <text class="pstat__n num">{{usedDays}}</text>
+        <text class="pstat__k">使用天数</text>
+      </view>
+      <view class="pstat">
+        <text class="pstat__n num">{{billCount}}</text>
+        <text class="pstat__k">已记笔数</text>
+      </view>
     </view>
   </view>
 
-  <view class="dm__more">
-    <view
-      wx:for="{{more}}"
-      wx:key="key"
-      class="dm__more-item"
-      hover-class="dm__more-item--hover"
-      data-url="{{item.url}}"
-      data-action="{{item.action}}"
-      bindtap="onMenuTap"
-    >
-      <ui-icon name="{{item.icon}}" size="28" color="#6E6F76" />
-      <text class="dm__more-label">{{item.label}}</text>
+  <!-- 月度报告（置顶突出） -->
+  <view class="report" hover-class="report--hover" bindtap="onReportTap">
+    <view class="report__ico">
+      <ui-icon name="spark" size="36" color="#A78BFA" />
+    </view>
+    <view class="report__main">
+      <view class="report__title-row">
+        <text class="report__title">月度报告</text>
+        <text class="report__new">NEW</text>
+      </view>
+      <text class="report__sub">查看 {{monthNum}} 月消费总结</text>
+    </view>
+    <ui-icon name="right" size="32" color="#A78BFA" />
+  </view>
+
+  <!-- 菜单分组 -->
+  <view wx:for="{{groups}}" wx:key="key" class="group">
+    <view class="group__title">{{item.title}}</view>
+    <view class="card group__card">
+      <view
+        wx:for="{{item.items}}"
+        wx:for-item="row"
+        wx:key="key"
+        class="mrow"
+        hover-class="mrow--hover"
+        data-url="{{row.url}}"
+        data-tab="{{row.tab}}"
+        data-action="{{row.action}}"
+        bindtap="onMenuTap"
+      >
+        <ui-icon name="{{row.icon}}" size="40" color="#A8ADB5" />
+        <text class="mrow__label">{{row.label}}</text>
+        <text wx:if="{{row.value}}" class="mrow__value">{{row.value}}</text>
+        <ui-icon name="right" size="28" color="#8A8F98" />
+      </view>
     </view>
   </view>
 
-  <view class="dm__foot">v{{version}} · AI 模型 Lumen 2</view>
+  <view class="dm__foot">萌萌记账 v{{version}}</view>
 </view>

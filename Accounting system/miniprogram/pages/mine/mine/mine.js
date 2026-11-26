@@ -1,26 +1,23 @@
 /**
  * 我的（tab）· 复用「我的」抽屉内容
  */
+const auth = require('../../../utils/auth');
 const storage = require('../../../utils/storage');
 const request = require('../../../utils/request');
-const auth = require('../../../utils/auth');
 
 Page({
-  data: {
-    statusBarHeight: 20
-  },
-
-  onLoad() {
-    try {
-      const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
-      this.setData({ statusBarHeight: info.statusBarHeight || 20 });
-    } catch (e) {
-      this.setData({ statusBarHeight: 20 });
-    }
-  },
+  data: {},
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setSelected(3);
+    }
+    // 游客态也能查看菜单，点昵称/登录入口时再引导授权
     if (!auth.guard()) {
+      const guestMenu = this.selectComponent('#menu');
+      if (guestMenu) {
+        guestMenu.refreshProfile();
+      }
       return;
     }
     const menu = this.selectComponent('#menu');
@@ -30,7 +27,11 @@ Page({
     }
   },
 
+  /** 点头像 / 昵称：游客先去登录，已登录则改名 */
   onProfile() {
+    if (auth.requireLogin()) {
+      return;
+    }
     wx.showModal({
       title: '修改昵称',
       editable: true,

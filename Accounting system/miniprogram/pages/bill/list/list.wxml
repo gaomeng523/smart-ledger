@@ -1,18 +1,17 @@
-<view class="page">
+<view class="page page--tab">
   <nav-bar>
     <view slot="left" class="mhead">
-      <text class="mhead__m">{{monthNum}}月</text>
-      <text class="mhead__y">{{yearText}}年</text>
+      <text class="mhead__m num">{{monthText}}</text>
     </view>
     <view slot="right" class="macts">
       <view class="mact" hover-class="mact--hover" bindtap="onPrevMonth">
-        <ui-icon name="left" size="32" color="#8A8B92" />
+        <ui-icon name="left" size="36" color="#A8ADB5" />
       </view>
       <view class="mact" hover-class="mact--hover" bindtap="onNextMonth">
-        <ui-icon name="right" size="32" color="#8A8B92" />
+        <ui-icon name="right" size="36" color="#A8ADB5" />
       </view>
-      <view class="mact" hover-class="mact--hover" bindtap="onSearchOpen">
-        <ui-icon name="search" size="34" color="#C4C5C1" />
+      <view wx:if="{{!searchMode}}" class="mact" hover-class="mact--hover" bindtap="onSearchOpen">
+        <ui-icon name="search" size="36" color="#A8ADB5" />
       </view>
     </view>
   </nav-bar>
@@ -22,7 +21,7 @@
     <block wx:if="{{searchMode}}">
       <view class="search">
         <view class="search__field">
-          <ui-icon name="search" size="30" color="#6E6F76" />
+          <ui-icon name="search" size="32" color="#8A8F98" />
           <input
             class="search__input"
             value="{{keyword}}"
@@ -37,14 +36,16 @@
         </view>
         <view class="search__tools">
           <view class="search__filter" hover-class="search__filter--hover" bindtap="onFilterOpen">
-            <ui-icon name="filter" size="26" color="#9A9BA1" />
+            <ui-icon name="filter" size="28" color="#A8ADB5" />
             <text>筛选</text>
           </view>
-          <text class="search__hint">本月命中 {{searchTotal}} 笔</text>
+          <text class="search__hint">找到 {{searchTotal}} 笔</text>
         </view>
       </view>
 
-      <view wx:if="{{searchLoading}}" class="search__empty">正在搜索…</view>
+      <view wx:if="{{searchLoading}}" class="search__empty">
+        <text>正在搜索…</text>
+      </view>
 
       <block wx:elif="{{searchGroups.length}}">
         <view wx:for="{{searchGroups}}" wx:key="date" class="card sgroup">
@@ -62,8 +63,8 @@
             data-id="{{bill.billId}}"
             bindtap="onBillTap"
           >
-            <view class="tx__ico">
-              <category-icon icon="{{bill.icon}}" size="34" color="#C4C5C1" />
+            <view class="tx__ico" style="background-color:{{bill.catBg}};">
+              <category-icon icon="{{bill.icon}}" size="36" color="{{bill.catColor}}" />
             </view>
             <view class="tx__main">
               <text class="tx__name">{{bill.name}}</text>
@@ -74,36 +75,20 @@
         </view>
       </block>
 
-      <view wx:else class="search__empty">
-        <ui-icon name="search" size="48" color="#3A3B42" />
+      <view wx:elif="{{!searchIdle}}" class="search__empty">
+        <ui-icon name="search" size="56" color="#3A3D44" />
         <text>没有找到符合条件的账单</text>
+      </view>
+
+      <view wx:else class="search__empty">
+        <text>本月还没有账单</text>
       </view>
     </block>
 
     <!-- ===== 月历 ===== -->
     <block wx:else>
-      <view class="cal">
-        <view class="cal__head">
-          <text wx:for="{{weekHead}}" wx:key="*this" class="cal__wh">{{item}}</text>
-        </view>
-        <view class="cal__grid">
-          <view
-            wx:for="{{cells}}"
-            wx:key="key"
-            class="cell {{item.blank ? 'is-blank' : ''}} {{item.isSelected ? 'is-on' : ''}} {{item.isToday ? 'is-today' : ''}}"
-            data-date="{{item.date}}"
-            bindtap="onDayTap"
-          >
-            <block wx:if="{{!item.blank}}">
-              <text class="cell__day">{{item.day}}</text>
-              <text wx:if="{{item.amountText}}" class="cell__amt num">{{item.amountText}}</text>
-              <view wx:elif="{{item.count}}" class="cell__dot"></view>
-            </block>
-          </view>
-        </view>
-      </view>
-
-      <view class="seg">
+      <!-- 切换控制的是格子数据，因此放在日历上方 -->
+      <view class="seg cal__seg">
         <view
           wx:for="{{segOptions}}"
           wx:key="value"
@@ -113,16 +98,32 @@
         >{{item.label}}</view>
       </view>
 
-      <view class="nowline">
-        <view class="nowline__dot"></view>
-        <text class="nowline__text">{{selectedLabel}} {{selectedWeek}}</text>
-        <text class="nowline__out">支出 ¥{{dayOutText}}</text>
+      <view class="card cal">
+        <view class="cal__head">
+          <text wx:for="{{weekHead}}" wx:key="*this" class="cal__wh">{{item}}</text>
+        </view>
+        <view class="cal__grid">
+          <view
+            wx:for="{{cells}}"
+            wx:key="key"
+            class="cell {{item.blank ? 'is-blank' : ''}} {{item.isToday ? 'is-today' : ''}} {{item.isSelected ? 'is-on' : ''}}"
+            data-date="{{item.date}}"
+            bindtap="onDayTap"
+          >
+            <block wx:if="{{!item.blank}}">
+              <text class="cell__day num {{item.isSelected ? 'is-on' : ''}}">{{item.day}}</text>
+              <text wx:if="{{item.amountText}}" class="cell__amt num">{{item.amountText}}</text>
+              <view wx:elif="{{item.count}}" class="cell__dot"></view>
+            </block>
+          </view>
+        </view>
       </view>
 
-      <view class="card daycard">
+      <!-- 当日明细（本页主角卡片） -->
+      <view class="card card--hero daycard">
         <view class="daycard__head">
-          <text class="daycard__title">{{selectedLabel}}</text>
-          <text class="daycard__sub">{{dayCount}} 笔 · 支出 ¥{{dayOutText}}</text>
+          <text class="daycard__title">{{selectedTitle}}</text>
+          <text class="daycard__sub">{{dayCount}} 笔{{daySummary ? ' · ' + daySummary : ''}}</text>
         </view>
 
         <view
@@ -133,8 +134,8 @@
           data-id="{{item.billId}}"
           bindtap="onBillTap"
         >
-          <view class="tx__ico">
-            <category-icon icon="{{item.icon}}" size="34" color="#C4C5C1" />
+          <view class="tx__ico" style="background-color:{{item.catBg}};">
+            <category-icon icon="{{item.icon}}" size="36" color="{{item.catColor}}" />
           </view>
           <view class="tx__main">
             <text class="tx__name">{{item.name}}</text>
@@ -148,7 +149,7 @@
 
       <view wx:if="{{insightPrefix}}" class="insight">
         <view class="insight__ico">
-          <ui-icon name="spark" size="26" color="#B49CFF" />
+          <ui-icon name="spark" size="28" color="#A78BFA" />
         </view>
         <text class="insight__text">{{insightPrefix}}<text class="insight__hl">{{insightHighlight}}</text>{{insightSuffix}}</text>
       </view>

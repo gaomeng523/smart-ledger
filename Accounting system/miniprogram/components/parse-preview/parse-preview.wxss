@@ -1,5 +1,9 @@
 .pp {
   position: relative;
+  /* 识别结果弹层只出现在记账页（带自定义 tab 栏），
+     变量直接声明在组件根节点：不依赖页面级继承，底部按钮不会被 tab 栏盖住 */
+  --sheet-bottom: calc(112rpx + env(safe-area-inset-bottom));
+  --sheet-safe: 0px;
 }
 
 .pp__mask {
@@ -16,7 +20,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--sheet-bottom, 0px);
   z-index: 201;
   background-color: var(--color-bg-card);
   border-top-left-radius: var(--radius-card);
@@ -76,6 +80,8 @@
 
 .pp__body {
   flex: 1;
+  /* 关键：flex 子项默认 min-height:auto，scroll-view 不收缩会把页脚挤出面板 */
+  min-height: 0;
   max-height: 56vh;
   padding: 0 32rpx;
 }
@@ -127,5 +133,5 @@
 
 .pp__safe {
   flex: none;
-  height: env(safe-area-inset-bottom);
+  height: var(--sheet-safe, env(safe-area-inset-bottom));
 }

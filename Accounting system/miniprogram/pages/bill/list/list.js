@@ -1,13 +1,15 @@
 /**
  * 日历账本（设计稿 02 屏）
- * 月历按日汇总 → 选日看流水 → AI 洞察；搜索 + 高级筛选保留。
+ * 月历按日汇总 → 选日看流水 → 消费洞察；搜索 + 高级筛选保留。
  */
 const billApi = require('../../../api/bill');
 const statApi = require('../../../api/stat');
 const request = require('../../../utils/request');
 const format = require('../../../utils/format');
+const storage = require('../../../utils/storage');
 const auth = require('../../../utils/auth');
 const categoryIcon = require('../../../utils/category-icon');
+const palette = require('../../../utils/palette');
 const { BILL_TYPE } = require('../../../config/const');
 
 const WEEK_HEAD = ['一', '二', '三', '四', '五', '六', '日'];
@@ -34,9 +36,10 @@ Page({
     selectedDate: '',
     selectedLabel: '',
     selectedWeek: '',
+    selectedTitle: '',
     dayBills: [],
     dayCount: 0,
-    dayOutText: '0.00',
+    daySummary: '',
 
     monthCount: 0,
     monthOutText: '0.00',
@@ -55,6 +58,8 @@ Page({
     searchLoading: false,
     searchGroups: [],
     searchTotal: 0,
+    /** 搜索态但关键词与筛选条件都为空：展示本月全部账单 */
+    searchIdle: false,
 
     // 筛选
     filterVisible: false,
@@ -70,14 +75,30 @@ Page({
 
   onLoad() {
     this.setMonth(format.currentMonthStr(), true);
-    this.loadTagSuggest();
+    // 游客态不请求接口
+    if (auth.guard()) {
+      this.loadTagSuggest();
+    }
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setSelected(1);
+    }
+    // 游客态展示空日历，点「记一笔」等写入动作时再引导登录
     if (!auth.guard()) {
       return;
     }
     this.loadMonth();
+    if (!this.data.tagSuggestions.length) {
+      this.loadTagSuggest();
+    }
+
+    // 「我的 → 搜索账单」跳转过来时直接进入搜索态
+    if (storage.get('pendingBillSearch', 0)) {
+      storage.set('pendingBillSearch', 0);
+      this.onSearchOpen();
+    }
   },
 
   onPullDownRefresh() {
@@ -93,7 +114,14 @@ Page({
       monthText: parts[0] + '年' + Number(parts[1]) + '月'
     });
     if (!initial) {
-      this.setData({ selectedDate: '', searchMode: false, keyword: '', searchGroups: [] });
+      this.setData({
+        selectedDate: '',
+        searchMode: false,
+        keyword: '',
+        searchGroups: [],
+        searchTotal: 0,
+        searchIdle: false
+      });
       this.records = [];
       this.dayMap = {};
       this.setData({ cells: [], dayBills: [], loading: true });
@@ -134,6 +162,10 @@ Page({
         });
         this.applySelection(selected);
         this.loadInsight();
+        // 搜索态且无任何搜索条件时，跟随月度数据刷新全部账单
+        if (this.data.searchMode && this.isSearchIdle()) {
+          this.showMonthBills();
+        }
         if (callback) callback();
       })
       .catch(() => {
@@ -276,13 +308,26 @@ Page({
     const out = bills.reduce((sum, r) => {
       return Number(r.billType) === BILL_TYPE.INCOME ? sum : sum + (Number(r.amount) || 0);
     }, 0);
+    const inc = bills.reduce((sum, r) => {
+      return Number(r.billType) === BILL_TYPE.INCOME ? sum + (Number(r.amount) || 0) : sum;
+    }, 0);
+    const isToday = date === format.todayStr();
+    const dayText = date ? Number(date.split('-')[1]) + '月' + Number(date.split('-')[2]) + '日' : '';
+    const week = format.weekdayText(date);
+    let daySummary = '';
+    if (out > 0) {
+      daySummary = '支出 ¥' + format.formatMoney(out);
+    } else if (inc > 0) {
+      daySummary = '收入 ¥' + format.formatMoney(inc);
+    }
 
     this.setData({
       selectedDate: date,
-      selectedLabel: date ? Number(date.split('-')[1]) + '月' + Number(date.split('-')[2]) + '日' : '',
-      selectedWeek: date === format.todayStr() ? '今天 · ' + format.weekdayText(date) : format.weekdayText(date),
+      selectedLabel: dayText,
+      selectedWeek: isToday ? '今天 · ' + week : week,
+      selectedTitle: dayText + (isToday ? ' 今天' : '') + (week ? ' · ' + week : ''),
       dayCount: bills.length,
-      dayOutText: format.formatMoney(out),
+      daySummary,
       dayBills: bills.map((r, index) => this.toRow(r, index))
     });
     this.buildCells(date);
@@ -290,6 +335,7 @@ Page({
 
   toRow(record, index) {
     const income = Number(record.billType) === BILL_TYPE.INCOME;
+    const catColor = palette.colorFor(record.categoryName);
     return {
       billId: record.billId,
       icon: categoryIcon.iconOf({ code: record.categoryCode, icon: record.categoryIcon }),
@@ -297,11 +343,13 @@ Page({
       meta: [record.categoryName, record.payChannelName].filter(Boolean).join(' · '),
       amountText: (income ? '+' : '-') + '¥' + format.formatMoney(record.amount),
       income,
+      catColor,
+      catBg: palette.rgba(catColor, 0.15),
       tint: index % 3
     };
   },
 
-  /* ---------- AI 洞察 ---------- */
+  /* ---------- 消费洞察 ---------- */
 
   loadInsight() {
     if (!this.records.length) {
@@ -358,6 +406,16 @@ Page({
     return format.toMonthStr(d);
   },
 
+  /** 统一日期格式：11月12日 · 周四 */
+  dateLabel(date) {
+    if (!date) {
+      return '';
+    }
+    const parts = date.split('-');
+    const weekday = format.weekdayText(date);
+    return Number(parts[1]) + '月' + Number(parts[2]) + '日' + (weekday ? ' · ' + weekday : '');
+  },
+
   /* ---------- 搜索 / 筛选 ---------- */
 
   onSearchOpen() {
@@ -365,16 +423,30 @@ Page({
       searchMode: true,
       keyword: '',
       searchGroups: [],
-      searchTotal: 0
+      searchTotal: 0,
+      searchIdle: true
     });
+    // 关键词与筛选都为空：直接展示本月全部账单
+    this.showMonthBills();
   },
 
   onSearchClose() {
-    this.setData({ searchMode: false, keyword: '', searchGroups: [], searchTotal: 0 });
+    this.setData({
+      searchMode: false,
+      keyword: '',
+      searchGroups: [],
+      searchTotal: 0,
+      searchIdle: false
+    });
   },
 
   onKeywordInput(e) {
-    this.setData({ keyword: e.detail.value || '' });
+    const keyword = e.detail.value || '';
+    this.setData({ keyword });
+    // 清空关键词且无其它筛选时，回到本月全部账单
+    if (this.isSearchIdle()) {
+      this.showMonthBills();
+    }
   },
 
   onKeywordConfirm() {
@@ -382,12 +454,12 @@ Page({
   },
 
   doSearch() {
-    const keyword = (this.data.keyword || '').trim();
-    if (!keyword && !this.hasFilter()) {
-      request.toast('输入关键词，或设置筛选条件');
+    // 空条件不算“无结果”，展示本月全部账单
+    if (this.isSearchIdle()) {
+      this.showMonthBills();
       return;
     }
-    this.setData({ searchLoading: true });
+    this.setData({ searchLoading: true, searchIdle: false });
     billApi.list(this.buildQuery(1, 50), { silent: true })
       .then((res) => {
         const records = (res && res.records) || [];
@@ -401,6 +473,23 @@ Page({
         this.setData({ searchLoading: false });
         request.toast('搜索失败，请稍后再试');
       });
+  },
+
+  /** 关键词与所有筛选条件是否都为空 */
+  isSearchIdle() {
+    const keyword = (this.data.keyword || '').trim();
+    return !keyword && !this.hasFilter();
+  },
+
+  /** 无搜索条件时，用已加载的月度数据铺满搜索列表 */
+  showMonthBills() {
+    const records = this.records || [];
+    this.setData({
+      searchIdle: true,
+      searchLoading: false,
+      searchGroups: this.groupByDate(records),
+      searchTotal: records.length
+    });
   },
 
   hasFilter() {
@@ -436,7 +525,7 @@ Page({
     records.forEach((r) => {
       const date = r.recordDate || '';
       if (!map[date]) {
-        map[date] = { date, label: format.shortDate(date) + ' ' + format.weekdayText(date), items: [] };
+        map[date] = { date, label: this.dateLabel(date), items: [] };
         order.push(date);
       }
       map[date].items.push(this.toRow(r, map[date].items.length));

@@ -1,30 +1,44 @@
 /**
  * 「我的」抽屉内容：首页左缘右滑与「我的」tab 共用。
- * 数据：昵称、累计记账笔数、使用天数；设置与导出分别走设置页、utils/bill-export。
+ * 菜单名称与目标页面标题保持一一对应。
  */
 const billApi = require('../../api/bill');
+const auth = require('../../utils/auth');
 const billExport = require('../../utils/bill-export');
 const storage = require('../../utils/storage');
 const avatar = require('../../utils/avatar');
 const format = require('../../utils/format');
+const usage = require('../../utils/usage');
 
-const FIRST_USE_KEY = 'firstUseDate';
-
-const MENUS = [
-  { key: 'asset', icon: 'wallet', label: '我的账本', tip: '日常账本', url: '/pages/asset/asset' },
-  { key: 'report', icon: 'spark', label: 'AI 月报', badge: 'NEW', url: '/pages/stat/stat/stat', tab: true, ai: true },
-  { key: 'category', icon: 'tag', label: '分类管理', url: '/pages/category/category' },
-  { key: 'search', icon: 'search', label: '搜索账单', url: '/pages/bill/list/list', tab: true },
-  { key: 'subscription', icon: 'repeat', label: '分期 · 周期', url: '/pages/subscription/subscription/subscription' },
-  { key: 'savings', icon: 'target', label: '存钱计划', url: '/pages/savings/savings/savings' },
-  { key: 'template', icon: 'receipt', label: '模板 · 预算', url: '/pages/template/list/list' },
-  { key: 'settings', icon: 'gear', label: '设置', url: '/pages/settings/settings' }
-];
-
-const MORE = [
-  { key: 'import', icon: 'in', label: '账单导入', url: '/pages/import/import/import' },
-  { key: 'alias', icon: 'book', label: '别名词典', url: '/pages/alias/alias/alias' },
-  { key: 'export', icon: 'out', label: '数据导出', action: 'export' }
+const GROUPS = [
+  {
+    key: 'ledger',
+    title: '账本与数据',
+    items: [
+      { key: 'asset', icon: 'wallet', label: '我的账户', url: '/pages/asset/asset' },
+      { key: 'category', icon: 'tag', label: '分类管理', url: '/pages/category/category' },
+      { key: 'search', icon: 'search', label: '搜索账单', url: '/pages/bill/list/list', tab: true, action: 'search' },
+      { key: 'import', icon: 'in', label: '导入账单', url: '/pages/import/import/import' },
+      { key: 'export', icon: 'out', label: '导出账单', action: 'export' }
+    ]
+  },
+  {
+    key: 'plan',
+    title: '计划与工具',
+    items: [
+      { key: 'subscription', icon: 'repeat', label: '订阅管理', url: '/pages/subscription/subscription/subscription' },
+      { key: 'savings', icon: 'target', label: '心愿储蓄', url: '/pages/savings/savings/savings' },
+      { key: 'template', icon: 'receipt', label: '模板管理', url: '/pages/template/list/list' },
+      { key: 'alias', icon: 'book', label: '别名词典', url: '/pages/alias/alias/alias' }
+    ]
+  },
+  {
+    key: 'setting',
+    title: '设置',
+    items: [
+      { key: 'settings', icon: 'gear', label: '设置', url: '/pages/settings/settings' }
+    ]
+  }
 ];
 
 Component({
@@ -37,21 +51,31 @@ Component({
   },
 
   data: {
+    /** 游客态：不展示微信头像授权按钮，点头像引导登录 */
+    guest: false,
     nickname: '',
     avatarText: '记',
     avatarPath: '',
     billCount: 0,
     usedDays: 1,
-    menus: MENUS,
-    more: MORE,
-    version: '2.6.0'
+    monthNum: new Date().getMonth() + 1,
+    groups: GROUPS,
+    version: '1.0.3'
   },
 
   lifetimes: {
     attached() {
-      this.setData({ nickname: this.readNickname(), avatarPath: avatar.read() });
-      this.markFirstUse();
-      this.loadCount();
+      const guest = !auth.isLoggedIn();
+      // 游客态不读取本机昵称/头像，避免退出后仍显示个人信息
+      this.setData({
+        nickname: guest ? '' : this.readNickname(),
+        avatarPath: guest ? '' : avatar.read()
+      });
+      this.setData({ usedDays: usage.usedDays(), guest });
+      // 游客态不发请求，避免浏览时产生任何登录行为
+      if (!guest) {
+        this.loadCount();
+      }
     }
   },
 
@@ -60,9 +84,14 @@ Component({
       this.triggerEvent('profile');
     },
 
-    /** 昵称/头像变更后由宿主页面调用 */
+    /** 昵称/头像/登录态变更后由宿主页面调用 */
     refreshProfile() {
-      this.setData({ nickname: this.readNickname(), avatarPath: avatar.read() });
+      const guest = !auth.isLoggedIn();
+      this.setData({
+        nickname: guest ? '' : this.readNickname(),
+        avatarPath: guest ? '' : avatar.read(),
+        guest
+      });
     },
 
     readNickname() {
@@ -92,22 +121,15 @@ Component({
 
     noop() {},
 
-    markFirstUse() {
-      const today = format.todayStr();
-      let first = storage.get(FIRST_USE_KEY, '');
-      if (!first) {
-        storage.set(FIRST_USE_KEY, today);
-        first = today;
-      }
-      const start = new Date(first.replace(/-/g, '/'));
-      const days = Math.max(1, Math.round((Date.now() - start.getTime()) / 86400000) + 1);
-      this.setData({ usedDays: isFinite(days) ? days : 1 });
-    },
-
     loadCount() {
       billApi.list({ page: 1, size: 1 }, { silent: true })
         .then((page) => this.setData({ billCount: (page && page.total) || 0 }))
         .catch(() => {});
+    },
+
+    onReportTap() {
+      this.triggerEvent('navigate');
+      wx.switchTab({ url: '/pages/stat/stat/stat' });
     },
 
     onMenuTap(e) {
@@ -120,6 +142,9 @@ Component({
         return;
       }
       this.triggerEvent('navigate');
+      if (action === 'search') {
+        storage.set('pendingBillSearch', 1);
+      }
       if (tab) {
         wx.switchTab({ url });
       } else {

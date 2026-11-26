@@ -251,7 +251,7 @@ Page({
       title: '删除预算',
       content: '确定删除「' + name + '」的预算吗？',
       confirmText: '删除',
-      confirmColor: '#E8454F',
+      confirmColor: '#FF6B6B',
       success: (res) => {
         if (!res.confirm) {
           return;

@@ -139,7 +139,7 @@ Page({
       title: '撤销导入',
       content: '撤销后将删除本次导入的全部账单，确定撤销？',
       confirmText: '撤销',
-      confirmColor: '#E8454F',
+      confirmColor: '#FF6B6B',
       success: (res) => {
         if (!res.confirm) {
           return;
